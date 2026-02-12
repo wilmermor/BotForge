@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 
+
+//Este es un componente que muestra un carrusel de problemas
 const MarketProblem: React.FC = () => {
     const scrollerRef = useRef<HTMLDivElement>(null);
     const [start, setStart] = useState(false);
