@@ -23,8 +23,16 @@ const Navbar: React.FC = () => {
             }`}>
             <div className="flex items-center justify-between h-full max-w-7xl mx-auto px-6 md:px-12">
                 {/* Logo */}
-                <div className="font-extrabold tracking-widest text-xl font-[Inter] transition-colors duration-500 text-accent">
-                    BOTFORGE
+                <div className="flex items-center gap-3">
+                    <img
+                        src="/ISOTIPO4.svg"
+                        alt="BotForge Logo"
+                        className="h-14 w-auto"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                    />
+                    <div className="font-extrabold tracking-widest text-xl font-[Inter] transition-colors duration-500 text-white">
+                        BOTFORGE
+                    </div>
                 </div>
 
                 {/* Right Group: Navigation */}
