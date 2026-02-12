@@ -20,7 +20,7 @@ const MarketProblem: React.FC = () => {
     ];
 
     return (
-        <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
+        <section id="problemas" className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-16">
                 Problemas a solucionar
             </h2>
