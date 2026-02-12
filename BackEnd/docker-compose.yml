@@ -1,0 +1,57 @@
+# === BotForge Backend – Docker Compose ===
+
+services:
+  # --- FastAPI Application ---
+  api:
+    build: .
+    container_name: botforge-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.example
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # --- PostgreSQL Database ---
+  db:
+    image: postgres:16-alpine
+    container_name: botforge-db
+    environment:
+      POSTGRES_USER: botforge
+      POSTGRES_PASSWORD: botforge_secret
+      POSTGRES_DB: botforge_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U botforge -d botforge_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # --- Redis Cache ---
+  redis:
+    image: redis:7-alpine
+    container_name: botforge-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
