@@ -34,7 +34,75 @@ Esta es la parte central desarrollada hasta ahora:
 
 ---
 
-## 2. Plan para Seguir Avanzando
+## 2. Diagrama de Entidad Relación (DER)
+
+Este diagrama representa la estructura de la base de datos y cómo se relacionan las tablas entre sí:
+
+```mermaid
+erDiagram
+    USERS ||--o{ API_CREDENTIALS : "has"
+    USERS ||--o{ STRATEGIES : "creates"
+    USERS ||--o{ SIMULATION_LOGS : "runs"
+    USERS ||--o{ SUBSCRIPTIONS : "owns"
+    STRATEGIES ||--o{ SIMULATION_LOGS : "used_in"
+
+    USERS {
+        uuid id PK
+        string email UK
+        string password_hash
+        string full_name
+        string plan
+        boolean is_active
+        datetime created_at
+    }
+
+    API_CREDENTIALS {
+        uuid id PK
+        uuid user_id FK
+        string exchange
+        text api_key_encrypted
+        text api_secret_encrypted
+        boolean is_active
+        datetime created_at
+    }
+
+    STRATEGIES {
+        uuid id PK
+        uuid user_id FK
+        string name
+        string type
+        jsonb params
+        boolean is_active
+        datetime created_at
+    }
+
+    SIMULATION_LOGS {
+        uuid id PK
+        uuid user_id FK
+        uuid strategy_id FK
+        string pair
+        string timeframe
+        datetime date_start
+        datetime date_end
+        jsonb metrics
+        jsonb equity_curve
+        jsonb trades
+    }
+
+    SUBSCRIPTIONS {
+        uuid id PK
+        uuid user_id FK
+        string plan
+        string status
+        string stripe_customer_id
+        datetime start_date
+        datetime end_date
+    }
+```
+
+---
+
+## 3. Plan para Seguir Avanzando
 
 El desarrollo sigue un enfoque iterativo. A continuación, el plan sugerido:
 

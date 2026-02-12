@@ -6,7 +6,7 @@ SaaS Backtesting Platform for Crypto Traders — API Backend.
 
 | Layer | Technology |
 |-------|-----------|
-| Language | Python 3.11+ |
+| Language | Python 3.12 |
 | Framework | FastAPI (async, Pydantic v2) |
 | Database | PostgreSQL 15 + SQLAlchemy 2.0 (async) |
 | Cache | Redis 7 |
