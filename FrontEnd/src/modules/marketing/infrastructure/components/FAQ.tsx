@@ -27,28 +27,55 @@ const FAQ: React.FC = () => {
     };
 
     return (
-        <section id="faq" className="py-24 border-t border-white/10 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-2">
-                Preguntas Frecuentes
-            </h2>
-            <p className="text-center text-accent font-bold mb-16 tracking-widest">FAQ</p>
+        <section id="faq" className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
+            <div className="max-w-3xl mx-auto mb-16">
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                    Preguntas Frecuentes
+                </h2>
+                <p className="text-white/60 text-lg">
+                    Todo lo que necesitas saber sobre BotForge.
+                </p>
+            </div>
 
-            <div className="max-w-3xl mx-auto space-y-4">
+            <div className="max-w-3xl mx-auto divide-y divide-white/10">
                 {faqs.map((faq, index) => (
-                    <div key={index} className="border border-white/10 rounded-lg overflow-hidden">
-                        <div
-                            className="p-5 font-semibold cursor-pointer flex justify-between items-center text-white hover:bg-white/5 transition"
+                    <div key={index} className="py-6 first:pt-0 last:pb-0">
+                        <button
+                            className="w-full flex items-center text-left focus:outline-none group"
                             onClick={() => toggleAccordion(index)}
                         >
-                            <span>{faq.question}</span>
-                            <span className={`text-accent transition-transform duration-300 ${activeIndex === index ? 'rotate-180' : ''}`}>
-                                ▼
+                            <span
+                                className="flex-shrink-0 mr-4 transition-transform duration-300 ease-in-out"
+                                style={{
+                                    color: '#F0B90B',
+                                    transform: activeIndex === index ? 'rotate(45deg)' : 'rotate(0deg)'
+                                }}
+                            >
+                                <svg
+                                    width="28"
+                                    height="28"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M12 5V19M5 12H19"
+                                        stroke="currentColor"
+                                        strokeWidth="2.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
+                                </svg>
                             </span>
-                        </div>
+                            <span className="text-xl font-medium text-white group-hover:text-white/80 transition-colors">
+                                {faq.question}
+                            </span>
+                        </button>
                         <div
-                            className={`transition-all duration-300 ease-in-out overflow-hidden ${activeIndex === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+                            className={`transition-all duration-300 ease-in-out overflow-hidden ${activeIndex === index ? 'max-h-96 opacity-100 mt-4 ml-11' : 'max-h-0 opacity-0'
+                                }`}
                         >
-                            <div className="p-5 text-white/70 border-t border-white/10 bg-white/5">
+                            <div className="text-white/70 text-lg leading-relaxed">
                                 {faq.answer}
                             </div>
                         </div>
