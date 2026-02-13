@@ -2,7 +2,7 @@ import React from 'react';
 
 const AboutUs: React.FC = () => {
     return (
-        <section className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
+        <section id="acerca-de" className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
             <div className="grid md:grid-cols-2 gap-16 items-center">
                 {/* Image Side */}
                 <div className="order-2 md:order-1 relative">
