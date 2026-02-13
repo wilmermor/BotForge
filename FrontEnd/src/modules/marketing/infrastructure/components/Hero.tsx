@@ -1,115 +1,89 @@
-import React, { useEffect, useRef } from 'react';
-import { Banknote } from 'lucide-react';
+import React from 'react';
 
-const Hero: React.FC = () => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+interface HeroProps {
+    title?: string;
+    subtitle?: string;
+}
 
-    useEffect(() => {
-        if (!canvasRef.current) return;
-
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
-        if (!context) return;
-
-        const img = new Image();
-        img.src = '/Frames/botforge.svg';
-
-        img.onload = () => {
-            const container = canvas.parentElement;
-            if (!container) return;
-
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-
-            canvas.width = width;
-            canvas.height = height;
-
-            context.clearRect(0, 0, width, height);
-
-            // 🟢 MODO COVER - Zoom para llenar TODO el espacio SIN deformar
-            const imgRatio = img.naturalWidth / img.naturalHeight;
-            const containerRatio = width / height;
-
-            let renderWidth, renderHeight, x, y;
-
-            if (imgRatio > containerRatio) {
-                // Imagen más ancha que el contenedor - ajustar por ALTO
-                renderHeight = height;
-                renderWidth = height * imgRatio;
-                x = (width - renderWidth) / 2;
-                y = 0;
-            } else {
-                // Imagen más alta que el contenedor - ajustar por ANCHO
-                renderWidth = width;
-                renderHeight = width / imgRatio;
-                x = 0;
-                y = (height - renderHeight) / 2;
-            }
-
-            context.drawImage(img, x, y, renderWidth, renderHeight);
-        };
-    }, []);
-
+const Hero: React.FC<HeroProps> = ({
+    title = "Diseña y comprueba tus Bots de trading",
+}) => {
     return (
-        <section id="inicio" className="relative w-full h-screen bg-black">
-            <div className="absolute inset-0 w-full h-full overflow-hidden">
-                <canvas
-                    ref={canvasRef}
-                    className="absolute inset-0 w-full h-full"
-                    style={{ display: 'block' }}
-                />
+        // Contenedor global - ocupa toda la pantalla
+        <section className="relative w-full min-h-screen bg-gray-50">
 
-                <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
+            {/* Contenedor interno principal - centrado y con padding */}
+            <div
+                className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 mx-auto bg-no-repeat bg-center"
+                style={{
+                    maxWidth: '1400px',
+                    backgroundImage: "url('/Frames/botforge.svg')",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
+            >
 
-                <div className="absolute inset-0 z-20 pointer-events-none">
-                    <div className="h-full max-w-7xl mx-auto px-6 md:px-12 flex flex-col">
-                        {/* 🍞 MIGAS DE PAN - Título ajustable */}
-                        <div className="mt-16 md:mt-20 lg:mt-24 mb-auto lg:mr-30 lg:mt-20">
-                            <h1 className="text-5xl md:text-6xl lg:text-5xl font-bold text-white drop-shadow-lg leading-tight text-right">
-                                Diseña y Comprueba tus Bots de<br />Trading
+
+                {/* Estructura de tabla de 2 filas */}
+                <div className="flex flex-col min-h-screen py-12">
+
+                    {/* Fila 1 - Título en BLANCO */}
+                    <div className="flex-1 flex items-center justify-center">
+                        <div className="text-center">
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-7 drop-shadow-lg">
+                                {title}
                             </h1>
                         </div>
+                    </div>
 
-                        {/* 📊 TABLA DE 3 COLUMNAS INVISIBLE */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 xl:gap-16 mb-16 md:mb-20 lg:mb-28">
+                    {/* Fila 2 - Tres columnas con MISMO ANCHO */}
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 lg:gap-25 items-stretch mb-15">
 
-                            {/* COLUMNA 1 - Propuesta principal */}
-                            <div className="col-span-1">
-                                <p className="text-xl md:text-2xl text-white/70 font-bold mb-4 drop-shadow-md">
-                                    Valide sus estrategias sin arriesgar capital.
-                                </p>
-                                <p className="text-white/80 text-base md:text-lg leading-relaxed drop-shadow-md font-light">
-                                    Convierta la especulación en ciencia aplicada, eliminando la incertidumbre antes de operar en el mercado real.
-                                </p>
-                                {/* 🪙 ICONO DE BILLETE BLANCO */}
-                                <div className="mt-6 flex items-center gap-2 text-white/60">
-                                    <Banknote className="w-20 h-20 text-white" />
+                        {/* Columna 1 - Con ancho controlado */}
+                        <div className="col-span-1 flex items-center h-full">
+                            <div className="bg-transparent rounded-lg p-6 
+                                              flex flex-col items-center justify-center 
+                                              h-full w-full max-w-md mx-auto text-left">
+                                <div className="space-y-4">
+                                    <h3 className="text-xl text-white font-bold drop-shadow-md">
+                                        Valida sus estrategias sin arriesgar el capital
+                                    </h3>
+                                    <p className="text-white/90 font-medium leading-relaxed drop-shadow-md">
+                                        Convierte la especulación en ciencia aplicada, eliminando la incertidumbre antes de operar en el mercado real
+                                    </p>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* COLUMNA 2 - ESPACIO VACÍO (solo separación) */}
-                            <div className="col-span-1 hidden lg:block"></div>
+                        {/* Columna 2 - Vacía (mismo ancho) */}
+                        <div className="col-span-1"></div>
 
-                            {/* COLUMNA 3 - Valor adicional + Botón - CON ESPACIADO PROFESIONAL */}
-                            <div className="col-span-1 flex flex-col h-full">
-                                <div className="flex-10"></div> {/* 🟢 EMPUJA TODO HACIA ABAJO */}
-                                <div>
-                                    <p className="text-white/70 text-base md:text-lg mb-6 drop-shadow-md font-light border-l-4 border-yellow-400 pl-4">
-                                        Mitiga la barrera más significativa para la adopción del trading algorítmico.
+                        {/* Columna 3 - MISMO ANCHO que columna 1 */}
+                        <div className="col-span-1 flex items-center h-full">
+                            <div className="bg-transparent rounded-lg p-6 
+                                              flex flex-col items-center justify-center 
+                                              h-full w-full max-w-md mx-auto text-center">
+                                <div className="space-y-5">
+                                    <p className="text-white font-semibold text-lg leading-relaxed drop-shadow-md">
+                                        Mitiga la barrera más significativa
+                                        para la adopción del trading algorítmico
                                     </p>
-                                    <div className="pointer-events-auto">
-                                        <a
-                                            href="/iniciar-sesion"
-                                            className="inline-flex items-center gap-3 bg-white/30 backdrop-blur-sm text-black font-light-bold hover:-translate-y-1 hover:scale-105 transition-all duration-300 ease-out px-6 py-3 rounded-2xl text-lg group"
-                                        >
+                                    <div className="flex justify-center">
+                                        <button className="group inline-flex items-center gap-3 
+                                                             bg-white/10 backdrop-blur-sm
+                                                             text-white font-semibold
+                                                             px-6 py-3 rounded-full
+                                                             hover:bg-white/20 
+                                                             hover:-translate-y-1
+                                                             transition-all duration-300 ease-in-out
+                                                             shadow-lg hover:shadow-xl">
                                             Empieza ya
-                                            <span className="bg-accent backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center text-white">
+                                            <span className="transform group-hover:translate-x-1 transition-transform duration-300">
                                                 →
                                             </span>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="flex-1"></div> {/* 🟢 ESPACIO EQUILIBRADO */}
                             </div>
                         </div>
                     </div>
