@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-
+import { TriangleAlert } from 'lucide-react';
 
 //Este es un componente que muestra un carrusel de problemas
 const MarketProblem: React.FC = () => {
@@ -10,17 +10,17 @@ const MarketProblem: React.FC = () => {
         {
             title: "Volatilidad extrema",
             description: "El mercado de criptomonedas es altamente volátil.",
-            icon: "📊"
+            icon: "/Img-MarketoProblem/Icon-2.svg"
         },
         {
             title: "Dependencia del backtesting",
             description: "El backtesting histórico no garantiza resultados futuros.",
-            icon: "📉"
+            icon: "/Img-MarketoProblem/Icon-1.svg"
         },
         {
             title: "Alto riesgo de fracaso",
             description: "La gran mayoría de los traders pierden dinero sin validación.",
-            icon: "⚠️"
+            icon: TriangleAlert
         }
     ];
 
@@ -58,19 +58,35 @@ const MarketProblem: React.FC = () => {
                         "--animation-direction": "reverse"
                     } as React.CSSProperties}
                 >
-                    {problems.map((problem, index) => (
-                        <div
-                            key={index}
-                            className="bg-accent p-10 rounded-3xl text-white text-center hover:scale-105 transition duration-300 flex flex-col items-center justify-center aspect-square w-[350px] md:w-[400px] shrink-0"
-                        >
-                            <div className="bg-white/20 p-4 rounded-full mb-6">
-                                <span className="text-5xl">{problem.icon}</span>
+                    {problems.map((problem, index) => {
+                        const Icon = problem.icon;
+                        return (
+                            <div
+                                key={index}
+                                className="bg-accent p-10 rounded-3xl text-white text-center hover:scale-105 transition duration-300 flex flex-col items-center justify-center aspect-square w-[350px] md:w-[400px] shrink-0"
+                            >
+                                <div className="mb-8">
+                                    {typeof Icon === 'string' ? (
+                                        <img
+                                            src={Icon}
+                                            alt={problem.title}
+                                            className="w-48 h-48 object-contain brightness-0 invert"
+                                        />
+                                    ) : (
+                                        <Icon
+                                            size={128}
+                                            className="text-white"
+                                            strokeWidth={2}
+                                            style={{ color: 'white' }}
+                                        />
+                                    )}
+                                </div>
+                                <p className="font-montserrat font-bold text-xl md:text-2xl leading-tight">
+                                    {problem.description}
+                                </p>
                             </div>
-                            <p className="font-montserrat font-bold text-xl md:text-2xl leading-tight">
-                                {problem.description}
-                            </p>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </section>
