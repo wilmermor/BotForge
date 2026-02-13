@@ -51,7 +51,7 @@ const Hero: React.FC = () => {
     }, []);
 
     return (
-        <section className="relative w-full h-screen bg-black">
+        <section id="inicio" className="relative w-full h-screen bg-black">
             <div className="absolute inset-0 w-full h-full overflow-hidden">
                 <canvas
                     ref={canvasRef}
