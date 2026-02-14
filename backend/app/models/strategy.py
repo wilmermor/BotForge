@@ -15,10 +15,10 @@ from app.models.base import Base, UUIDMixin
 class Strategy(Base, UUIDMixin):
     """User-defined trading strategy configuration."""
 
-    __tablename__ = "strategies"
+    __tablename__ = "strategy"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"),
         nullable=False, index=True,
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)

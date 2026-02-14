@@ -15,18 +15,23 @@ from app.models.base import Base, UUIDMixin
 class SimulationLog(Base, UUIDMixin):
     """Record of a backtesting simulation run."""
 
-    __tablename__ = "simulation_logs"
+    __tablename__ = "simulation_log"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"),
         nullable=False, index=True,
     )
     strategy_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("strategies.id", ondelete="SET NULL"),
+        ForeignKey("strategy.id", ondelete="SET NULL"),
         nullable=True,
     )
-    pair: Mapped[str] = mapped_column(String(20), nullable=False)
+    currency_pair_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("currency_pair.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    pair: Mapped[str | None] = mapped_column(String(20), nullable=True)
     timeframe: Mapped[str] = mapped_column(String(10), nullable=False)
     date_start: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
@@ -51,3 +56,4 @@ class SimulationLog(Base, UUIDMixin):
     # Relationships
     user = relationship("User", back_populates="simulation_logs")
     strategy = relationship("Strategy", back_populates="simulation_logs")
+    currency_pair = relationship("CurrencyPair", back_populates="simulation_logs")
