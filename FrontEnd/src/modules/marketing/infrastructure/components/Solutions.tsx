@@ -5,17 +5,17 @@ const Solutions: React.FC = () => {
         {
             title: "Fácil y Visual",
             description: "No requiere código. Enlace una visualización de operaciones simple.",
-            image: "/Img-solutions/image1.png"
+            image: "/Img-solutions/1.svg"
         },
         {
             title: "Mitigación de Riesgos",
             description: "Enseñanza de bot trading seg. y 100% libre de capital real.",
-            image: "/Img-solutions/image2.png"
+            image: "/Img-solutions/2.svg"
         },
         {
             title: "Validación Superior",
             description: "Dedícate a la validación visual y backtesting de alta fidelidad.",
-            image: "/Img-solutions/image.png"
+            image: "/Img-solutions/3.svg"
         }
     ];
 

@@ -79,15 +79,27 @@ async def client():
         yield ac
 
 
+from app.models.plan import Plan
+
+
 @pytest_asyncio.fixture
 async def test_user(db_session: AsyncSession) -> User:
     """Create and return a test user."""
+    # Create a default plan first
+    plan = Plan(
+        id=uuid.uuid4(),
+        name="free",
+        description="Free Plan",
+    )
+    db_session.add(plan)
+    await db_session.flush()
+
     user = User(
         id=uuid.uuid4(),
         email="test@botforge.com",
         password_hash=hash_password("testpassword123"),
         full_name="Test User",
-        plan="free",
+        plan_id=plan.id,
     )
     db_session.add(user)
     await db_session.commit()

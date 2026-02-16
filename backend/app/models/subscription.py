@@ -15,14 +15,14 @@ from app.models.base import Base, UUIDMixin
 class Subscription(Base, UUIDMixin):
     """User subscription record (Free/Pro plans)."""
 
-    __tablename__ = "subscriptions"
+    __tablename__ = "subscription"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
+        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"),
         nullable=False, index=True,
     )
-    plan: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="free"
+    plan_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("plan.id"), nullable=False
     )
     status: Mapped[str] = mapped_column(
         String(20), nullable=False, default="active"
@@ -42,3 +42,4 @@ class Subscription(Base, UUIDMixin):
 
     # Relationships
     user = relationship("User", back_populates="subscriptions")
+    plan_rel = relationship("Plan", back_populates="subscriptions")

@@ -5,7 +5,10 @@ BotForge - User Pydantic Schemas.
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
+
+
+from app.schemas.plan import Plan
 
 
 class UserResponse(BaseModel):
@@ -13,11 +16,12 @@ class UserResponse(BaseModel):
     id: uuid.UUID
     email: EmailStr
     full_name: str | None
-    plan: str
+    plan_id: uuid.UUID
+    plan_rel: Plan | None = None
     is_active: bool
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserUpdate(BaseModel):

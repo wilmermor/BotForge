@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # --- Request ---
@@ -62,10 +62,15 @@ class SimulationMetrics(BaseModel):
     total_pnl: float
 
 
+from app.schemas.currency_pair import CurrencyPair
+
+
 class SimulationResponse(BaseModel):
     """Full simulation result response."""
     id: uuid.UUID
-    pair: str
+    currency_pair_id: uuid.UUID | None = None
+    currency_pair: CurrencyPair | None = None
+    pair: str | None = None
     timeframe: str
     date_start: datetime
     date_end: datetime
@@ -75,13 +80,15 @@ class SimulationResponse(BaseModel):
     execution_time_ms: int | None = None
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SimulationSummary(BaseModel):
     """Lightweight summary for simulation history listing."""
     id: uuid.UUID
-    pair: str
+    currency_pair_id: uuid.UUID | None = None
+    currency_pair: CurrencyPair | None = None
+    pair: str | None = None
     timeframe: str
     date_start: datetime
     date_end: datetime
@@ -89,4 +96,4 @@ class SimulationSummary(BaseModel):
     execution_time_ms: int | None
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
