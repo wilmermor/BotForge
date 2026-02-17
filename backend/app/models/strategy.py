@@ -6,7 +6,8 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, ForeignKey, String, Boolean, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.types import JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, UUIDMixin
@@ -25,7 +26,7 @@ class Strategy(Base, UUIDMixin):
     type: Mapped[str] = mapped_column(
         String(20), nullable=False
     )  # 'grid' or 'dca'
-    params: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    params: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     is_active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True
     )

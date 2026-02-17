@@ -4,8 +4,7 @@ BotForge - Plan Model.
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Numeric, String
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Numeric, String, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -25,7 +24,7 @@ class Plan(Base, UUIDMixin, TimestampMixin):
     price_monthly: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False, default=0.00)
     max_strategies: Mapped[int] = mapped_column(nullable=False, default=1)
     max_simulations_per_day: Mapped[int] = mapped_column(nullable=False, default=5)
-    features: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    features: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
     # Relationships
     users = relationship("User", back_populates="plan_rel")
