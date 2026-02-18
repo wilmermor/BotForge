@@ -13,11 +13,19 @@ const LoginPage = () => {
     return (
         <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-[#0B0E11] text-white">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <div className="flex justify-center">
+                <div className="flex flex-col items-center justify-center gap-2">
                     {/* Placeholder for Logo */}
-                    <div className="h-10 w-10 bg-[#F0B90B] rounded-full flex items-center justify-center text-black font-bold">BF</div>
+                    <img
+                        src="/ISOTIPO4.svg"
+                        alt="BotForge Logo"
+                        className="h-14 w-auto"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                    />
+                    <div className="font-extrabold tracking-widest text-xl font-[Inter] transition-colors duration-500 text-white">
+                        BOTFORGE
+                    </div>
                 </div>
-                <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-white">
+                <h2 className="mt-3 text-center text-2xl font-bold tracking-tight text-white">
                     Sign in to your account
                 </h2>
                 <p className="mt-2 text-center text-sm text-[#848E9C]">

@@ -54,7 +54,7 @@ const Navbar: React.FC<{ variant?: 'marketing' | 'checkout' }> = ({ variant = 'm
                         {variant === 'marketing' ? (
                             /* Navigation (Desktop) */
                             <div className="hidden md:flex gap-10 text-sm font-medium font-['Montserrat'] items-center">
-                                <a href="/#inicio" className="transition-colors duration-300 text-white/70 hover:text-[#F0B90B]">Inicio</a>
+                                <a href="/#" className="transition-colors duration-300 text-white/70 hover:text-[#F0B90B]">Inicio</a>
                                 <a href="/#soluciones" className="transition-colors duration-300 text-white/70 hover:text-[#F0B90B]">Soluciones</a>
                                 <a href="/#acerca-de" className="transition-colors duration-300 text-white/70 hover:text-[#F0B90B]">Acerca de</a>
                                 <a href="/#problemas" className="transition-colors duration-300 text-white/70 hover:text-[#F0B90B]">Problemas</a>
