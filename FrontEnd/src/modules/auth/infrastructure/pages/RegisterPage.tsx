@@ -14,10 +14,19 @@ const RegisterPage = () => {
     return (
         <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-[#0B0E11] text-white">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <div className="h-10 w-10 bg-[#F0B90B] rounded-full flex items-center justify-center text-black font-bold">BF</div>
+                <div className="flex flex-col items-center justify-center gap-2">
+                    {/* Placeholder for Logo */}
+                    <img
+                        src="/ISOTIPO4.svg"
+                        alt="BotForge Logo"
+                        className="h-14 w-auto"
+                        style={{ filter: 'brightness(0) invert(1)' }}
+                    />
+                    <div className="font-extrabold tracking-widest text-xl font-[Inter] transition-colors duration-500 text-white">
+                        BOTFORGE
+                    </div>
                 </div>
-                <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-white">
+                <h2 className="mt-1 text-center text-2xl font-bold tracking-tight text-white">
                     Create your account
                 </h2>
                 <div className="mt-2 flex justify-center space-x-2">
