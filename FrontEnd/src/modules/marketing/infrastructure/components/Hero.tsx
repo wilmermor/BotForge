@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface HeroProps {
     title?: string;
@@ -69,19 +70,22 @@ const Hero: React.FC<HeroProps> = ({
                                         para la adopción del trading algorítmico
                                     </p>
                                     <div className="flex justify-center">
-                                        <button className="group inline-flex items-center gap-3 
+                                        <Link
+                                            to="/login"
+                                            className="group inline-flex items-center gap-3 
                                                              bg-white/10 backdrop-blur-sm
                                                              text-white font-semibold
                                                              px-6 py-3 rounded-full
                                                              hover:bg-white/20 
                                                              hover:-translate-y-1
                                                              transition-all duration-300 ease-in-out
-                                                             shadow-lg hover:shadow-xl">
+                                                             shadow-lg hover:shadow-xl"
+                                        >
                                             Empieza ya
                                             <span className="transform group-hover:translate-x-1 transition-transform duration-300">
                                                 →
                                             </span>
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
