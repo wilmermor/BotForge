@@ -1,6 +1,7 @@
 
 import { Outlet, useLocation } from 'react-router-dom';
-import { CheckCircle, ShieldCheck } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import Navbar from '../../../marketing/infrastructure/components/Navbar';
 
 const CheckoutLayout = () => {
     const location = useLocation();
@@ -25,25 +26,10 @@ const CheckoutLayout = () => {
 
     return (
         <div className="min-h-screen bg-[#0B0E11] text-white font-sans antialiased">
-            {/* Navbar (Simplified for Checkout) */}
-            <header className="bg-[#0B0E11] border-b border-[#1E2329]">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 items-center justify-between">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <div className="h-8 w-8 bg-[#F0B90B] rounded-full flex items-center justify-center text-black font-bold">BF</div>
-                            </div>
-                            <span className="ml-3 text-xl font-bold text-white">BotForge</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-[#848E9C]">
-                            <ShieldCheck className="h-4 w-4 text-[#02C076]" />
-                            <span>Secure Checkout</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            {/* Reused Navbar with checkout variant */}
+            <Navbar variant="checkout" />
 
-            <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <main className="mx-auto max-w-7xl px-4 pt-24 pb-8 sm:px-6 lg:px-8">
                 {/* Progress Bar */}
                 <div className="mb-8">
                     <div className="flex items-center space-x-4 text-sm">
