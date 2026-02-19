@@ -28,13 +28,14 @@ const FAQ: React.FC = () => {
 
     return (
         <section id="faq" className="py-20 pb-30 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
-            <div className="max-w-3xl mx-auto mb-16">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                    Preguntas Frecuentes
+            <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 uppercase tracking-tighter">
+                    Preguntas <span className="text-accent">Frecuentes</span>
                 </h2>
-                <p className="text-white/60 text-lg">
+                <p className="text-white/60 text-lg mb-2 max-w-2xl mx-auto">
                     Todo lo que necesitas saber sobre BotForge.
                 </p>
+                <div className="h-1 w-20 bg-accent mx-auto"></div>
             </div>
 
             <div className="max-w-3xl mx-auto divide-y divide-white/10">

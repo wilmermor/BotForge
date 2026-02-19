@@ -39,7 +39,7 @@ const AboutUs: React.FC = () => {
     return (
         <section id="acerca-de" className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
             {/* Título de la sección */}
-            <div className="text-center mb-20">
+            <div className="text-center mb-12">
                 <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-tighter">
                     Sobre <span className="text-accent">Nosotros</span>
                 </h2>

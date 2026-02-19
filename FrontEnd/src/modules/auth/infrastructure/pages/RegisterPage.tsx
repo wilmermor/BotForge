@@ -91,7 +91,7 @@ const RegisterPage = () => {
                                     required
                                     className="block w-full appearance-none bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 >
-                                    <option value="" disabled selected className="bg-[#1E2329] text-[#5E6873]">Selecciona un país</option>
+                                    <option value="" disabled className="bg-[#1E2329] text-[#5E6873]">Selecciona un país</option>
                                     <option className="bg-[#1E2329] text-[#EAECEF]">México</option>
                                     <option className="bg-[#1E2329] text-[#EAECEF]">Argentina</option>
                                     <option className="bg-[#1E2329] text-[#EAECEF]">Colombia</option>

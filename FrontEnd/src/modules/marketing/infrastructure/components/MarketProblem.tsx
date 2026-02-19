@@ -45,7 +45,7 @@ const MarketProblem: React.FC = () => {
 
     return (
         <section id="problemas" className="py-10 bg-primary overflow-hidden">
-            <div className="text-center mb-16">
+            <div className="text-center mb-6">
                 <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-tighter">
                     Problemas a <span className="text-accent">solucionar</span>
                 </h2>
