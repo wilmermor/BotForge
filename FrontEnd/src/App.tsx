@@ -11,6 +11,8 @@ import MobilePaymentPage from './modules/subscription/infrastructure/pages/Mobil
 import BankTransferPage from './modules/subscription/infrastructure/pages/BankTransferPage';
 import BinancePayPage from './modules/subscription/infrastructure/pages/BinancePayPage';
 import SuccessPage from './modules/subscription/infrastructure/pages/SuccessPage';
+import PendingPage from './modules/subscription/infrastructure/pages/PendingPage';
+import FailedPage from './modules/subscription/infrastructure/pages/FailedPage';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
         <Route path="payment/transfer" element={<BankTransferPage />} />
         <Route path="payment/crypto" element={<BinancePayPage />} />
         <Route path="success" element={<SuccessPage />} />
+        <Route path="pending" element={<PendingPage />} />
+        <Route path="failed" element={<FailedPage />} />
       </Route>
     </Routes>
   );
