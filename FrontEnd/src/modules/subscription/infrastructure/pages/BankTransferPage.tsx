@@ -1,11 +1,14 @@
 
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Copy, Info, UploadCloud } from 'lucide-react';
+import { ArrowLeft, Copy, Info, UploadCloud, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { useCurrencyConversion } from '../../../shared/infrastructure/hooks/useCurrencyConversion';
 
 const BankTransferPage = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<'reference' | 'receipt'>('reference');
+    const { amountInBs, rate, loading } = useCurrencyConversion(29.99);
+
 
     return (
         <div>
@@ -33,7 +36,14 @@ const BankTransferPage = () => {
                     <div className="mb-6">
                         <span className="text-sm text-[#848E9C]">Monto a transferir</span>
                         <div className="flex items-end gap-3 mt-1">
-                            <h2 className="text-3xl font-bold text-white">1.200,00 Bs.</h2>
+                            {loading ? (
+                                <div className="flex items-center gap-2 text-[#F0B90B]">
+                                    <Loader2 className="h-6 w-6 animate-spin" />
+                                    <span className="text-lg">Calculando...</span>
+                                </div>
+                            ) : (
+                                <h2 className="text-3xl font-bold text-white">{amountInBs} Bs.</h2>
+                            )}
                         </div>
                     </div>
 
@@ -82,8 +92,14 @@ const BankTransferPage = () => {
 
                     <div className="mt-6 flex items-start gap-3 p-4 bg-[#2B3139]/50 rounded-lg border-l-4 border-[#F0B90B]">
                         <Info className="h-5 w-5 text-[#F0B90B] flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-[#848E9C]">Las transferencias pueden tardar hasta 24h hábiles en reflejarse. Enviaremos confirmación por email.</p>
+                        <div className="text-sm text-[#848E9C]">
+                            <p>Las transferencias pueden tardar hasta 24h hábiles en reflejarse. Enviaremos confirmación por email.</p>
+                            {!loading && rate && (
+                                <p className="mt-1 text-xs">Tasa BCV: {rate.toLocaleString('es-VE')} Bs/USD</p>
+                            )}
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -142,7 +158,7 @@ const BankTransferPage = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
