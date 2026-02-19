@@ -1,28 +1,9 @@
 
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import Navbar from '../../../marketing/infrastructure/components/Navbar';
 
 const CheckoutLayout = () => {
-    const location = useLocation();
-
-    // Mapping steps to routes
-    const getStepStatus = (step: number) => {
-        const path = location.pathname;
-        if (step === 1) return 'completed'; // Registration is always done if we contain here (theoretically)
-
-        if (step === 2) {
-            if (path.includes('payment')) return 'active';
-            if (path.includes('success')) return 'completed';
-            return 'pending'; // In plan selection
-        }
-
-        if (step === 3) {
-            if (path.includes('success')) return 'active'; // Or completed
-            return 'pending';
-        }
-        return 'pending';
-    };
 
     return (
         <div className="min-h-screen bg-[#0B0E11] text-white font-sans antialiased">
@@ -30,32 +11,6 @@ const CheckoutLayout = () => {
             <Navbar variant="checkout" />
 
             <main className="mx-auto max-w-7xl px-4 pt-24 pb-8 sm:px-6 lg:px-8">
-                {/* Progress Bar */}
-                <div className="mb-8">
-                    <div className="flex items-center space-x-4 text-sm">
-                        <div className={`flex items-center ${getStepStatus(1) === 'completed' ? 'text-[#F0B90B]' : 'text-white'}`}>
-                            <span className={`flex items-center justify-center w-6 h-6 rounded-full ${getStepStatus(1) === 'completed' ? 'bg-[#F0B90B] text-black' : 'border-2 border-white'} font-bold mr-2 text-xs`}>
-                                {getStepStatus(1) === 'completed' ? '✓' : '1'}
-                            </span>
-                            Registro
-                        </div>
-                        <div className={`w-8 h-[1px] ${getStepStatus(2) !== 'pending' ? 'bg-[#F0B90B]' : 'bg-[#2B3139]'}`}></div>
-                        <div className={`flex items-center ${getStepStatus(2) === 'active' ? 'text-[#F0B90B] font-semibold' : getStepStatus(2) === 'completed' ? 'text-[#F0B90B]' : 'text-[#474D57]'}`}>
-                            <span className={`flex items-center justify-center w-6 h-6 rounded-full border-2 ${getStepStatus(2) === 'active' || getStepStatus(2) === 'completed' ? 'border-[#F0B90B] text-[#F0B90B]' : 'border-[#474D57] text-[#474D57]'} font-bold mr-2 text-xs`}>
-                                2
-                            </span>
-                            Pago
-                        </div>
-                        <div className={`w-8 h-[1px] ${getStepStatus(3) === 'active' ? 'bg-[#F0B90B]' : 'bg-[#2B3139]'}`}></div>
-                        <div className={`flex items-center ${getStepStatus(3) === 'active' ? 'text-[#F0B90B] font-semibold' : 'text-[#474D57]'}`}>
-                            <span className={`flex items-center justify-center w-6 h-6 rounded-full border-2 ${getStepStatus(3) === 'active' ? 'border-[#F0B90B] text-[#F0B90B]' : 'border-[#474D57] text-[#474D57]'} font-bold mr-2 text-xs`}>
-                                3
-                            </span>
-                            Confirmación
-                        </div>
-                    </div>
-                </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content Area */}
                     <div className="lg:col-span-2">
