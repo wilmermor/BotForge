@@ -44,10 +44,13 @@ const MarketProblem: React.FC = () => {
     }
 
     return (
-        <section id="problemas" className="py-24 bg-primary overflow-hidden">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-16">
-                Problemas a solucionar
-            </h2>
+        <section id="problemas" className="py-10 bg-primary overflow-hidden">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-tighter">
+                    Problemas a <span className="text-accent">solucionar</span>
+                </h2>
+                <div className="h-1 w-20 bg-accent mx-auto"></div>
+            </div>
 
             <div className="relative z-20 max-w-7xl mx-auto overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]">
                 <div

@@ -20,7 +20,14 @@ const Solutions: React.FC = () => {
     ];
 
     return (
-        <section id="soluciones" className="py-24 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
+        <section id="soluciones" className="py-18 max-w-7xl mx-auto px-6 md:px-12 bg-primary">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 uppercase tracking-tighter">
+                    Nuestras <span className="text-accent">Soluciones</span>
+                </h2>
+                <div className="h-1 w-20 bg-accent mx-auto"></div>
+            </div>
+
             <div className="grid md:grid-cols-3 gap-10">
                 {solutions.map((sol, index) => (
                     <div
