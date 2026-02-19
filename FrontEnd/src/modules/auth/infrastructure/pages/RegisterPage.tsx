@@ -12,129 +12,170 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-[#0B0E11] text-white">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex flex-col items-center justify-center gap-2">
-                    {/* Placeholder for Logo */}
-                    <img
-                        src="/ISOTIPO4.svg"
-                        alt="BotForge Logo"
-                        className="h-14 w-auto"
-                        style={{ filter: 'brightness(0) invert(1)' }}
-                    />
-                    <div className="font-extrabold tracking-widest text-xl font-[Inter] transition-colors duration-500 text-white">
-                        BOTFORGE
+        <div className="flex min-h-screen items-center justify-center bg-[#0B0E11] px-6 py-12">
+            <form
+                className="bg-[#0B0E11] p-8 rounded-lg max-w-md w-full border border-[#2B3139]"
+                onSubmit={handleSubmit}
+            >
+                <div className="space-y-8">
+                    {/* Header */}
+                    <div className="text-center">
+                        <div className="flex flex-col items-center justify-center gap-2 mb-6">
+                            <img
+                                src="/ISOTIPO4.svg"
+                                alt="BotForge Logo"
+                                className="h-12 w-auto"
+                                style={{ filter: 'brightness(0) invert(1)' }}
+                            />
+                            <div className="font-extrabold tracking-widest text-lg font-[Inter] text-white">
+                                BOTFORGE
+                            </div>
+                        </div>
+                        <h2 className="text-2xl font-semibold text-[#EAECEF]">Crear cuenta</h2>
+                        <p className="mt-2 text-sm text-[#848E9C]">Ingresa tus datos para comenzar</p>
                     </div>
-                </div>
-                <h2 className="mt-1 text-center text-2xl font-bold tracking-tight text-white">
-                    Create your account
-                </h2>
-                <div className="mt-2 flex justify-center space-x-2">
-                    <div className="h-1 w-16 bg-[#F0B90B] rounded"></div>
-                    <div className="h-1 w-16 bg-[#2B3139] rounded"></div>
-                    <div className="h-1 w-16 bg-[#2B3139] rounded"></div>
-                </div>
-            </div>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[1200px]">
-                <div className="bg-[#1E2329] px-6 py-12 shadow sm:rounded-lg sm:px-12 border border-[#2B3139]">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-
-                            <div className="sm:col-span-3">
-                                <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-[#848E9C]">
-                                    First name
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="first-name"
-                                        id="first-name"
-                                        autoComplete="given-name"
-                                        required
-                                        className="block w-full rounded-md border-0 bg-[#0B0E11] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
-                                    />
-                                </div>
+                    {/* Grid de campos */}
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        {/* Nombre */}
+                        <div className="col-span-1">
+                            <label htmlFor="first-name" className="block text-sm font-medium text-[#EAECEF]">Nombre</label>
+                            <div className="mt-1.5">
+                                <input
+                                    id="first-name"
+                                    name="first-name"
+                                    type="text"
+                                    placeholder="Carlos"
+                                    required
+                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
+                                />
                             </div>
+                        </div>
 
-                            <div className="sm:col-span-3">
-                                <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#848E9C]">
-                                    Last name
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="last-name"
-                                        id="last-name"
-                                        autoComplete="family-name"
-                                        required
-                                        className="block w-full rounded-md border-0 bg-[#0B0E11] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
-                                    />
-                                </div>
+                        {/* Apellido */}
+                        <div className="col-span-1">
+                            <label htmlFor="last-name" className="block text-sm font-medium text-[#EAECEF]">Apellido</label>
+                            <div className="mt-1.5">
+                                <input
+                                    id="last-name"
+                                    name="last-name"
+                                    type="text"
+                                    placeholder="Rodríguez"
+                                    required
+                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
+                                />
                             </div>
+                        </div>
 
-                            <div className="sm:col-span-3">
-                                <label htmlFor="birthdate" className="block text-sm font-medium leading-6 text-[#848E9C]">
-                                    Date of Birth
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="date"
-                                        name="birthdate"
-                                        id="birthdate"
-                                        required
-                                        className="block w-full rounded-md border-0 bg-[#0B0E11] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6 [color-scheme:dark]"
-                                    />
-                                </div>
+                        {/* Fecha de nacimiento */}
+                        <div className="col-span-2">
+                            <label htmlFor="birthdate" className="block text-sm font-medium text-[#EAECEF]">Fecha de nacimiento</label>
+                            <div className="mt-1.5">
+                                <input
+                                    id="birthdate"
+                                    name="birthdate"
+                                    type="date"
+                                    required
+                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors [color-scheme:dark]"
+                                />
                             </div>
+                        </div>
 
-                            <div className="sm:col-span-3">
-                                <label htmlFor="nationality" className="block text-sm font-medium leading-6 text-[#848E9C]">
-                                    Nationality
-                                </label>
-                                <div className="mt-2">
-                                    <select
-                                        id="nationality"
-                                        name="nationality"
-                                        autoComplete="country-name"
-                                        className="block w-full rounded-md border-0 bg-[#0B0E11] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
-                                    >
-                                        <option>Venezuela</option>
-                                        <option>United States</option>
-                                        <option>Canada</option>
-                                        <option>Mexico</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="col-span-full">
-                                <label htmlFor="street-address" className="block text-sm font-medium leading-6 text-[#848E9C]">
-                                    Address
-                                </label>
-                                <div className="mt-2">
-                                    <input
-                                        type="text"
-                                        name="street-address"
-                                        id="street-address"
-                                        autoComplete="street-address"
-                                        required
-                                        className="block w-full rounded-md border-0 bg-[#0B0E11] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
-                                    />
+                        {/* Nacionalidad (select) */}
+                        <div className="col-span-2">
+                            <label htmlFor="nationality" className="block text-sm font-medium text-[#EAECEF]">Nacionalidad</label>
+                            <div className="mt-1.5 relative">
+                                <select
+                                    id="nationality"
+                                    name="nationality"
+                                    required
+                                    className="block w-full appearance-none bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
+                                >
+                                    <option value="" disabled selected className="bg-[#1E2329] text-[#5E6873]">Selecciona un país</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">México</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">Argentina</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">Colombia</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">Chile</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">Venezuela</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">España</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">Estados Unidos</option>
+                                    <option className="bg-[#1E2329] text-[#EAECEF]">Otro</option>
+                                </select>
+                                {/* Icono de flecha personalizado */}
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#848E9C]">
+                                    <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                    </svg>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-end gap-x-6 border-t border-[#2B3139] pt-6">
-                            <button
-                                type="submit"
-                                className="rounded-md bg-[#F0B90B] px-8 py-2.5 text-sm font-semibold text-black shadow-sm circle hover:bg-[#FCD535] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0B90B] transition-all duration-200"
-                            >
-                                Continue to Plan Selection
-                            </button>
+                        {/* Dirección */}
+                        <div className="col-span-2">
+                            <label htmlFor="address" className="block text-sm font-medium text-[#EAECEF]">Dirección</label>
+                            <div className="mt-1.5">
+                                <input
+                                    id="address"
+                                    name="address"
+                                    type="text"
+                                    placeholder="Ciudad, calle, número..."
+                                    required
+                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
+                                />
+                            </div>
                         </div>
-                    </form>
+
+                        {/* Correo electrónico */}
+                        <div className="col-span-2">
+                            <label htmlFor="email" className="block text-sm font-medium text-[#EAECEF]">Correo electrónico</label>
+                            <div className="mt-1.5">
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="carlos.rodriguez@ejemplo.com"
+                                    required
+                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Contraseña */}
+                        <div className="col-span-2">
+                            <label htmlFor="password" className="block text-sm font-medium text-[#EAECEF]">Contraseña</label>
+                            <div className="mt-1.5">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    required
+                                    minLength={8}
+                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
+                                />
+                            </div>
+                            <p className="mt-1.5 text-xs text-[#848E9C]">Mínimo 8 caracteres, con mayúsculas y números</p>
+                        </div>
+                    </div>
+
+                    {/* Botón continuar */}
+                    <div className="pt-4">
+                        <button
+                            type="submit"
+                            className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-[#1E2329] font-semibold py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-[#F0B90B] focus:ring-offset-2 focus:ring-offset-[#0B0E11] text-base"
+                        >
+                            Continuar
+                        </button>
+                    </div>
+
+                    {/* Términos y condiciones */}
+                    <p className="text-center text-xs text-[#848E9C]">
+                        Al continuar, aceptas los
+                        <a href="#" className="text-[#F0B90B] hover:underline mx-1">Términos de servicio</a> y
+                        <a href="#" className="text-[#F0B90B] hover:underline mx-1">Política de privacidad</a>.
+                    </p>
                 </div>
-            </div>
+            </form>
         </div>
     );
 };
