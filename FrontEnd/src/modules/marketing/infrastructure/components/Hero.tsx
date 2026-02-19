@@ -11,7 +11,7 @@ const Hero: React.FC<HeroProps> = ({
 }) => {
     return (
         // Contenedor global - ocupa toda la pantalla
-        <section className="relative w-full min-h-screen bg-gray-50">
+        <section className="relative w-full min-h-screen">
 
             {/* Contenedor interno principal - centrado y con padding */}
             <div
