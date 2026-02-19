@@ -1,12 +1,15 @@
 
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Copy, Info, Check } from 'lucide-react';
+import { ArrowLeft, Copy, Info, Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { useCurrencyConversion } from '../../../shared/infrastructure/hooks/useCurrencyConversion';
 
 const MobilePaymentPage = () => {
     const navigate = useNavigate();
     const [reference, setReference] = useState('');
     const [bank, setBank] = useState('');
+    const { amountInBs, rate, loading } = useCurrencyConversion(29.99);
+
 
     const handleCopy = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -44,8 +47,16 @@ const MobilePaymentPage = () => {
                     <div className="mb-6">
                         <span className="text-sm text-[#848E9C]">Monto a pagar</span>
                         <div className="flex items-end gap-3 mt-1">
-                            <h2 className="text-3xl font-bold text-white">1.200,00 Bs.</h2>
+                            {loading ? (
+                                <div className="flex items-center gap-2 text-[#F0B90B]">
+                                    <Loader2 className="h-6 w-6 animate-spin" />
+                                    <span className="text-lg">Calculando...</span>
+                                </div>
+                            ) : (
+                                <h2 className="text-3xl font-bold text-white">{amountInBs} Bs.</h2>
+                            )}
                             <span className="mb-1.5 px-2 py-0.5 rounded bg-[#2B3139] text-[#F0B90B] text-xs font-bold">Monto exacto</span>
+
                         </div>
                     </div>
 
@@ -83,8 +94,14 @@ const MobilePaymentPage = () => {
 
                     <div className="mt-6 flex items-start gap-3 p-4 bg-[#2B3139]/50 rounded-lg border-l-4 border-[#F0B90B]">
                         <Info className="h-5 w-5 text-[#F0B90B] flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-[#848E9C]">El pago debe ser exactamente por este monto para activar tu plan automáticamente.</p>
+                        <div className="text-sm text-[#848E9C]">
+                            <p>El pago debe ser exactamente por este monto para activar tu plan automáticamente.</p>
+                            {!loading && rate && (
+                                <p className="mt-1 text-xs">Tasa BCV: {rate.toLocaleString('es-VE')} Bs/USD</p>
+                            )}
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -151,7 +168,7 @@ const MobilePaymentPage = () => {
                     </div>
                 </form>
             </div>
-        </div>
+        </div >
     );
 };
 
