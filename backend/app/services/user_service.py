@@ -36,10 +36,26 @@ async def create_user(db: AsyncSession, data: RegisterRequest) -> User:
     if existing:
         raise ValueError("Email already registered")
 
+    # Get or create default "free" plan
+    from app.models.plan import Plan
+
+    result = await db.execute(select(Plan).where(Plan.name == "free"))
+    plan = result.scalar_one_or_none()
+
+    if not plan:
+        plan = Plan(
+            id=uuid.uuid4(),
+            name="free",
+            description="Default free plan",
+        )
+        db.add(plan)
+        await db.flush()
+
     user = User(
         email=data.email,
         password_hash=hash_password(data.password),
         full_name=data.full_name,
+        plan_id=plan.id,
     )
     db.add(user)
     await db.flush()

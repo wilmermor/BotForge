@@ -1,0 +1,62 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.3.4, pluggy-1.6.0 -- C:\Users\wilme\Documents\WILL\ANTIGRAVITY-IA\BotForget\BotForge\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\wilme\Documents\WILL\ANTIGRAVITY-IA\BotForget\BotForge\backend
+plugins: anyio-4.12.1, asyncio-0.25.2
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None
+collecting ... collected 1 item
+
+tests/test_auth.py::test_register_success 
+--- DEBUG: Setting up database ---
+DEBUG: Response body: {'detail': 'password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])'}
+FAILED--- DEBUG: Tearing down database ---
+
+
+================================== FAILURES ===================================
+____________________________ test_register_success ____________________________
+
+client = <httpx.AsyncClient object at 0x0000024773091E80>
+
+    @pytest.mark.asyncio
+    async def test_register_success(client: AsyncClient):
+        """Register a new user and receive tokens."""
+        response = await client.post(
+            "/api/v1/auth/register",
+            json={
+                "email": "nuevo@botforge.com",
+                "password": "securepass123",
+                "full_name": "Nuevo Usuario",
+            },
+        )
+        if response.status_code != 201:
+            print(f"DEBUG: Response body: {response.json()}")
+>       assert response.status_code == 201
+E       assert 409 == 201
+E        +  where 409 = <Response [409 Conflict]>.status_code
+
+tests\test_auth.py:22: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\wilme\Documents\WILL\ANTIGRAVITY-IA\BotForget\BotForge\backend\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+============================== warnings summary ===============================
+tests/test_auth.py::test_register_success
+  C:\Users\wilme\Documents\WILL\ANTIGRAVITY-IA\BotForget\BotForge\backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:867: DeprecationWarning: The event_loop fixture provided by pytest-asyncio has been redefined in
+  C:\Users\wilme\Documents\WILL\ANTIGRAVITY-IA\BotForget\BotForge\backend\tests\conftest.py:35
+  Replacing the event_loop fixture with a custom implementation is deprecated
+  and will lead to errors in the future.
+  If you want to request an asyncio event loop with a scope other than function
+  scope, use the "loop_scope" argument to the asyncio mark when marking the tests.
+  If you want to return different types of event loops, use the event_loop_policy
+  fixture.
+  
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_auth.py::test_register_success - assert 409 == 201
+ +  where 409 = <Response [409 Conflict]>.status_code
+======================== 1 failed, 1 warning in 0.60s =========================
