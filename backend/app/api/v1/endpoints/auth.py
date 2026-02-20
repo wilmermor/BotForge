@@ -37,8 +37,12 @@ async def register(
     try:
         user = await create_user(db, data)
     except ValueError as e:
+        status_code = status.HTTP_400_BAD_REQUEST
+        if "already registered" in str(e).lower():
+            status_code = status.HTTP_409_CONFLICT
+            
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=status_code,
             detail=str(e),
         )
 

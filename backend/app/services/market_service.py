@@ -7,16 +7,10 @@ Fetches OHLCV candlestick data from Binance API with Redis caching.
 import json
 from datetime import datetime
 
-import httpx
-
 from app.core.config import settings
+from app.services.market_data import MarketDataService
 
-
-# Binance kline interval mapping
-BINANCE_INTERVALS = {
-    "1m": "1m", "5m": "5m", "15m": "15m", "30m": "30m",
-    "1h": "1h", "4h": "4h", "1d": "1d", "1w": "1w",
-}
+BATCH_LIMIT = 1000
 
 
 async def fetch_ohlcv(
@@ -43,44 +37,70 @@ async def fetch_ohlcv(
         if cached:
             return json.loads(cached)
 
-    # --- Fetch from Binance ---
-    start_ms = int(start_date.timestamp() * 1000)
-    end_ms = int(end_date.timestamp() * 1000)
-
+    # --- Fetch from Binance (via CCXT) ---
+    # Convert pair to CCXT format (e.g. BTCUSDT -> BTC/USDT)
+    # This is a basic heuristic; for a real app, we might need a better mapping or allow flexible input.
+    symbol = pair.upper()
+    if not "/" in symbol and symbol.endswith("USDT"):
+        symbol = f"{symbol[:-4]}/{symbol[-4:]}"
+    elif not "/" in symbol and symbol.endswith("BTC"):
+        symbol = f"{symbol[:-3]}/{symbol[-3:]}"
+    
     all_candles = []
-    current_start = start_ms
-
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        while current_start < end_ms:
-            params = {
-                "symbol": pair.upper(),
-                "interval": BINANCE_INTERVALS.get(timeframe, "1h"),
-                "startTime": current_start,
-                "endTime": end_ms,
-                "limit": 1000,  # Binance max per request
-            }
-            response = await client.get(
-                f"{settings.BINANCE_BASE_URL}/api/v3/klines",
-                params=params,
-            )
-            response.raise_for_status()
-            klines = response.json()
-
-            if not klines:
+    
+    
+    service = MarketDataService()
+    try:
+        # CCXT 'since' is inclusive. We loop to fetch all data in the range.
+        current_since = start_date
+        end_ts = int(end_date.timestamp() * 1000)
+        
+        while True:
+            # Check if we've reached the end
+            if int(current_since.timestamp() * 1000) >= end_ts:
                 break
-
-            for k in klines:
-                all_candles.append({
-                    "timestamp": k[0],        # Open time (ms)
-                    "open": float(k[1]),
-                    "high": float(k[2]),
-                    "low": float(k[3]),
-                    "close": float(k[4]),
-                    "volume": float(k[5]),
-                })
-
-            # Move to next batch
-            current_start = klines[-1][0] + 1
+                
+            candles = await service.fetch_ohlcv(
+                symbol=symbol,
+                timeframe=timeframe,
+                since=current_since,
+                limit=BATCH_LIMIT 
+            )
+            
+            if not candles:
+                break
+                
+            for c in candles:
+                # c['timestamp'] is in ms
+                if c['timestamp'] < end_ts:
+                    all_candles.append(c)
+                else:
+                    # Candle is outside our requested range (after end_date)
+                    pass
+            
+            # Prepare for next iteration
+            last_candle_ts = candles[-1]['timestamp']
+            
+            # If the last candle fetched is strictly before our current 'since', 
+            # or if we got fewer than limit, we are likely done or stuck.
+            # Usually, next since = last_timestamp + 1ms (or timeframe duration)
+            next_since_ts = last_candle_ts + 1
+            
+            # Break interaction if we aren't moving forward
+            if next_since_ts <= int(current_since.timestamp() * 1000):
+                break
+                
+            current_since = datetime.fromtimestamp(next_since_ts / 1000, tz=start_date.tzinfo or None)
+            
+            if len(candles) < BATCH_LIMIT:
+                break
+                
+    except Exception as e:
+        # In case of error, we might want to log it and re-raise
+        # The endpoint handles generic exceptions, but good to know what failed.
+        raise e
+    finally:
+        await service.close()
 
     # --- Cache result ---
     if redis_client and all_candles:

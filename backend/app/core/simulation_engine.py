@@ -156,11 +156,11 @@ def run_simulation(
             f"Available: {list(STRATEGY_REGISTRY.keys())}"
         )
 
+    if not ohlcv_data:
+        raise ValueError("No data to simulate")
+
     # 2. Build DataFrame
     df = _build_dataframe(ohlcv_data)
-
-    if len(df) == 0:
-        raise ValueError("No data to simulate")
 
     # 3. Instantiate strategy and generate signals
     strategy = strategy_cls(strategy_params)
