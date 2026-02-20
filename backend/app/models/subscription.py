@@ -18,7 +18,7 @@ class Subscription(Base, UUIDMixin):
     __tablename__ = "subscription"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"),
+        UUID(as_uuid=True), ForeignKey("user_b.id", ondelete="CASCADE"),
         nullable=False, index=True,
     )
     plan_id: Mapped[uuid.UUID] = mapped_column(

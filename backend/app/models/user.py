@@ -14,7 +14,7 @@ from app.models.base import Base, TimestampMixin, UUIDMixin
 class User(Base, UUIDMixin, TimestampMixin):
     """User account model."""
 
-    __tablename__ = "user"
+    __tablename__ = "user_b"
 
     email: Mapped[str] = mapped_column(
         String(255), unique=True, nullable=False, index=True
