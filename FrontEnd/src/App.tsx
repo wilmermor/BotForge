@@ -13,6 +13,7 @@ import BinancePayPage from './modules/subscription/infrastructure/pages/BinanceP
 import SuccessPage from './modules/subscription/infrastructure/pages/SuccessPage';
 import PendingPage from './modules/subscription/infrastructure/pages/PendingPage';
 import FailedPage from './modules/subscription/infrastructure/pages/FailedPage';
+import DashboardPage from './modules/dashboard/infrastructure/pages/DashboardPage';
 
 function App() {
   return (
@@ -41,6 +42,9 @@ function App() {
         <Route path="pending" element={<PendingPage />} />
         <Route path="failed" element={<FailedPage />} />
       </Route>
+
+      {/* Main Single-Screen Dashboard Route */}
+      <Route path="/dashboard" element={<DashboardPage />} />
     </Routes>
   );
 }
