@@ -19,7 +19,7 @@ class SimulationLog(Base, UUIDMixin):
     __tablename__ = "simulation_log"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"),
+        UUID(as_uuid=True), ForeignKey("user_b.id", ondelete="CASCADE"),
         nullable=False, index=True,
     )
     strategy_id: Mapped[uuid.UUID | None] = mapped_column(

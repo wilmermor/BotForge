@@ -7,17 +7,18 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ============================================================
--- PLAN (Singular naming)
+-- PLAN
 -- ============================================================
 CREATE TABLE IF NOT EXISTS plan (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) UNIQUE NOT NULL,
     description TEXT,
-    price_monthly DECEMBER(10, 2) NOT NULL DEFAULT 0.00,
+    price_monthly DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     max_strategies INTEGER NOT NULL DEFAULT 1,
     max_simulations_per_day INTEGER NOT NULL DEFAULT 5,
     features JSONB DEFAULT '[]',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Seed Initial Plans
@@ -38,7 +39,8 @@ CREATE TABLE IF NOT EXISTS currency_pair (
     quote_asset VARCHAR(10) NOT NULL,   -- e.g., 'USDT'
     exchange VARCHAR(50) NOT NULL DEFAULT 'binance',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Seed common pairs
@@ -51,21 +53,21 @@ VALUES
 ON CONFLICT (symbol) DO NOTHING;
 
 -- ============================================================
--- USER ("user" is reserved in PG)
+-- USER_B
 -- ============================================================
-CREATE TABLE IF NOT EXISTS "user" (
+CREATE TABLE IF NOT EXISTS user_b (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
-    plan_id UUID NOT NULL REFERENCES plan(id) DEFAULT (SELECT id FROM plan WHERE name = 'free'),
+    plan_id UUID NOT NULL REFERENCES plan(id),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_user_email ON "user"(email);
-CREATE INDEX IF NOT EXISTS idx_user_plan_id ON "user"(plan_id);
+CREATE INDEX IF NOT EXISTS idx_user_b_email ON user_b(email);
+CREATE INDEX IF NOT EXISTS idx_user_b_plan_id ON user_b(plan_id);
 
 
 -- ============================================================
@@ -73,7 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_user_plan_id ON "user"(plan_id);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS strategy (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES user_b(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(20) NOT NULL,  -- 'grid' or 'dca'
     params JSONB NOT NULL DEFAULT '{}',
@@ -89,7 +91,7 @@ CREATE INDEX IF NOT EXISTS idx_strategy_user_id ON strategy(user_id);
 -- ============================================================
 CREATE TABLE IF NOT EXISTS simulation_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES user_b(id) ON DELETE CASCADE,
     strategy_id UUID REFERENCES strategy(id) ON DELETE SET NULL,
     currency_pair_id UUID REFERENCES currency_pair(id) ON DELETE SET NULL,
     pair VARCHAR(20), -- Deprecated
@@ -112,7 +114,7 @@ CREATE INDEX IF NOT EXISTS idx_simulation_log_created_at ON simulation_log(creat
 -- ============================================================
 CREATE TABLE IF NOT EXISTS subscription (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES user_b(id) ON DELETE CASCADE,
     plan_id UUID NOT NULL REFERENCES plan(id),
     status VARCHAR(20) NOT NULL DEFAULT 'active',
     stripe_customer_id VARCHAR(255),

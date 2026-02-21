@@ -13,6 +13,7 @@ from app.core.security import hash_password, verify_password
 from app.models.user import User
 from app.schemas.auth import RegisterRequest
 
+from app.models.plan import Plan
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
     """Find a user by email address."""
@@ -37,11 +38,12 @@ async def create_user(db: AsyncSession, data: RegisterRequest) -> User:
         raise ValueError("Email already registered")
 
     # Get or create default "free" plan
-    from app.models.plan import Plan
-
+    
+    print("lelimo2")
     result = await db.execute(select(Plan).where(Plan.name == "free"))
+    print("lelimo")
     plan = result.scalar_one_or_none()
-
+    
     if not plan:
         plan = Plan(
             id=uuid.uuid4(),
