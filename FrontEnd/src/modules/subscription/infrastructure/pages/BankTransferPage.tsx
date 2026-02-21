@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Info, UploadCloud, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useCurrencyConversion } from '../../../shared/infrastructure/hooks/useCurrencyConversion';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const BankTransferPage = () => {
     const navigate = useNavigate();
@@ -23,6 +24,10 @@ const BankTransferPage = () => {
                     </h1>
                     <p className="text-[#848E9C]">Realiza la transferencia y confirma los datos</p>
                 </div>
+            </div>
+
+            <div className="mb-8">
+                <CheckoutProgressBar step={2} />
             </div>
 
             {/* Step 1: Realiza la transferencia */}
@@ -129,7 +134,7 @@ const BankTransferPage = () => {
 
                     <div className="p-6">
                         {activeTab === 'reference' ? (
-                            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/checkout/success'); }}>
+                            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/checkout/pending'); }}>
                                 <div>
                                     <label className="block text-sm font-medium text-white mb-2">Número de referencia</label>
                                     <input type="text" placeholder="Ej. 1234567890" className="block w-full rounded-lg border border-[#3A4149] bg-[#2B3139] p-3 text-white focus:ring-1 focus:ring-[#F0B90B] outline-none" required />

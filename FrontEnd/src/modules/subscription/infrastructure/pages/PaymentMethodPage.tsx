@@ -1,33 +1,18 @@
 
 import { useNavigate } from 'react-router-dom';
 import { Smartphone, Building2, Bitcoin } from 'lucide-react';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const PaymentMethodPage = () => {
     const navigate = useNavigate();
 
     return (
+
         <div>
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white mb-2">Método de pago</h1>
                 <p className="text-[#848E9C]">Selecciona cómo quieres pagar tu suscripción.</p>
-
-                {/* Progress Indicator (Local) */}
-                <div className="mt-6 flex items-center space-x-4 text-sm">
-                    <div className="flex items-center text-[#F0B90B]">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#F0B90B] text-black font-bold mr-2 text-xs">✓</span>
-                        Registro
-                    </div>
-                    <div className="w-8 h-[1px] bg-[#F0B90B]"></div>
-                    <div className="flex items-center text-[#F0B90B] font-semibold">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-[#F0B90B] text-[#F0B90B] font-bold mr-2 text-xs">2</span>
-                        Pago
-                    </div>
-                    <div className="w-8 h-[1px] bg-[#2B3139]"></div>
-                    <div className="flex items-center text-[#474D57]">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-[#2B3139] text-[#474D57] font-bold mr-2 text-xs">3</span>
-                        Confirmación
-                    </div>
-                </div>
+                <CheckoutProgressBar step={2} />
             </div>
 
             <div className="space-y-4">
