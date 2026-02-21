@@ -1,6 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Bitcoin, AlertTriangle, CheckCircle } from 'lucide-react';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const BinancePayPage = () => {
     const navigate = useNavigate();
@@ -18,6 +19,10 @@ const BinancePayPage = () => {
                     </h1>
                     <p className="text-[#848E9C]">Paga con USDT vía Binance Pay. Red BSC.</p>
                 </div>
+            </div>
+
+            <div className="mb-8">
+                <CheckoutProgressBar step={2} />
             </div>
 
             {/* Step 1: Datos */}
@@ -75,7 +80,7 @@ const BinancePayPage = () => {
                 </h3>
 
                 <div className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-6">
-                    <form onSubmit={(e) => { e.preventDefault(); navigate('/checkout/success'); }}>
+                    <form onSubmit={(e) => { e.preventDefault(); navigate('/checkout/pending'); }}>
                         <div className="mb-6">
                             <label className="block text-sm font-medium text-white mb-2">TXID (Transaction ID)</label>
                             <input type="text" placeholder="Ej. 0x1a2b3c4d5e6f..." className="block w-full rounded-lg border border-[#3A4149] bg-[#2B3139] p-3 text-white font-mono placeholder:font-sans focus:ring-1 focus:ring-[#F0B90B] outline-none" required />

@@ -1,6 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ArrowRight, Smartphone, Building2, Bitcoin } from 'lucide-react';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const SuccessPage = () => {
     const navigate = useNavigate();
@@ -33,6 +34,8 @@ const SuccessPage = () => {
                     <CheckCircle className="h-12 w-12 text-[#02C076]" />
                 </div>
             </div>
+
+            <CheckoutProgressBar step={3} />
 
             <h1 className="text-4xl font-bold text-white mb-2">¡Pago recibido con éxito!</h1>
             <p className="text-[#848E9C] text-lg mb-10 max-w-md mx-auto">

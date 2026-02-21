@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Copy, Info, Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useCurrencyConversion } from '../../../shared/infrastructure/hooks/useCurrencyConversion';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const MobilePaymentPage = () => {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ const MobilePaymentPage = () => {
 
     const handleConfirm = (e: React.FormEvent) => {
         e.preventDefault();
-        navigate('/checkout/success');
+        navigate('/checkout/pending');
     };
 
     return (
@@ -34,6 +35,10 @@ const MobilePaymentPage = () => {
                     </h1>
                     <p className="text-[#848E9C]">Completa los siguientes pasos para activar tu suscripción</p>
                 </div>
+            </div>
+
+            <div className="mb-8">
+                <CheckoutProgressBar step={2} />
             </div>
 
             {/* Step 1: Realiza el pago */}
