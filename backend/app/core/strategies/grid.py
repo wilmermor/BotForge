@@ -52,6 +52,20 @@ class GridStrategy(BaseStrategy):
         - Each grid level can hold at most one position.
         """
         df = df.copy()
+        
+        # Edge case: empty dataframe or missing close column
+        if df.empty or "close" not in df.columns:
+            df["signal"] = 0
+            df["quantity"] = 0.0
+            if "close" in df.columns:
+                df["exec_price"] = df["close"]
+            else:
+                df["exec_price"] = 0.0
+            return df
+
+        # Edge case: handle NaNs by forward-filling, then backward-filling
+        df["close"] = df["close"].ffill().bfill()
+
         upper = float(self.params["upper_price"])
         lower = float(self.params["lower_price"])
         grid_count = int(self.params["grid_count"])
@@ -74,6 +88,10 @@ class GridStrategy(BaseStrategy):
         for i in range(n_prices):
             price = close_prices[i]
             
+            # Additional safety: should not happen after bfill, but protect against invalid prices
+            if price <= 0.0 or np.isnan(price):
+                continue
+                
             # Ensure max 1 action per time step to avoid net overlap
             action_taken = False
             

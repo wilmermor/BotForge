@@ -49,6 +49,20 @@ class DCAStrategy(BaseStrategy):
         - After a TP/SL exit, restart DCA accumulation.
         """
         df = df.copy()
+
+        # Edge case: empty dataframe or missing close column
+        if df.empty or "close" not in df.columns:
+            df["signal"] = 0
+            df["quantity"] = 0.0
+            if "close" in df.columns:
+                df["exec_price"] = df["close"]
+            else:
+                df["exec_price"] = 0.0
+            return df
+
+        # Edge case: handle NaNs by forward-filling, then backward-filling
+        df["close"] = df["close"].ffill().bfill()
+
         buy_amount = float(self.params["buy_amount"])
         interval = int(self.params["interval_bars"])
         
@@ -72,10 +86,18 @@ class DCAStrategy(BaseStrategy):
         for i in range(n_prices):
             price = close_prices[i]
 
+            # Security catch, prevent devision by zero or issues with NaNs
+            if price <= 0.0 or np.isnan(price):
+                continue
+
             # Check TP/SL exits first (if we have a position)
             if total_qty > 0.0:
                 avg_price = total_cost / total_qty
-                pnl_pct = ((price - avg_price) / avg_price) * 100.0
+                
+                if avg_price > 0.0:
+                    pnl_pct = ((price - avg_price) / avg_price) * 100.0
+                else:
+                    pnl_pct = 0.0
 
                 # Take Profit
                 if tp_pct is not None and pnl_pct >= tp_pct:

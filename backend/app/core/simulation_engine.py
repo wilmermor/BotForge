@@ -17,10 +17,12 @@ import numpy as np
 import pandas as pd
 
 from app.core.metrics import (
+    calmar_ratio,
     max_drawdown,
     profit_factor,
     roi,
     sharpe_ratio,
+    sortino_ratio,
     win_rate,
 )
 from app.core.strategies.base import BaseStrategy
@@ -45,6 +47,8 @@ def _build_dataframe(ohlcv_data: list[dict]) -> pd.DataFrame:
 def _simulate_trades(
     df: pd.DataFrame,
     initial_capital: float = 10000.0,
+    fee_rate: float = 0.001,
+    slippage_pct: float = 0.001,
 ) -> dict[str, Any]:
     """
     Walk through signal-annotated DataFrame and simulate trades.
@@ -70,29 +74,42 @@ def _simulate_trades(
 
         if signal == 1 and qty > 0:
             # BUY
-            cost = qty * price
-            if cost <= cash:
-                cash -= cost
-                total_cost_basis += cost
+            actual_slippage = np.random.uniform(0, slippage_pct)
+            exec_price = price * (1 + actual_slippage)
+            
+            cost = qty * exec_price
+            fee = cost * fee_rate
+            total_cost = cost + fee
+            
+            if total_cost <= cash:
+                cash -= total_cost
+                total_cost_basis += total_cost
                 position_qty += qty
                 if position_qty > 0:
                     position_avg_price = total_cost_basis / position_qty
                 trades.append({
                     "timestamp": row["timestamp"].isoformat(),
                     "side": "buy",
-                    "price": float(price),
+                    "price": float(exec_price),
+                    "fee": float(fee),
                     "quantity": float(qty),
                     "pnl": None,
                 })
 
         elif signal == -1 and qty > 0 and position_qty > 0:
             # SELL
+            actual_slippage = np.random.uniform(0, slippage_pct)
+            exec_price = price * (1 - actual_slippage)
+            
             sell_qty = min(qty, position_qty)
-            revenue = sell_qty * price
+            revenue = sell_qty * exec_price
+            fee = revenue * fee_rate
+            net_revenue = revenue - fee
+            
             cost_of_sold = sell_qty * position_avg_price
-            pnl = revenue - cost_of_sold
+            pnl = net_revenue - cost_of_sold
 
-            cash += revenue
+            cash += net_revenue
             position_qty -= sell_qty
             if position_qty > 0:
                 total_cost_basis = position_qty * position_avg_price
@@ -104,7 +121,8 @@ def _simulate_trades(
             trades.append({
                 "timestamp": row["timestamp"].isoformat(),
                 "side": "sell",
-                "price": float(price),
+                "price": float(exec_price),
+                "fee": float(fee),
                 "quantity": float(sell_qty),
                 "pnl": float(pnl),
             })
@@ -135,6 +153,8 @@ def run_simulation(
     strategy_type: str,
     strategy_params: dict[str, Any],
     initial_capital: float = 10000.0,
+    fee_rate: float = 0.001,
+    slippage_pct: float = 0.001,
 ) -> dict[str, Any]:
     """
     Run a complete backtesting simulation.
@@ -144,6 +164,8 @@ def run_simulation(
         strategy_type: 'grid' or 'dca'.
         strategy_params: Strategy configuration.
         initial_capital: Starting capital (default $10,000).
+        fee_rate: Fee fraction per trade (e.g. 0.001 for 0.1%).
+        slippage_pct: Max slippage penalty per trade (e.g. 0.001 for 0.1%).
 
     Returns:
         Dict with 'metrics', 'equity_curve', and 'trades'.
@@ -167,7 +189,7 @@ def run_simulation(
     df = strategy.generate_signals(df)
 
     # 4. Simulate trades
-    result = _simulate_trades(df, initial_capital)
+    result = _simulate_trades(df, initial_capital, fee_rate, slippage_pct)
 
     # 5. Calculate metrics
     equity_values = np.array([e["equity"] for e in result["equity_curve"]])
@@ -181,14 +203,27 @@ def run_simulation(
     pnls = result["trade_pnls"]
     sell_trades = [t for t in result["trades"] if t["side"] == "sell"]
 
+    max_dd = max_drawdown(equity_values)
+    roi_val = roi(initial_capital, result["final_equity"])
+
     metrics = {
-        "roi_pct": round(roi(initial_capital, result["final_equity"]), 2),
+        "roi_pct": round(roi_val, 2),
         "sharpe_ratio": (
             round(sharpe_ratio(returns), 4)
             if sharpe_ratio(returns) is not None
             else None
         ),
-        "max_drawdown_pct": round(max_drawdown(equity_values), 2),
+        "sortino_ratio": (
+            round(sortino_ratio(returns), 4)
+            if sortino_ratio(returns) is not None
+            else None
+        ),
+        "calmar_ratio": (
+            round(calmar_ratio(roi_val, max_dd), 4)
+            if calmar_ratio(roi_val, max_dd) is not None
+            else None
+        ),
+        "max_drawdown_pct": round(max_dd, 2),
         "win_rate_pct": round(win_rate(pnls), 2) if len(pnls) > 0 else 0.0,
         "profit_factor": (
             round(profit_factor(pnls), 4)

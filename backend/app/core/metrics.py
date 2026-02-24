@@ -111,3 +111,58 @@ def profit_factor(pnls: np.ndarray) -> float | None:
         return None if gross_profit == 0 else float("inf")
 
     return float(gross_profit / gross_loss)
+
+
+def sortino_ratio(
+    returns: np.ndarray,
+    risk_free_rate: float = 0.0,
+    periods_per_year: int = 365,
+) -> float | None:
+    """
+    Calculate annualized Sortino Ratio.
+    Similar to Sharpe but only considers downside volatility.
+
+    Args:
+        returns: Array of periodic returns.
+        risk_free_rate: Annualized risk-free rate.
+        periods_per_year: Number of periods in a year.
+
+    Returns:
+        Annualized Sortino Ratio.
+    """
+    if len(returns) < 2:
+        return None
+
+    downside_returns = returns[returns < 0]
+    mean_return = np.mean(returns)
+    rf_per_period = risk_free_rate / periods_per_year
+
+    if len(downside_returns) == 0:
+        return float('inf') if (mean_return - rf_per_period) > 0 else None
+
+    # Calculate standard deviation of downside returns
+    downside_std = np.std(downside_returns, ddof=1) if len(downside_returns) > 1 else np.std(downside_returns)
+
+    if downside_std == 0:
+        return float('inf') if (mean_return - rf_per_period) > 0 else None
+
+    sortino = (mean_return - rf_per_period) / downside_std
+    return float(sortino * np.sqrt(periods_per_year))
+
+
+def calmar_ratio(roi_pct: float, max_drawdown_pct: float) -> float | None:
+    """
+    Calculate Calmar Ratio.
+    Uses Total ROI over Maximum Drawdown.
+
+    Args:
+        roi_pct: Total Return on Investment percentage.
+        max_drawdown_pct: Maximum Drawdown percentage (negative value).
+
+    Returns:
+        Calmar Ratio, or None if no drawdown.
+    """
+    if max_drawdown_pct == 0:
+        return float('inf') if roi_pct > 0 else None
+
+    return float(roi_pct / abs(max_drawdown_pct))
