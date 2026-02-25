@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, RefreshCw, Smartphone, Building2, Bitcoin } from 'lucide-react';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const PendingPage = () => {
     const navigate = useNavigate();
@@ -44,6 +45,8 @@ const PendingPage = () => {
                     <Clock className={`h-12 w-12 text-[#F0B90B] ${isVerifying ? 'animate-spin' : ''}`} />
                 </div>
             </div>
+
+            <CheckoutProgressBar step={3} />
 
             <div className="flex items-center justify-center gap-3 mb-2">
                 <h1 className="text-4xl font-bold text-white">Esperando confirmación del pago</h1>

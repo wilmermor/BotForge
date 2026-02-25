@@ -1,6 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { XCircle, AlertCircle, Smartphone, Building2, Bitcoin, ArrowRight, MessageSquare } from 'lucide-react';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const FailedPage = () => {
     const navigate = useNavigate();
@@ -33,6 +34,8 @@ const FailedPage = () => {
                     <XCircle className="h-12 w-12 text-[#EF4444]" />
                 </div>
             </div>
+
+            <CheckoutProgressBar step={3} />
 
             <h1 className="text-4xl font-bold text-white mb-2">Pago no pudo ser procesado</h1>
             <p className="text-[#848E9C] text-lg mb-2 max-w-md mx-auto">

@@ -85,9 +85,9 @@ const LoginPage = () => {
                 </form>
 
                 <p className="mt-10 text-center text-sm text-[#848E9C]">
-                    Not a member?{' '}
+                    No tienes cuenta?{' '}
                     <Link to="/register" className="font-semibold leading-6 text-[#F0B90B] hover:text-[#d9a50a]">
-                        Start your journey
+                        Regitrate aqui
                     </Link>
                 </p>
             </div>

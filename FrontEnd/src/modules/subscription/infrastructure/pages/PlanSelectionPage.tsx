@@ -1,6 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
+import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const PlanSelectionPage = () => {
     const navigate = useNavigate();
@@ -19,6 +20,7 @@ const PlanSelectionPage = () => {
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-white mb-2">Selecciona tu plan</h1>
                 <p className="text-[#848E9C]">Elige el plan que mejor se adapte a tus necesidades de trading.</p>
+                <CheckoutProgressBar step={2} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
