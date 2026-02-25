@@ -2,6 +2,7 @@ import Sidebar from '../components/Sidebar';
 import type { ViewType } from '../components/Sidebar';
 import TopHeader from '../components/TopHeader';
 import DashboardComponent from '../components/DashboardComponent';
+import SimuladorComponent from '../components/SimuladorComponent';
 import { ArrowLeftRight } from 'lucide-react';
 import { useState } from 'react';
 
@@ -31,6 +32,8 @@ const DashboardPage = () => {
                 <main className="flex-1 overflow-y-auto bg-[#0B0E11] p-6 relative">
                     {activeView === 'dashboard' ? (
                         <DashboardComponent />
+                    ) : activeView === 'simulador' ? (
+                        <SimuladorComponent />
                     ) : (
                         <div className="h-full min-h-[500px] border-2 border-dashed border-[#F0B90B]/50 rounded-xl bg-[#1E2329]/50 flex flex-col items-center justify-center relative p-8 text-center transition-all duration-300">
                             <ArrowLeftRight className="h-16 w-16 text-[#F0B90B] mb-6 opacity-80" />
