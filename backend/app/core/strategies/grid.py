@@ -52,51 +52,72 @@ class GridStrategy(BaseStrategy):
         - Each grid level can hold at most one position.
         """
         df = df.copy()
-        upper = self.params["upper_price"]
-        lower = self.params["lower_price"]
-        grid_count = self.params["grid_count"]
-        investment = self.params["investment_amount"]
+        
+        # Edge case: empty dataframe or missing close column
+        if df.empty or "close" not in df.columns:
+            df["signal"] = 0
+            df["quantity"] = 0.0
+            if "close" in df.columns:
+                df["exec_price"] = df["close"]
+            else:
+                df["exec_price"] = 0.0
+            return df
+
+        # Edge case: handle NaNs by forward-filling, then backward-filling
+        df["close"] = df["close"].ffill().bfill()
+
+        upper = float(self.params["upper_price"])
+        lower = float(self.params["lower_price"])
+        grid_count = int(self.params["grid_count"])
+        investment = float(self.params["investment_amount"])
 
         # Create grid levels
         grid_levels = np.linspace(lower, upper, grid_count + 1)
         amount_per_grid = investment / grid_count
 
-        # Track which grid levels have been bought
-        grid_bought = {level: False for level in grid_levels}
-
-        signals = []
-        quantities = []
-        prices = []
-
-        close_prices = df["close"].values
-
-        for i in range(len(close_prices)):
+        # Optimize by using arrays for cache locality and fast access
+        levels_qty = np.zeros(len(grid_levels), dtype=np.float64)
+        
+        close_prices = df["close"].to_numpy()
+        n_prices = len(close_prices)
+        n_levels = len(grid_levels)
+        
+        signals = np.zeros(n_prices, dtype=np.int8)
+        quantities = np.zeros(n_prices, dtype=np.float64)
+        
+        for i in range(n_prices):
             price = close_prices[i]
-            signal = 0
-            qty = 0.0
-            exec_price = price
-
-            # Check each grid level
-            for level in grid_levels:
-                if price <= level and not grid_bought[level]:
-                    # Price is at or below this grid level → BUY
-                    signal = 1
-                    qty = amount_per_grid / price
-                    grid_bought[level] = True
+            
+            # Additional safety: should not happen after bfill, but protect against invalid prices
+            if price <= 0.0 or np.isnan(price):
+                continue
+                
+            # Ensure max 1 action per time step to avoid net overlap
+            action_taken = False
+            
+            # Check Sells First: iterate lowest to highest level
+            # If price rises above a level we hold, we sell it.
+            for j in range(n_levels):
+                if price >= grid_levels[j] and levels_qty[j] > 0.0:
+                    signals[i] = -1
+                    quantities[i] = levels_qty[j]
+                    levels_qty[j] = 0.0
+                    action_taken = True
                     break
-                elif price >= level and grid_bought[level]:
-                    # Price is at or above a bought level → SELL
-                    signal = -1
-                    qty = amount_per_grid / level  # Sell the qty bought at level
-                    grid_bought[level] = False
-                    break
-
-            signals.append(signal)
-            quantities.append(qty)
-            prices.append(exec_price)
+                    
+            if not action_taken:
+                # Check Buys: iterate highest to lowest level
+                # If price drops below a level we don't hold, we buy it.
+                for j in range(n_levels - 1, -1, -1):
+                    if price <= grid_levels[j] and levels_qty[j] == 0.0:
+                        signals[i] = 1
+                        buy_qty = amount_per_grid / price
+                        quantities[i] = buy_qty
+                        levels_qty[j] = buy_qty
+                        break
 
         df["signal"] = signals
         df["quantity"] = quantities
-        df["exec_price"] = prices
+        df["exec_price"] = close_prices
 
         return df

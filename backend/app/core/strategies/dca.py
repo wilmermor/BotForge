@@ -13,6 +13,7 @@ Parameters:
 
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 from app.core.strategies.base import BaseStrategy
@@ -48,71 +49,86 @@ class DCAStrategy(BaseStrategy):
         - After a TP/SL exit, restart DCA accumulation.
         """
         df = df.copy()
-        buy_amount = self.params["buy_amount"]
-        interval = self.params["interval_bars"]
-        tp_pct = self.params.get("take_profit_pct")
-        sl_pct = self.params.get("stop_loss_pct")
 
-        signals = []
-        quantities = []
-        prices = []
+        # Edge case: empty dataframe or missing close column
+        if df.empty or "close" not in df.columns:
+            df["signal"] = 0
+            df["quantity"] = 0.0
+            if "close" in df.columns:
+                df["exec_price"] = df["close"]
+            else:
+                df["exec_price"] = 0.0
+            return df
+
+        # Edge case: handle NaNs by forward-filling, then backward-filling
+        df["close"] = df["close"].ffill().bfill()
+
+        buy_amount = float(self.params["buy_amount"])
+        interval = int(self.params["interval_bars"])
+        
+        tp_pct = self.params.get("take_profit_pct")
+        if tp_pct is not None: tp_pct = float(tp_pct)
+            
+        sl_pct = self.params.get("stop_loss_pct")
+        if sl_pct is not None: sl_pct = float(sl_pct)
+
+        close_prices = df["close"].to_numpy()
+        n_prices = len(close_prices)
+
+        signals = np.zeros(n_prices, dtype=np.int8)
+        quantities = np.zeros(n_prices, dtype=np.float64)
 
         # Position tracking
         total_qty = 0.0
         total_cost = 0.0
         bars_since_last_buy = interval  # Buy on first bar
 
-        close_prices = df["close"].values
-
-        for i in range(len(close_prices)):
+        for i in range(n_prices):
             price = close_prices[i]
-            signal = 0
-            qty = 0.0
+
+            # Security catch, prevent devision by zero or issues with NaNs
+            if price <= 0.0 or np.isnan(price):
+                continue
 
             # Check TP/SL exits first (if we have a position)
-            if total_qty > 0:
+            if total_qty > 0.0:
                 avg_price = total_cost / total_qty
-                pnl_pct = ((price - avg_price) / avg_price) * 100
+                
+                if avg_price > 0.0:
+                    pnl_pct = ((price - avg_price) / avg_price) * 100.0
+                else:
+                    pnl_pct = 0.0
 
                 # Take Profit
                 if tp_pct is not None and pnl_pct >= tp_pct:
-                    signal = -1
-                    qty = total_qty
+                    signals[i] = -1
+                    quantities[i] = total_qty
                     total_qty = 0.0
                     total_cost = 0.0
                     bars_since_last_buy = 0
-                    signals.append(signal)
-                    quantities.append(qty)
-                    prices.append(price)
                     continue
 
                 # Stop Loss
                 if sl_pct is not None and pnl_pct <= -sl_pct:
-                    signal = -1
-                    qty = total_qty
+                    signals[i] = -1
+                    quantities[i] = total_qty
                     total_qty = 0.0
                     total_cost = 0.0
                     bars_since_last_buy = 0
-                    signals.append(signal)
-                    quantities.append(qty)
-                    prices.append(price)
                     continue
 
             # DCA Buy at interval
             bars_since_last_buy += 1
             if bars_since_last_buy >= interval:
-                signal = 1
-                qty = buy_amount / price
-                total_qty += qty
+                signals[i] = 1
+                buy_qty = buy_amount / price
+                quantities[i] = buy_qty
+                total_qty += buy_qty
                 total_cost += buy_amount
                 bars_since_last_buy = 0
 
-            signals.append(signal)
-            quantities.append(qty)
-            prices.append(price)
-
         df["signal"] = signals
         df["quantity"] = quantities
-        df["exec_price"] = prices
+        df["exec_price"] = close_prices
 
         return df
