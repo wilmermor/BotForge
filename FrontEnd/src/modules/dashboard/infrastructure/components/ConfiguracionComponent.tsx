@@ -13,6 +13,11 @@ import { Toast } from './configuracion/Toast';
 
 type SettingsTab = 'perfil' | 'seguridad' | 'suscripcion';
 
+interface ConfiguracionComponentProps {
+    activeTab: SettingsTab;
+    setActiveTab: (tab: SettingsTab) => void;
+}
+
 interface Plan {
     id: string;
     name: string;
@@ -20,9 +25,7 @@ interface Plan {
     features: string[];
 }
 
-const ConfiguracionComponent = () => {
-    const [activeTab, setActiveTab] = useState<SettingsTab>('perfil');
-
+const ConfiguracionComponent = ({ activeTab, setActiveTab }: ConfiguracionComponentProps) => {
     // --- Profile State ---
     const [avatar, setAvatar] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
