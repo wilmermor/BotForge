@@ -39,9 +39,7 @@ async def create_user(db: AsyncSession, data: RegisterRequest) -> User:
 
     # Get or create default "free" plan
     
-    print("lelimo2")
     result = await db.execute(select(Plan).where(Plan.name == "free"))
-    print("lelimo")
     plan = result.scalar_one_or_none()
     
     if not plan:
