@@ -1,7 +1,7 @@
 import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export type ViewType = 'dashboard' | 'simulador' | 'historial';
+export type ViewType = 'dashboard' | 'simulador' | 'historial' | 'configuracion' | 'soporte';
 
 interface SidebarProps {
     isCollapsed: boolean;
@@ -16,6 +16,11 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
         { id: 'dashboard' as ViewType, name: 'Dashboard', icon: LayoutGrid },
         { id: 'simulador' as ViewType, name: 'Simulador', icon: BarChart2 },
         { id: 'historial' as ViewType, name: 'Historial', icon: Clock },
+    ];
+
+    const systemItems = [
+        { id: 'configuracion' as ViewType, name: 'Configuración', icon: Settings },
+        { id: 'soporte' as ViewType, name: 'Soporte', icon: MessageSquare },
     ];
 
     const handleLogout = () => {
@@ -122,22 +127,40 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
                         </h3>
                     )}
                     <nav className="flex flex-col">
-                        <button className={`
-                            group relative flex items-center py-3 w-full text-[#848E9C] hover:bg-[#2B3139] hover:text-white transition-colors
-                            ${isCollapsed ? 'justify-center px-0' : 'px-6'}
-                        `}>
-                            <Settings className="h-6 w-6 shrink-0 transition-colors group-hover:text-white" />
-                            {!isCollapsed && <span className="ml-4 text-[14px] font-medium whitespace-nowrap">Configuración</span>}
-                            {isCollapsed && <div className="absolute left-16 hidden group-hover:block bg-[#1E2329] text-white px-3 py-1.5 rounded-md text-xs whitespace-nowrap z-50 border border-[#2B3139] shadow-lg">Configuración</div>}
-                        </button>
-                        <button className={`
-                            group relative flex items-center py-3 w-full text-[#848E9C] hover:bg-[#2B3139] hover:text-white transition-colors
-                            ${isCollapsed ? 'justify-center px-0' : 'px-6'}
-                        `}>
-                            <MessageSquare className="h-6 w-6 shrink-0 transition-colors group-hover:text-white" />
-                            {!isCollapsed && <span className="ml-4 text-[14px] font-medium whitespace-nowrap">Soporte</span>}
-                            {isCollapsed && <div className="absolute left-16 hidden group-hover:block bg-[#1E2329] text-white px-3 py-1.5 rounded-md text-xs whitespace-nowrap z-50 border border-[#2B3139] shadow-lg">Soporte</div>}
-                        </button>
+                        {systemItems.map((item) => {
+                            const isActive = activeView === item.id;
+                            const Icon = item.icon;
+
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveView(item.id)}
+                                    className={`
+                                        group relative flex items-center py-3 w-full transition-colors
+                                        ${isActive ? 'bg-[#2B3139]' : 'text-[#848E9C] hover:bg-[#2B3139] hover:text-white'}
+                                        ${isCollapsed ? 'justify-center px-0' : 'px-6'}
+                                    `}
+                                >
+                                    {/* Active Left Border indicator */}
+                                    <div className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[#F0B90B] transition-opacity ${isActive ? 'opacity-100' : 'opacity-0'}`} />
+
+                                    <Icon className={`h-6 w-6 shrink-0 transition-colors ${isActive ? 'text-[#F0B90B]' : 'group-hover:text-white'}`} />
+
+                                    {!isCollapsed && (
+                                        <span className={`ml-4 text-[14px] font-medium whitespace-nowrap overflow-hidden ${isActive ? 'text-[#F0B90B]' : ''}`}>
+                                            {item.name}
+                                        </span>
+                                    )}
+
+                                    {/* Tooltip for collapsed state */}
+                                    {isCollapsed && (
+                                        <div className="absolute left-16 hidden group-hover:block bg-[#1E2329] text-white px-3 py-1.5 rounded-md text-xs whitespace-nowrap z-50 border border-[#2B3139] shadow-lg">
+                                            {item.name}
+                                        </div>
+                                    )}
+                                </button>
+                            );
+                        })}
                     </nav>
                 </div>
             </div>
