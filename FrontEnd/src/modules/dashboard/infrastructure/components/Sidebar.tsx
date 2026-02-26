@@ -1,7 +1,7 @@
-import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut, ChevronDown } from 'lucide-react';
+import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export type ViewType = 'dashboard' | 'simulador' | 'historial' | 'configuracion' | 'soporte';
+export type ViewType = 'dashboard' | 'simulador' | 'historial' | 'notificaciones' | 'configuracion' | 'soporte';
 
 interface SidebarProps {
     isCollapsed: boolean;
@@ -16,6 +16,7 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
         { id: 'dashboard' as ViewType, name: 'Dashboard', icon: LayoutGrid },
         { id: 'simulador' as ViewType, name: 'Simulador', icon: BarChart2 },
         { id: 'historial' as ViewType, name: 'Historial', icon: Clock },
+        { id: 'notificaciones' as ViewType, name: 'Notificaciones', icon: Bell, badge: 3 },
     ];
 
     const systemItems = [
@@ -51,28 +52,6 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
                     )}
                 </div>
             </div>
-
-            {/* User Profile Card */}
-            <div className={`mb-6 transition-all ${isCollapsed ? 'px-2' : 'px-6'}`}>
-                <div className={`
-                    bg-[#1E2329] rounded-lg flex items-center 
-                    ${isCollapsed ? 'p-2 justify-center' : 'p-3'}
-                `}>
-                    <div className="h-10 w-10 bg-[#2B3139] rounded-lg flex items-center justify-center shrink-0">
-                        <span className="text-white font-medium text-sm">TR</span>
-                    </div>
-                    {!isCollapsed && (
-                        <div className="ml-3 flex-1 overflow-hidden">
-                            <div className="text-white text-sm font-medium truncate">Trader</div>
-                            <div className="flex items-center gap-1 mt-0.5">
-                                <span className="bg-[#F0B90B] text-black text-[10px] font-bold px-1.5 py-0.5 rounded leading-none">PLAN PRO</span>
-                            </div>
-                        </div>
-                    )}
-                    {!isCollapsed && <ChevronDown className="h-4 w-4 text-[#848E9C] shrink-0" />}
-                </div>
-            </div>
-
             {/* Navigation Menu */}
             <div className="flex-1 overflow-y-auto w-full">
                 <div className="mb-6">
@@ -102,15 +81,27 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
                                     <Icon className={`h-6 w-6 shrink-0 transition-colors ${isActive ? 'text-[#F0B90B]' : 'text-[#848E9C]'}`} />
 
                                     {!isCollapsed && (
-                                        <span className={`ml-4 text-[14px] font-medium whitespace-nowrap overflow-hidden ${isActive ? 'text-[#F0B90B]' : 'text-white'}`}>
-                                            {item.name}
-                                        </span>
+                                        <div className="flex items-center justify-between w-full ml-4">
+                                            <span className={`text-[14px] font-medium whitespace-nowrap overflow-hidden ${isActive ? 'text-[#F0B90B]' : 'text-white'}`}>
+                                                {item.name}
+                                            </span>
+                                            {item.badge && (
+                                                <span className="bg-[#F0B90B] text-black text-xs font-bold px-1.5 py-0.5 rounded-full mr-2">
+                                                    {item.badge}
+                                                </span>
+                                            )}
+                                        </div>
                                     )}
 
                                     {/* Tooltip for collapsed state */}
                                     {isCollapsed && (
-                                        <div className="absolute left-16 hidden group-hover:block bg-[#1E2329] text-white px-3 py-1.5 rounded-md text-xs whitespace-nowrap z-50 border border-[#2B3139] shadow-lg">
+                                        <div className="absolute left-16 hidden group-hover:block bg-[#1E2329] text-white px-3 py-1.5 rounded-md text-xs whitespace-nowrap z-50 border border-[#2B3139] shadow-lg flex items-center gap-2">
                                             {item.name}
+                                            {item.badge && (
+                                                <span className="bg-[#F0B90B] text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                                    {item.badge}
+                                                </span>
+                                            )}
                                         </div>
                                     )}
                                 </button>

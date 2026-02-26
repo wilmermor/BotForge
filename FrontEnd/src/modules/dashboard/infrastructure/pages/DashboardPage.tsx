@@ -6,12 +6,24 @@ import SimuladorComponent from '../components/SimuladorComponent';
 import HistorialComponent from '../components/HistorialComponent';
 import ConfiguracionComponent from '../components/ConfiguracionComponent';
 import SoporteComponent from '../components/SoporteComponent';
+import NotificacionesComponent from '../components/NotificacionesComponent';
 import { useState } from 'react';
+
+type SettingsTab = 'perfil' | 'seguridad' | 'suscripcion';
 
 const DashboardPage = () => {
     // Application State
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [activeView, setActiveView] = useState<ViewType>('dashboard');
+    const [activeConfigTab, setActiveConfigTab] = useState<SettingsTab>('perfil');
+
+    // unified navigation handler
+    const handleNavigate = (view: ViewType, configTab?: SettingsTab) => {
+        setActiveView(view);
+        if (configTab) {
+            setActiveConfigTab(configTab);
+        }
+    };
 
     const renderContent = () => {
         switch (activeView) {
@@ -21,8 +33,10 @@ const DashboardPage = () => {
                 return <SimuladorComponent />;
             case 'historial':
                 return <HistorialComponent />;
+            case 'notificaciones':
+                return <NotificacionesComponent />;
             case 'configuracion':
-                return <ConfiguracionComponent />;
+                return <ConfiguracionComponent activeTab={activeConfigTab} setActiveTab={setActiveConfigTab} />;
             case 'soporte':
                 return <SoporteComponent />;
             default:
@@ -45,13 +59,30 @@ const DashboardPage = () => {
                     isCollapsed={isCollapsed}
                     setIsCollapsed={setIsCollapsed}
                     activeView={activeView}
+                    onNavigate={handleNavigate}
                 />
 
                 {/* Dynamic Content Canvas with Independent Scroll */}
-                <main className="flex-1 overflow-y-auto bg-[#0B0E11] p-6 relative">
+                <main className="flex-1 overflow-y-auto bg-[#0B0E11] p-6 relative custom-scrollbar">
                     {renderContent()}
                 </main>
             </div>
+            {/* Global Custom Scrollbar logic passed down from previous views */}
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background-color: #2B3139;
+                    border-radius: 10px;
+                }
+                .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+                    background-color: #3A4149;
+                }
+            `}</style>
         </div>
     );
 };
