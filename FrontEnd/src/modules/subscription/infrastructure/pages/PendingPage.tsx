@@ -12,7 +12,7 @@ const PendingPage = () => {
     const transaction = {
         method: 'mobile', // 'mobile', 'transfer', 'crypto'
         plan: 'Plan Pro - Mensual',
-        amount: '$29.99 USD',
+        amount: '$19.99 USD',
         date: '18 Feb 2026, 21:05',
         reference: '1234-5678-9012',
     };
