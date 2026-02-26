@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Calendar,
     ChevronDown,
@@ -34,6 +34,64 @@ const SimuladorComponent = () => {
     const [qtyPerOrder, setQtyPerOrder] = useState('');
     const [autoCalculate, setAutoCalculate] = useState(false);
     const [leverage, setLeverage] = useState('14');
+
+    // Date Range State
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const today = new Date();
+    const [startDate, setStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
+
+    // Simulation Execution State
+    const [isLoading, setIsLoading] = useState(false);
+    const [simulationResult, setSimulationResult] = useState<any>(null);
+
+    const handleStartSimulation = async () => {
+        try {
+            setIsLoading(true);
+
+            // Build payload
+            const payload = {
+                strategy_id: "cff381e0-5c8b-4982-b82a-af0170a609aa",//id de estrategia placeholder
+                pair: "BTCUSDT",
+                timeframe: "1h",
+                date_start: new Date(startDate).toISOString(),
+                date_end: new Date(endDate).toISOString(),
+                strategy_type: "grid",
+                strategy_params: {
+                    upper_price: parseFloat(maxPrice) || 3000,
+                    lower_price: parseFloat(minPrice) || 2000,
+                    grid_count: parseInt(grids) || 12,
+                    investment_amount: parseFloat(investment) || 1000,
+                }
+            };
+
+            //const token = localStorage.getItem('token') || '';
+
+            //token placeholder sacado de la autorización por swager
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZDlmMmU5MS05MmM3LTRmMmEtYWJhNi1hMDJjZTkzODllZDkiLCJleHAiOjE3NzIwNzM2MzYsInR5cGUiOiJhY2Nlc3MifQ.6kNDweB_j8t3x6GrOVXRb32abg8QS-3okHsgg4f6l1c"
+            const response = await fetch("http://localhost:8000/api/v1/simulations/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setSimulationResult(data);
+                // Optionally switch to HISTORIAL tab
+                setPositionsTab('HISTORIAL');
+            } else {
+                console.error("Simulation failed:", await response.text());
+            }
+        } catch (error) {
+            console.error("Connection error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="w-full h-full flex flex-col  space-y-6">
@@ -86,10 +144,26 @@ const SimuladorComponent = () => {
                         </div>
 
                         {/* Date Range Selector */}
-                        <button className="hidden sm:flex items-center gap-2 text-[#848E9C] hover:text-white transition-colors text-sm font-medium">
-                            <Calendar className="w-4 h-4" />
-                            Rango de fechas <ChevronDown className="w-3 h-3" />
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 bg-[#1E2329] border border-[#2B3139] hover:border-[#3A4149] px-3 py-1.5 rounded-lg transition-colors">
+                                <Calendar className="w-4 h-4 text-[#848E9C]" />
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="date"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                        className="bg-transparent text-sm text-white focus:outline-none w-[110px] [&::-webkit-calendar-picker-indicator]:filter-invert"
+                                    />
+                                    <span className="text-[#848E9C]">-</span>
+                                    <input
+                                        type="date"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                        className="bg-transparent text-sm text-white focus:outline-none w-[110px] [&::-webkit-calendar-picker-indicator]:filter-invert"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Chart Container */}
@@ -105,25 +179,33 @@ const SimuladorComponent = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full">
                         <div className="bg-[#1E2329] border border-[#2B3139] rounded-lg p-3 flex flex-col justify-center">
                             <span className="text-[#848E9C] text-xs font-medium mb-1 flex items-center gap-1">
-                                <Activity className="w-3 h-3" /> Grids activos
+                                <Activity className="w-3 h-3" /> Trades totales
                             </span>
-                            <span className="text-white font-bold text-sm">12</span>
+                            <span className="text-white font-bold text-sm">
+                                {simulationResult ? simulationResult.metrics.total_trades : '0'}
+                            </span>
                         </div>
                         <div className="bg-[#1E2329] border border-[#2B3139] rounded-lg p-3 flex flex-col justify-center">
-                            <span className="text-[#848E9C] text-xs font-medium mb-1">Spread</span>
-                            <span className="text-white font-bold text-sm">2.5%</span>
+                            <span className="text-[#848E9C] text-xs font-medium mb-1">Win Rate</span>
+                            <span className="text-white font-bold text-sm">
+                                {simulationResult ? `${simulationResult.metrics.win_rate_pct.toFixed(2)}%` : '0.00%'}
+                            </span>
                         </div>
                         <div className="bg-[#1E2329] border border-[#2B3139] rounded-lg p-3 flex flex-col justify-center">
                             <span className="text-[#848E9C] text-xs font-medium mb-1 flex items-center gap-1">
                                 <TrendingUp className="w-3 h-3 text-[#02C076]" /> Profit estimado
                             </span>
-                            <span className="text-[#02C076] font-bold text-sm">+$124.50</span>
+                            <span className={`font-bold text-sm ${simulationResult && simulationResult.metrics.total_pnl < 0 ? 'text-[#F6465D]' : 'text-[#02C076]'}`}>
+                                {simulationResult ? `${simulationResult.metrics.total_pnl > 0 ? '+' : ''}$${simulationResult.metrics.total_pnl.toFixed(2)}` : '+$0.00'}
+                            </span>
                         </div>
                         <div className="bg-[#1E2329] border border-[#2B3139] rounded-lg p-3 flex flex-col justify-center">
                             <span className="text-[#848E9C] text-xs font-medium mb-1 flex items-center gap-1">
-                                <TrendingDown className="w-3 h-3 text-[#F6465D]" /> Drawdown
+                                <TrendingDown className="w-3 h-3 text-[#F6465D]" /> Drawdown Max
                             </span>
-                            <span className="text-[#F6465D] font-bold text-sm">-3.2%</span>
+                            <span className="text-[#F6465D] font-bold text-sm">
+                                {simulationResult ? `${simulationResult.metrics.max_drawdown_pct.toFixed(2)}%` : '0.00%'}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -321,8 +403,11 @@ const SimuladorComponent = () => {
 
                     {/* Action Buttons */}
                     <div className="p-5 border-t border-[#2B3139] bg-[#1E2329] rounded-b-xl flex flex-col gap-3">
-                        <button className="w-full py-3.5 rounded-lg font-bold text-white bg-[#02C076] hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                            INICIAR BOT
+                        <button
+                            onClick={handleStartSimulation}
+                            disabled={isLoading}
+                            className={`w-full py-3.5 rounded-lg font-bold text-white transition-all flex items-center justify-center gap-2 ${isLoading ? 'bg-[#2B3139] cursor-not-allowed' : 'bg-[#02C076] hover:brightness-110 active:scale-[0.98]'}`}>
+                            {isLoading ? 'SIMULANDO...' : 'INICIAR SIMULACIÓN'}
                         </button>
                         <button className="w-full py-2.5 rounded-lg font-medium text-white bg-[#2B3139] hover:bg-[#3A4149] transition-all flex items-center justify-center gap-2 text-sm">
                             <Settings className="w-4 h-4" /> Guardar configuración
@@ -548,49 +633,105 @@ const SimuladorComponent = () => {
 
                     {positionsTab === 'HISTORIAL' && (
                         <div className="flex flex-col gap-2">
-                            {/* History List Item 1 */}
-                            <div className="bg-[#1E2329] border border-[#2B3139] hover:bg-[#2B3139]/50 transition-colors rounded-lg p-3 flex items-center justify-between cursor-pointer group">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-1 h-10 bg-[#02C076] rounded-full" />
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="font-bold text-white text-sm">BTCUSDT Perp</span>
-                                            <span className="bg-[#2B3139] text-[#848E9C] text-[10px] px-1.5 py-0.5 rounded">Cerrada</span>
+                            {simulationResult && simulationResult.metrics && (
+                                <div className="bg-[#1E2329] border border-[#2B3139] rounded-lg p-4 mb-4">
+                                    <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+                                        <BookOpen className="w-4 h-4 text-[#F0B90B]" />
+                                        Resultados de Simulación (Métricas Finales)
+                                    </h3>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        <div>
+                                            <div className="text-[#848E9C] text-xs mb-1">ROI</div>
+                                            <div className="text-white font-bold">{simulationResult.metrics.roi_pct.toFixed(2)}%</div>
                                         </div>
-                                        <div className="text-[#848E9C] text-xs flex items-center gap-2">
-                                            <span><Clock className="w-3 h-3 inline mr-1" /> Hoy, 14:23</span>
-                                            <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                                            <span>Duración: 2d 4h</span>
+                                        <div>
+                                            <div className="text-[#848E9C] text-xs mb-1">Trades Ganadores</div>
+                                            <div className="text-[#02C076] font-bold">{simulationResult.metrics.profitable_trades}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[#848E9C] text-xs mb-1">Trades Perdedores</div>
+                                            <div className="text-[#F6465D] font-bold">{simulationResult.metrics.losing_trades}</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-[#848E9C] text-xs mb-1">Profit Factor</div>
+                                            <div className="text-white font-bold">{simulationResult.metrics.profit_factor?.toFixed(2) || '0.00'}</div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-[#02C076] font-bold">+184.20 USDT</div>
-                                    <div className="text-[#02C076] text-xs">+12.4%</div>
-                                </div>
-                            </div>
+                            )}
 
-                            {/* History List Item 2 */}
-                            <div className="bg-[#1E2329] border border-[#2B3139] hover:bg-[#2B3139]/50 transition-colors rounded-lg p-3 flex items-center justify-between cursor-pointer group">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-1 h-10 bg-[#F6465D] rounded-full" />
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="font-bold text-white text-sm">SOLUSDT Perp</span>
-                                            <span className="bg-[#2B3139] text-[#848E9C] text-[10px] px-1.5 py-0.5 rounded">Cerrada</span>
+                            {simulationResult && simulationResult.trades && simulationResult.trades.length > 0 ? (
+                                simulationResult.trades.map((trade: any, idx: number) => (
+                                    <div key={idx} className="bg-[#1E2329] border border-[#2B3139] hover:bg-[#2B3139]/50 transition-colors rounded-lg p-3 flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-1 h-10 ${trade.pnl && trade.pnl >= 0 ? 'bg-[#02C076]' : 'bg-[#F6465D]'} rounded-full`} />
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-bold text-white text-sm">{simulationResult.pair}</span>
+                                                    <span className="bg-[#2B3139] text-[#848E9C] text-[10px] px-1.5 py-0.5 rounded uppercase">Simulado</span>
+                                                </div>
+                                                <div className="text-[#848E9C] text-xs flex items-center gap-2">
+                                                    <span><Clock className="w-3 h-3 inline mr-1" /> {new Date(trade.timestamp).toLocaleString()}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
+                                                    <span className="uppercase">{trade.side === 'buy' ? 'Compra' : 'Venta'} {trade.quantity}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="text-[#848E9C] text-xs flex items-center gap-2">
-                                            <span><Clock className="w-3 h-3 inline mr-1" /> Ayer, 09:15</span>
-                                            <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                                            <span>Duración: 14h</span>
+                                        <div className="text-right">
+                                            <div className={`font-bold ${trade.pnl && trade.pnl >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]'}`}>
+                                                {trade.pnl ? (trade.pnl > 0 ? `+${trade.pnl.toFixed(2)} USDT` : `${trade.pnl.toFixed(2)} USDT`) : 'Abierta'}
+                                            </div>
+                                            <div className="text-[#848E9C] text-xs">A: {trade.price.toFixed(2)}</div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-[#F6465D] font-bold">-45.80 USDT</div>
-                                    <div className="text-[#F6465D] text-xs">-3.2%</div>
-                                </div>
-                            </div>
+                                ))
+                            ) : (
+                                <>
+                                    {/* History List Item 1 */}
+                                    <div className="bg-[#1E2329] border border-[#2B3139] hover:bg-[#2B3139]/50 transition-colors rounded-lg p-3 flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-1 h-10 bg-[#02C076] rounded-full" />
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-bold text-white text-sm">BTCUSDT Perp</span>
+                                                    <span className="bg-[#2B3139] text-[#848E9C] text-[10px] px-1.5 py-0.5 rounded">Cerrada</span>
+                                                </div>
+                                                <div className="text-[#848E9C] text-xs flex items-center gap-2">
+                                                    <span><Clock className="w-3 h-3 inline mr-1" /> Hoy, 14:23</span>
+                                                    <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
+                                                    <span>Duración: 2d 4h</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[#02C076] font-bold">+184.20 USDT</div>
+                                            <div className="text-[#02C076] text-xs">+12.4%</div>
+                                        </div>
+                                    </div>
+
+                                    {/* History List Item 2 */}
+                                    <div className="bg-[#1E2329] border border-[#2B3139] hover:bg-[#2B3139]/50 transition-colors rounded-lg p-3 flex items-center justify-between cursor-pointer group">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-1 h-10 bg-[#F6465D] rounded-full" />
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-bold text-white text-sm">SOLUSDT Perp</span>
+                                                    <span className="bg-[#2B3139] text-[#848E9C] text-[10px] px-1.5 py-0.5 rounded">Cerrada</span>
+                                                </div>
+                                                <div className="text-[#848E9C] text-xs flex items-center gap-2">
+                                                    <span><Clock className="w-3 h-3 inline mr-1" /> Ayer, 09:15</span>
+                                                    <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
+                                                    <span>Duración: 14h</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[#F6465D] font-bold">-45.80 USDT</div>
+                                            <div className="text-[#F6465D] text-xs">-3.2%</div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
