@@ -33,12 +33,15 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
             {/* Header: Logo */}
             <div className={`pt-6 pb-4 px-6 flex items-center shrink-0 ${isCollapsed ? 'justify-center px-0' : ''}`}>
                 <div className="flex items-center gap-3">
-                    <div className="text-[#F0B90B]">
-                        <BarChart2 className="h-8 w-8 stroke-[2.5px]" />
-                    </div>
+                    <img
+                        src="/ISOTIPO4.svg"
+                        alt="BotForge Logo"
+                        className="h-14 w-auto t-[#F0B90B]"
+                    />
+
                     {!isCollapsed && (
-                        <span className="text-white text-[18px] font-semibold tracking-wide whitespace-nowrap overflow-hidden">
-                            BacktestPro
+                        <span className="font-extrabold tracking-widest text-xl font-[Inter] transition-colors duration-500 text-[#F0B90B]">
+                            BOTFORGE
                         </span>
                     )}
                 </div>

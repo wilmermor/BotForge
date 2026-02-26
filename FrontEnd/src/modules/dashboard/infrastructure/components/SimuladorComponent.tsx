@@ -90,7 +90,7 @@ const SimuladorComponent = () => {
                     </div>
 
                     {/* Chart Container */}
-                    <div className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-4 flex flex-col relative h-[450px] overflow-hidden">
+                    <div className="bg-[#1E2329] rounded-xl border border-[#2B3139] flex flex-col relative h-[450px] overflow-hidden">
                         <TradingViewWidget />
                     </div>
 
