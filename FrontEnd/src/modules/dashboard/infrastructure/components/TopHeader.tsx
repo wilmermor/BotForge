@@ -11,6 +11,8 @@ const viewTitles: Record<ViewType, string> = {
     'dashboard': 'Dashboard',
     'simulador': 'Simulador',
     'historial': 'Historial',
+    'configuracion': 'Configuración',
+    'soporte': 'Soporte',
 };
 
 const TopHeader = ({ isCollapsed, setIsCollapsed, activeView }: TopHeaderProps) => {
