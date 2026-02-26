@@ -30,7 +30,7 @@ const CheckoutLayout = () => {
                                         <span className="text-[#F0B90B] text-xs font-semibold px-2 py-1 bg-[#F0B90B]/10 rounded-full">Mensual</span>
                                     </div>
                                     <div className="flex items-baseline">
-                                        <span className="text-3xl font-bold text-white">$29.99</span>
+                                        <span className="text-3xl font-bold text-white">$19.99</span>
                                         <span className="text-[#848E9C] ml-1">/mes</span>
                                     </div>
                                 </div>

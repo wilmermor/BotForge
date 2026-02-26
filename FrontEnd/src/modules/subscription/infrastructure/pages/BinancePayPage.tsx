@@ -49,7 +49,7 @@ const BinancePayPage = () => {
                             <div>
                                 <label className="text-sm text-[#848E9C]">Monto exacto</label>
                                 <div className="text-3xl font-bold text-white">29.99 USDT</div>
-                                <div className="text-xs text-[#848E9C]">≈ $29.99 USD</div>
+                                <div className="text-xs text-[#848E9C]">≈ $19.99 USD</div>
                             </div>
 
                             <div className="space-y-1">

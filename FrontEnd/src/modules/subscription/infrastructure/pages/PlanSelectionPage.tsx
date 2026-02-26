@@ -8,10 +8,10 @@ const PlanSelectionPage = () => {
 
     const handleSelectPlan = (plan: 'free' | 'pro') => {
         if (plan === 'pro') {
-            navigate('/checkout/payment');
+            navigate('/checkout/payment', { state: { amount: '$19.99 USD' } });
         } else {
             // Logic for free plan (maybe direct dashboard access?)
-            navigate('/dashboard');
+            navigate('/dashboard?view=dashboard');
         }
     };
 
@@ -55,7 +55,7 @@ const PlanSelectionPage = () => {
                     </div>
                     <h3 className="text-lg font-semibold text-white">Pro</h3>
                     <div className="mt-4 flex items-baseline text-white">
-                        <span className="text-4xl font-bold tracking-tight">$29.99</span>
+                        <span className="text-4xl font-bold tracking-tight">$19.99</span>
                         <span className="ml-1 text-xl font-semibold text-[#848E9C]">/mes</span>
                     </div>
                     <p className="mt-6 text-[#848E9C]">Para traders que van en serio.</p>

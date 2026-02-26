@@ -7,19 +7,35 @@ import HistorialComponent from '../components/HistorialComponent';
 import ConfiguracionComponent from '../components/ConfiguracionComponent';
 import SoporteComponent from '../components/SoporteComponent';
 import NotificacionesComponent from '../components/NotificacionesComponent';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 type SettingsTab = 'perfil' | 'seguridad' | 'suscripcion';
 
 const DashboardPage = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
     // Application State
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const [activeView, setActiveView] = useState<ViewType>('dashboard');
+    const [activeView, setActiveView] = useState<ViewType>((searchParams.get('view') as ViewType) || 'dashboard');
     const [activeConfigTab, setActiveConfigTab] = useState<SettingsTab>('perfil');
+
+    // Sync view if URL changes (external navigation)
+    useEffect(() => {
+        const view = searchParams.get('view') as ViewType;
+        if (view && view !== activeView) {
+            setActiveView(view);
+        }
+    }, [searchParams]);
+
+    // Update URL when activeView changes (internal navigation)
+    const handleUpdateView = (view: ViewType) => {
+        setActiveView(view);
+        setSearchParams({ view });
+    };
 
     // unified navigation handler
     const handleNavigate = (view: ViewType, configTab?: SettingsTab) => {
-        setActiveView(view);
+        handleUpdateView(view);
         if (configTab) {
             setActiveConfigTab(configTab);
         }
@@ -50,7 +66,7 @@ const DashboardPage = () => {
             <Sidebar
                 isCollapsed={isCollapsed}
                 activeView={activeView}
-                setActiveView={setActiveView}
+                setActiveView={handleUpdateView}
             />
 
             {/* Main Wrapper */}
