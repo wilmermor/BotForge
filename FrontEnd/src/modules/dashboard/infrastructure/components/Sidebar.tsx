@@ -1,5 +1,5 @@
 import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut, ChevronDown } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export type ViewType = 'dashboard' | 'simulador' | 'historial';
 
