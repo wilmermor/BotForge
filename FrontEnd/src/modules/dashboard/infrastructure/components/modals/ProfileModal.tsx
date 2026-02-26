@@ -4,8 +4,6 @@ import {
     User,
     Settings,
     CreditCard,
-    Key,
-    Sliders,
     LogOut
 } from 'lucide-react';
 import type { ViewType } from '../Sidebar';
@@ -79,21 +77,6 @@ export const ProfileModal = ({ isOpen, onNavigate }: ProfileModalProps) => {
                     >
                         <CreditCard className="w-4 h-4 text-[#848E9C] group-hover:text-[#F0B90B] transition-colors" />
                         <span className="text-sm font-medium">Suscripción y facturación</span>
-                    </button>
-                    <button
-                        onClick={() => onNavigate('configuracion', 'seguridad')}
-                        className="flex items-center gap-3 w-full py-2.5 px-2 rounded hover:bg-[#2B3139] text-white hover:text-[#F0B90B] transition-colors group"
-                    >
-                        <Key className="w-4 h-4 text-[#848E9C] group-hover:text-[#F0B90B] transition-colors" />
-                        <span className="text-sm font-medium">API Keys</span>
-                    </button>
-                    <button
-                        onClick={() => onNavigate('configuracion')}
-                        className="flex items-center gap-3 w-full py-2.5 px-2 rounded hover:bg-[#2B3139] text-white hover:text-[#F0B90B] transition-colors group"
-                    >
-                        <Sliders className="w-4 h-4 text-[#848E9C] group-hover:text-[#F0B90B] transition-colors" />
-                        <span className="text-sm font-medium">Preferencias</span>
-                        <span className="ml-auto bg-[#F0B90B] text-black text-[10px] font-bold px-1.5 py-0.5 rounded">Nuevo</span>
                     </button>
                 </div>
             </div>

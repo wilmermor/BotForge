@@ -127,20 +127,6 @@ const SimuladorComponent = () => {
                                 BTC/USDT <ChevronDown className="w-4 h-4 text-[#848E9C]" />
                             </button>
 
-                            {/* Interval Tabs */}
-                            <div className="hidden sm:flex items-center bg-[#1E2329] p-1 rounded-lg border border-[#2B3139]">
-                                {['1h', '4h', '12h', '1d'].map((interval) => (
-                                    <button
-                                        key={interval}
-                                        className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${interval === '4h'
-                                            ? 'bg-[#2B3139] text-[#F0B90B] border-b-2 border-[#F0B90B] pb-[2px]'
-                                            : 'text-[#848E9C] hover:text-white hover:bg-[#2B3139]/50'
-                                            }`}
-                                    >
-                                        {interval}
-                                    </button>
-                                ))}
-                            </div>
                         </div>
 
                         {/* Date Range Selector */}
