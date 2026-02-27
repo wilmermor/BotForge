@@ -1,5 +1,6 @@
 import type { PositionsTabType, StrategyType, SimulationResult } from './types';
 import { useState } from 'react';
+import type { SimulationStatus } from '../components/modals/SimulationLoadingModal';
 
 export const useSimulador = () => {
     const [positionsTab, setPositionsTab] = useState<PositionsTabType>('HISTORIAL');
@@ -32,6 +33,8 @@ export const useSimulador = () => {
     const [dcaSlPct, setDcaSlPct] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
+    const [simulationStatus, setSimulationStatus] = useState<SimulationStatus>('idle');
+    const [simulationError, setSimulationError] = useState<string | null>(null);
     const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
     const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
     const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null);
@@ -58,10 +61,16 @@ export const useSimulador = () => {
     const handleStartSimulation = async () => {
         try {
             setIsLoading(true);
+            setSimulationStatus('simulating');
+            setSimulationError(null);
+
+            // Start a timer for the minimum 10s duration
+            const minimumExecutionTime = 10000; // 10 seconds
+            const startTime = Date.now();
 
             // Build payload
             const payload = {
-                strategy_id: selectedStrategyId || "cff381e0-5c8b-4982-b82a-af0170a609aa",
+                strategy_id: selectedStrategyId || "47895ffa-e32b-41fd-8ba2-cc430bb65fe0",
                 pair: "BTCUSDT",
                 timeframe: "1h",
                 date_start: new Date(startDate).toISOString(),
@@ -82,7 +91,7 @@ export const useSimulador = () => {
                     }
             };
 
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZDlmMmU5MS05MmM3LTRmMmEtYWJhNi1hMDJjZTkzODllZDkiLCJleHAiOjE3NzIwNzM2MzYsInR5cGUiOiJhY2Nlc3MifQ.6kNDweB_j8t3x6GrOVXRb32abg8QS-3okHsgg4f6l1c";
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDkyNTAsInR5cGUiOiJhY2Nlc3MifQ.5unVva5TUW-zym5T93MjULYti5EwlUPEvu0t6imnDbA"
             const response = await fetch("http://localhost:8000/api/v1/simulations/", {
                 method: "POST",
                 headers: {
@@ -92,14 +101,20 @@ export const useSimulador = () => {
                 body: JSON.stringify(payload)
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const data = await response.json();
                 setSimulationResult(data);
+                setSimulationStatus('completed');
                 setPositionsTab('HISTORIAL');
             } else {
-                console.error("Simulation failed:", await response.text());
+                setSimulationStatus('error');
+                setSimulationError(data.detail || "Error en la simulación");
+                console.error("Simulation failed:", data);
             }
         } catch (error) {
+            setSimulationStatus('error');
+            setSimulationError("Error de conexión con el servidor");
             console.error("Connection error:", error);
         } finally {
             setIsLoading(false);
@@ -127,6 +142,8 @@ export const useSimulador = () => {
         dcaTpPct, setDcaTpPct,
         dcaSlPct, setDcaSlPct,
         isLoading,
+        simulationStatus, setSimulationStatus,
+        simulationError,
         simulationResult,
         isStrategyModalOpen, setIsStrategyModalOpen,
         selectedStrategyId,
