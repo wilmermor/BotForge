@@ -64,13 +64,9 @@ export const useSimulador = () => {
             setSimulationStatus('simulating');
             setSimulationError(null);
 
-            // Start a timer for the minimum 10s duration
-            const minimumExecutionTime = 10000; // 10 seconds
-            const startTime = Date.now();
-
             // Build payload
             const payload = {
-                strategy_id: selectedStrategyId || "47895ffa-e32b-41fd-8ba2-cc430bb65fe0",
+                strategy_id: selectedStrategyId || "486ef1dd-600a-4878-836b-b623b5a3b8b8",
                 pair: "BTCUSDT",
                 timeframe: "1h",
                 date_start: new Date(startDate).toISOString(),
@@ -91,7 +87,7 @@ export const useSimulador = () => {
                     }
             };
 
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDkyNTAsInR5cGUiOiJhY2Nlc3MifQ.5unVva5TUW-zym5T93MjULYti5EwlUPEvu0t6imnDbA"
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNmI5MDQ3Yi1jOGE2LTQwYjYtODhmOS1iYjYxY2Y4MDQxNTEiLCJleHAiOjE3NzIyMjE5ODMsInR5cGUiOiJhY2Nlc3MifQ.xVIDFhFu9oBk3DIJKTSoRV6sjN19pH-kY-9bBBYMMr0"
             const response = await fetch("http://localhost:8000/api/v1/simulations/", {
                 method: "POST",
                 headers: {

@@ -40,7 +40,7 @@ const SimuladorComponent = () => {
                     <div className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-4 flex flex-col relative h-[400px] overflow-hidden group">
                         <TradingViewWidget />
                         <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span className="bg-[#1E2329]/80 text-[#848E9C] text-xs px-3 py-1 rounded">Las líneas punteadas del grid (#F0B90B) se renderizan en el gráfico principal</span>
+                            <span className="bg-[#1E2329]/80 text-[#848E9C] text-xs px-3 py-1 rounded"></span>
                         </div>
                     </div>
 
