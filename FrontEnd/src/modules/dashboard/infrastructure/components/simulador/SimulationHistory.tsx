@@ -107,7 +107,8 @@ const SimulationHistory: React.FC<SimulationHistoryProps> = ({
                                                 <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
                                                 <span>Qty: {trade.quantity}</span>
                                                 <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                                                <span className="text-[#F0B90B]">Fee: ${trade.fee.toFixed(4)}</span>
+                                                {/*<span className="text-[#F0B90B]">Fee: ${trade.fee.toFixed(4)}</span>*/}
+                                                <span className="text-[#F0B90B]">Fee: 0.0</span>
                                             </div>
                                         </div>
                                     </div>
