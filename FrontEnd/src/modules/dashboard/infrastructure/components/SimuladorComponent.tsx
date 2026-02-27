@@ -43,14 +43,15 @@ const SimuladorComponent = () => {
                     setStrategyType={simulador.setStrategyType}
                 />
 
-            <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-                {/* LEFT COLUMN: Candlestick Chart and Indicators (70%) */}
-                <div className="lg:col-span-7 flex flex-col gap-4">
-                    {/* Chart Container */}
-                    <div className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-4 flex flex-col relative h-[400px] overflow-hidden group">
-                        <TradingViewWidget />
-                        <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span className="bg-[#1E2329]/80 text-[#848E9C] text-xs px-3 py-1 rounded"></span>
+                <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+                    {/* LEFT COLUMN: Candlestick Chart and Indicators (70%) */}
+                    <div className="lg:col-span-7 flex flex-col gap-4">
+                        {/* Chart Container */}
+                        <div className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-4 flex flex-col relative h-[400px] overflow-hidden group">
+                            <TradingViewWidget />
+                            <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="bg-[#1E2329]/80 text-[#848E9C] text-xs px-3 py-1 rounded"></span>
+                            </div>
                         </div>
 
                         <PerformanceIndicators simulationResult={simulador.simulationResult} />
