@@ -35,7 +35,7 @@ const SuccessPage = () => {
                 </div>
             </div>
 
-            <CheckoutProgressBar step={3} />
+            <CheckoutProgressBar step={4} />
 
             <h1 className="text-4xl font-bold text-white mb-2">¡Pago recibido con éxito!</h1>
             <p className="text-[#848E9C] text-lg mb-10 max-w-md mx-auto">

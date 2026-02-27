@@ -11,15 +11,20 @@ import {
     CheckCircle2,
     BookOpen,
     ToggleRight,
-    ToggleLeft
+    ToggleLeft,
+    FolderOpen,
+    Play
 } from 'lucide-react';
 
 import TradingViewWidget from './TradingViewWidget';
+import { StrategySelectionModal } from './modals/StrategySelectionModal';
 
-type PositionsTabType = 'ACTIVAS' | 'EJECUCION' | 'HISTORIAL';
+type PositionsTabType = 'HISTORIAL';
+type StrategyType = 'GRID' | 'DCA';
 
 const SimuladorComponent = () => {
-    const [positionsTab, setPositionsTab] = useState<PositionsTabType>('ACTIVAS');
+    const [positionsTab, setPositionsTab] = useState<PositionsTabType>('HISTORIAL');
+    const [strategyType, setStrategyType] = useState<StrategyType>('GRID');
 
     // Bot Configuration State
     const [gridType, setGridType] = useState<'ARITMETICA' | 'GEOMETRICA'>('ARITMETICA');
@@ -41,9 +46,35 @@ const SimuladorComponent = () => {
     const [startDate, setStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
 
-    // Simulation Execution State
+    // DCA Strategy State
+    const [dcaBuyAmount, setDcaBuyAmount] = useState('100');
+    const [dcaIntervalBars, setDcaIntervalBars] = useState('24');
+    const [dcaTpPct, setDcaTpPct] = useState('');
+    const [dcaSlPct, setDcaSlPct] = useState('');
+
     const [isLoading, setIsLoading] = useState(false);
     const [simulationResult, setSimulationResult] = useState<any>(null);
+    const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
+    const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null);
+
+    const handleSelectStrategy = (strategy: any) => {
+        setIsStrategyModalOpen(false);
+        setSelectedStrategyId(strategy.id);
+        const type = strategy.type.toUpperCase() as StrategyType;
+        setStrategyType(type);
+
+        if (type === 'GRID') {
+            setMinPrice(strategy.params.lower_price?.toString() || '');
+            setMaxPrice(strategy.params.upper_price?.toString() || '');
+            setGrids(strategy.params.grid_count?.toString() || '12');
+            setInvestment(strategy.params.investment_amount?.toString() || '');
+        } else {
+            setDcaBuyAmount(strategy.params.buy_amount?.toString() || '100');
+            setDcaIntervalBars(strategy.params.interval_bars?.toString() || '24');
+            setDcaTpPct(strategy.params.take_profit_pct?.toString() || '');
+            setDcaSlPct(strategy.params.stop_loss_pct?.toString() || '');
+        }
+    };
 
     const handleStartSimulation = async () => {
         try {
@@ -51,18 +82,25 @@ const SimuladorComponent = () => {
 
             // Build payload
             const payload = {
-                strategy_id: "cff381e0-5c8b-4982-b82a-af0170a609aa",//id de estrategia placeholder
+                strategy_id: selectedStrategyId || "cff381e0-5c8b-4982-b82a-af0170a609aa",//id de estrategia placeholder
                 pair: "BTCUSDT",
                 timeframe: "1h",
                 date_start: new Date(startDate).toISOString(),
                 date_end: new Date(endDate).toISOString(),
-                strategy_type: "grid",
-                strategy_params: {
-                    upper_price: parseFloat(maxPrice) || 3000,
-                    lower_price: parseFloat(minPrice) || 2000,
-                    grid_count: parseInt(grids) || 12,
-                    investment_amount: parseFloat(investment) || 1000,
-                }
+                strategy_type: strategyType.toLowerCase(),
+                strategy_params: strategyType === 'GRID'
+                    ? {
+                        upper_price: parseFloat(maxPrice) || 3000,
+                        lower_price: parseFloat(minPrice) || 2000,
+                        grid_count: parseInt(grids) || 12,
+                        investment_amount: parseFloat(investment) || 1000,
+                    }
+                    : {
+                        buy_amount: parseFloat(dcaBuyAmount) || 100,
+                        interval_bars: parseInt(dcaIntervalBars) || 24,
+                        take_profit_pct: dcaTpPct ? parseFloat(dcaTpPct) : null,
+                        stop_loss_pct: dcaSlPct ? parseFloat(dcaSlPct) : null,
+                    }
             };
 
             //const token = localStorage.getItem('token') || '';
@@ -101,7 +139,7 @@ const SimuladorComponent = () => {
                 <div>
                     <div className="flex items-center gap-3">
                         <h1 className="text-[28px] font-bold text-white tracking-tight">
-                            Simulador de Bots - Grid Trading
+                            Simulador de Bots - {strategyType === 'GRID' ? 'Grid Trading' : 'DCA Strategy'}
                         </h1>
                         <div className="bg-[#2B3139] px-3 py-1.5 rounded-full border border-[#3A4149] flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#F0B90B] animate-pulse"></span>
@@ -109,48 +147,91 @@ const SimuladorComponent = () => {
                         </div>
                     </div>
                     <p className="text-[#848E9C] text-sm mt-1">
-                        Configura y prueba tus estrategias automatizadas
+                        Configura y prueba tus {strategyType === 'GRID' ? 'estrategias de malla' : 'estrategias de promediado de costo'} automatizadas
                     </p>
                 </div>
+
+                {/* Strategy Selector */}
+
             </header>
+
+            {/* Full Width Selectors Bar */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full rounded-xl mb-2">
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                    {/* Strategy Library Button */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsStrategyModalOpen(!isStrategyModalOpen)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all border ${isStrategyModalOpen
+                                    ? 'bg-[#F0B90B] text-black border-[#F0B90B]'
+                                    : 'bg-[#2B3139] text-white border-[#3A4149] hover:border-[#F0B90B]'
+                                }`}
+                        >
+                            <FolderOpen className="w-4 h-4" />
+                            Mis Estrategias
+                        </button>
+
+                        <StrategySelectionModal
+                            isOpen={isStrategyModalOpen}
+                            onClose={() => setIsStrategyModalOpen(false)}
+                            onSelect={handleSelectStrategy}
+                        />
+                    </div>
+
+                    <div className="w-[1px] h-8 bg-[#2B3139] hidden md:block" />
+
+                    {/* Pair Selector */}
+                    <button className="bg-[#2B3139] border border-[#3A4149] hover:border-[#4A5159] px-4 py-2 rounded-lg flex items-center gap-2 text-white font-medium transition-colors">
+                        BTC/USDT
+                    </button>
+
+                    {/* Date Range Selector */}
+                    <div className="flex items-center gap-2 bg-[#2B3139] border border-[#3A4149] hover:border-[#4A5159] px-3 py-1.5 rounded-lg transition-colors">
+                        <Calendar className="w-4 h-4 text-[#848E9C]" />
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="bg-transparent text-sm text-white focus:outline-none w-[110px] [&::-webkit-calendar-picker-indicator]:filter-invert"
+                            />
+                            <span className="text-[#848E9C]">-</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="bg-transparent text-sm text-white focus:outline-none w-[110px] [&::-webkit-calendar-picker-indicator]:filter-invert"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="relative flex bg-[#2B3139] p-1 rounded-xl border border-[#3A4149] w-64 h-[44px]">
+                    {/* Animated Background Selector */}
+                    <div
+                        className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#F0B90B] rounded-lg transition-transform duration-300 ease-in-out ${strategyType === 'DCA' ? 'translate-x-full' : 'translate-x-0'}`}
+                    />
+
+                    <button
+                        onClick={() => setStrategyType('GRID')}
+                        className={`relative z-10 flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-colors duration-300 flex items-center justify-center gap-2 ${strategyType === 'GRID' ? 'text-[#1E2329]' : 'text-[#848E9C] hover:text-white'}`}
+                    >
+                        <Settings className="w-4 h-4" /> GRID
+                    </button>
+                    <button
+                        onClick={() => setStrategyType('DCA')}
+                        className={`relative z-10 flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-colors duration-300 flex items-center justify-center gap-2 ${strategyType === 'DCA' ? 'text-[#1E2329]' : 'text-[#848E9C] hover:text-white'}`}
+                    >
+                        <Activity className="w-4 h-4" /> DCA
+                    </button>
+                </div>
+            </div>
 
             {/* Main Grid: 70 / 30 */}
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
 
                 {/* LEFT COLUMN: Candlestick Chart and Indicators (70%) */}
                 <div className="lg:col-span-7 flex flex-col gap-4">
-                    {/* Top Selectors */}
-                    <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-4">
-                            {/* Pair Selector */}
-                            <button className="bg-[#1E2329] border border-[#2B3139] hover:border-[#3A4149] px-4 py-2 rounded-lg flex items-center gap-2 text-white font-medium transition-colors">
-                                BTC/USDT <ChevronDown className="w-4 h-4 text-[#848E9C]" />
-                            </button>
-
-                        </div>
-
-                        {/* Date Range Selector */}
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2 bg-[#1E2329] border border-[#2B3139] hover:border-[#3A4149] px-3 py-1.5 rounded-lg transition-colors">
-                                <Calendar className="w-4 h-4 text-[#848E9C]" />
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="date"
-                                        value={startDate}
-                                        onChange={(e) => setStartDate(e.target.value)}
-                                        className="bg-transparent text-sm text-white focus:outline-none w-[110px] [&::-webkit-calendar-picker-indicator]:filter-invert"
-                                    />
-                                    <span className="text-[#848E9C]">-</span>
-                                    <input
-                                        type="date"
-                                        value={endDate}
-                                        onChange={(e) => setEndDate(e.target.value)}
-                                        className="bg-transparent text-sm text-white focus:outline-none w-[110px] [&::-webkit-calendar-picker-indicator]:filter-invert"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* Chart Container */}
                     <div className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-4 flex flex-col relative h-[400px] overflow-hidden group">
@@ -206,119 +287,183 @@ const SimuladorComponent = () => {
                     </div>
 
                     {/* Config Scrollable Area */}
-                    <div className="flex-1 p-5 flex flex-col space-y-5 overflow-y-auto custom-scrollbar">
+                    <div className="flex-1 p-5 flex flex-col space-y-5 overflow-y-auto custom-scrollbar max-h-[600px]">
 
-                        {/* Field 1: Price Range */}
-                        <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-sm text-white font-medium">Rango de precio</label>
-                            </div>
-                            <div className="flex gap-2 mb-1">
-                                <div className="flex-1 bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
+                        {strategyType === 'GRID' ? (
+                            <>
+                                {/* Field 1: Price Range */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="text-sm text-white font-medium">Rango de precio</label>
+                                    </div>
+                                    <div className="flex gap-2 mb-1">
+                                        <div className="flex-1 bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
+                                            <input
+                                                type="number"
+                                                value={minPrice}
+                                                onChange={(e) => setMinPrice(e.target.value)}
+                                                placeholder="Min: 2.000"
+                                                className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                            />
+                                        </div>
+                                        <div className="flex-1 bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
+                                            <input
+                                                type="number"
+                                                value={maxPrice}
+                                                onChange={(e) => setMaxPrice(e.target.value)}
+                                                placeholder="Max: 3.000"
+                                                className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="text-xs text-[#848E9C] text-right">Precio marca: 2.124 USDT</div>
+                                </div>
+
+                                {/* Field 2: Grid Quantity */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <label className="text-sm text-white font-medium">Cantidad de grids</label>
+                                        <div className="flex bg-[#2B3139] rounded p-0.5">
+                                            <button
+                                                onClick={() => setGridType('ARITMETICA')}
+                                                className={`px-2 py-1 text-[10px] font-medium rounded ${gridType === 'ARITMETICA'
+                                                    ? 'bg-[#1E2329] text-[#F0B90B] border border-[#F0B90B]/50'
+                                                    : 'text-[#848E9C] hover:text-white'
+                                                    }`}
+                                            >
+                                                Aritmética
+                                            </button>
+                                            <button
+                                                onClick={() => setGridType('GEOMETRICA')}
+                                                className={`px-2 py-1 text-[10px] font-medium rounded ${gridType === 'GEOMETRICA'
+                                                    ? 'bg-[#1E2329] text-[#F0B90B] border border-[#F0B90B]/50'
+                                                    : 'text-[#848E9C] hover:text-white'
+                                                    }`}
+                                            >
+                                                Geométrica
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
+                                        <input
+                                            type="number"
+                                            value={grids}
+                                            onChange={(e) => setGrids(e.target.value)}
+                                            placeholder="12"
+                                            className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Investment (Grid Only) */}
+                                <div>
+                                    <label className="text-sm text-white font-medium block mb-2">Inversión total</label>
+                                    <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors mb-1">
+                                        <input
+                                            type="number"
+                                            value={investment}
+                                            onChange={(e) => setInvestment(e.target.value)}
+                                            placeholder="1,000.00"
+                                            className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                        />
+                                        <span className="text-[#848E9C] text-sm font-medium">USDT</span>
+                                    </div>
+                                    <div className="text-xs text-[#848E9C] text-right">Por grid: {(parseFloat(investment) / (parseInt(grids) || 1) || 0).toFixed(2)} USDT</div>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                {/* DCA Specific Fields */}
+                                <div>
+                                    <label className="text-sm text-white font-medium block mb-2">Monto de Compra (USD)</label>
+                                    <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
+                                        <input
+                                            type="number"
+                                            value={dcaBuyAmount}
+                                            onChange={(e) => setDcaBuyAmount(e.target.value)}
+                                            placeholder="100.00"
+                                            className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                        />
+                                        <span className="text-[#848E9C] text-sm font-medium">USDT</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-white font-medium block mb-2">Intervalo de Barras</label>
+                                    <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
+                                        <input
+                                            type="number"
+                                            value={dcaIntervalBars}
+                                            onChange={(e) => setDcaIntervalBars(e.target.value)}
+                                            placeholder="24"
+                                            className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                        />
+                                        <span className="text-[#848E9C] text-xs px-2">Barras</span>
+                                    </div>
+                                    <p className="text-[10px] text-[#848E9C] mt-1">Frecuencia de compra recurrente</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="text-xs text-white font-medium block mb-2">Take Profit (%)</label>
+                                        <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#02C076] transition-colors">
+                                            <input
+                                                type="number"
+                                                value={dcaTpPct}
+                                                onChange={(e) => setDcaTpPct(e.target.value)}
+                                                placeholder="10.0"
+                                                className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-white font-medium block mb-2">Stop Loss (%)</label>
+                                        <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F6465D] transition-colors">
+                                            <input
+                                                type="number"
+                                                value={dcaSlPct}
+                                                onChange={(e) => setDcaSlPct(e.target.value)}
+                                                placeholder="5.0"
+                                                className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Common Fields for both strategies if any, currently leverage etc below */}
+
+                        {strategyType === 'GRID' && (
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-sm text-white font-medium">Cant/orden <span className="text-[#848E9C] font-normal">(opcional)</span></label>
+                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={autoCalculate}
+                                            onChange={(e) => setAutoCalculate(e.target.checked)}
+                                            className="hidden"
+                                        />
+                                        {autoCalculate ? (
+                                            <ToggleRight className="w-4 h-4 text-[#02C076]" />
+                                        ) : (
+                                            <ToggleLeft className="w-4 h-4 text-[#848E9C]" />
+                                        )}
+                                        <span className="text-[#848E9C] text-[10px]">Auto-calcular</span>
+                                    </label>
+                                </div>
+                                <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
                                     <input
                                         type="number"
-                                        value={minPrice}
-                                        onChange={(e) => setMinPrice(e.target.value)}
-                                        placeholder="Min: 2.000"
-                                        className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
+                                        value={qtyPerOrder}
+                                        onChange={(e) => setQtyPerOrder(e.target.value)}
+                                        placeholder="0.000"
+                                        disabled={autoCalculate}
+                                        className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C] disabled:opacity-50"
                                     />
-                                </div>
-                                <div className="flex-1 bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
-                                    <input
-                                        type="number"
-                                        value={maxPrice}
-                                        onChange={(e) => setMaxPrice(e.target.value)}
-                                        placeholder="Max: 3.000"
-                                        className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
-                                    />
+                                    <span className="text-[#848E9C] text-sm font-medium">BTC</span>
                                 </div>
                             </div>
-                            <div className="text-xs text-[#848E9C] text-right">Precio marca: 2.124 USDT</div>
-                        </div>
-
-                        {/* Field 2: Grid Quantity */}
-                        <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-sm text-white font-medium">Cantidad de grids</label>
-                                <div className="flex bg-[#2B3139] rounded p-0.5">
-                                    <button
-                                        onClick={() => setGridType('ARITMETICA')}
-                                        className={`px-2 py-1 text-[10px] font-medium rounded ${gridType === 'ARITMETICA'
-                                            ? 'bg-[#1E2329] text-[#F0B90B] border border-[#F0B90B]/50'
-                                            : 'text-[#848E9C] hover:text-white'
-                                            }`}
-                                    >
-                                        Aritmética
-                                    </button>
-                                    <button
-                                        onClick={() => setGridType('GEOMETRICA')}
-                                        className={`px-2 py-1 text-[10px] font-medium rounded ${gridType === 'GEOMETRICA'
-                                            ? 'bg-[#1E2329] text-[#F0B90B] border border-[#F0B90B]/50'
-                                            : 'text-[#848E9C] hover:text-white'
-                                            }`}
-                                    >
-                                        Geométrica
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
-                                <input
-                                    type="number"
-                                    value={grids}
-                                    onChange={(e) => setGrids(e.target.value)}
-                                    placeholder="12"
-                                    className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Field 3: Total Investment */}
-                        <div>
-                            <label className="text-sm text-white font-medium block mb-2">Inversión total</label>
-                            <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors mb-1">
-                                <input
-                                    type="number"
-                                    value={investment}
-                                    onChange={(e) => setInvestment(e.target.value)}
-                                    placeholder="1,000.00"
-                                    className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C]"
-                                />
-                                <span className="text-[#848E9C] text-sm font-medium">USDT</span>
-                            </div>
-                            <div className="text-xs text-[#848E9C] text-right">Por grid: 83.33 USDT</div>
-                        </div>
-
-                        {/* Field 4: Amount per order (optional) */}
-                        <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <label className="text-sm text-white font-medium">Cant/orden <span className="text-[#848E9C] font-normal">(opcional)</span></label>
-                                <label className="flex items-center gap-1.5 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={autoCalculate}
-                                        onChange={(e) => setAutoCalculate(e.target.checked)}
-                                        className="hidden"
-                                    />
-                                    {autoCalculate ? (
-                                        <ToggleRight className="w-4 h-4 text-[#02C076]" />
-                                    ) : (
-                                        <ToggleLeft className="w-4 h-4 text-[#848E9C]" />
-                                    )}
-                                    <span className="text-[#848E9C] text-[10px]">Auto-calcular</span>
-                                </label>
-                            </div>
-                            <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
-                                <input
-                                    type="number"
-                                    value={qtyPerOrder}
-                                    onChange={(e) => setQtyPerOrder(e.target.value)}
-                                    placeholder="0.000"
-                                    disabled={autoCalculate}
-                                    className="w-full bg-transparent py-2 text-white text-sm focus:outline-none placeholder-[#848E9C] disabled:opacity-50"
-                                />
-                                <span className="text-[#848E9C] text-sm font-medium">BTC</span>
-                            </div>
-                        </div>
+                        )}
 
                         {/* Liquidation Summary */}
                         <div className="bg-[#1E2329] border border-[#2B3139] p-3 rounded-lg shadow-inner">
@@ -409,7 +554,7 @@ const SimuladorComponent = () => {
                 {/* Top Tabs */}
                 <div className="flex items-center justify-between border-b border-[#2B3139] mb-6">
                     <div className="flex">
-                        {(['ACTIVAS', 'EJECUCION', 'HISTORIAL'] as PositionsTabType[]).map((tab) => (
+                        {(['HISTORIAL'] as PositionsTabType[]).map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setPositionsTab(tab)}
@@ -418,204 +563,14 @@ const SimuladorComponent = () => {
                                     : 'text-[#848E9C] border-transparent hover:text-white'
                                     }`}
                             >
-                                {tab === 'ACTIVAS' ? 'POSICIONES ACTIVAS' : tab === 'EJECUCION' ? 'EN EJECUCIÓN' : 'HISTORIAL'}
+                                {tab === 'HISTORIAL' ? 'HISTORIAL' : tab}
                             </button>
                         ))}
                     </div>
-                    <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-[#2B3139] hover:bg-[#3A4149] rounded text-[#F0B90B] text-xs font-bold transition-colors">
-                        VER TODO EL HISTORIAL
-                    </button>
                 </div>
 
                 {/* Tab Content */}
-                <div className="w-full max-h-[400px] overflow-y-auto custom-scrollbar pb-6 pr-2">
-                    {positionsTab === 'ACTIVAS' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {/* Card 1 */}
-                            <div className="bg-[#1E2329] border border-[#2B3139] hover:border-[#F0B90B]/50 transition-colors rounded-xl p-4 relative overflow-hidden group">
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#02C076]" />
-                                {/* Header */}
-                                <div className="flex justify-between items-center mb-4 pl-2">
-                                    <div className="font-bold text-white">BTCUSDT Perp</div>
-                                    <div className="bg-[#2B3139] text-[#F0B90B] text-[10px] font-bold px-2 py-0.5 rounded">Cruzado 14X</div>
-                                </div>
-                                {/* Grid Data */}
-                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 pl-2 mb-5">
-                                    <div>
-                                        <div className="text-[#848E9C] text-[10px] mb-0.5">Pérdidas y ganancias (USDT)</div>
-                                        <div className="text-[#02C076] font-bold text-lg">+3,484.81</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Cantidad (USDT)</div>
-                                        <div className="text-white font-medium text-sm">18,200.0</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Entrada (USDT)</div>
-                                        <div className="text-white text-sm">2.627</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Margen (USDT)</div>
-                                        <div className="text-white text-sm">1,300.0</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Proporción de margen</div>
-                                        <div className="text-[#F0B90B] text-sm font-medium">0.86%</div>
-                                    </div>
-                                    <div className="relative group/tooltip">
-                                        <div className="text-[#848E9C] text-xs mb-0.5 truncate cursor-help">Precio de marca (U...</div>
-                                        <div className="text-white text-sm">2.124</div>
-                                        <div className="absolute bottom-full left-0 mb-1 bg-[#2B3139] text-white text-xs px-2 py-1 rounded hidden group-hover/tooltip:block z-10 whitespace-nowrap border border-[#3A4149]">
-                                            Precio de marca (USDT)
-                                        </div>
-                                    </div>
-                                    <div className="col-span-2 grid grid-cols-2 gap-4">
-                                        <div className="relative group/tooltip">
-                                            <div className="text-[#848E9C] text-xs mb-0.5 truncate cursor-help">Precio de liquidación...</div>
-                                            <div className="text-[#F6465D] text-sm font-medium">2.815</div>
-                                            <div className="absolute bottom-full left-0 mb-1 bg-[#2B3139] text-white text-xs px-2 py-1 rounded hidden group-hover/tooltip:block z-10 whitespace-nowrap border border-[#3A4149]">
-                                                Precio de liquidación (USDT)
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Actions */}
-                                <div className="flex items-center gap-2 pl-2">
-                                    <button className="flex-1 py-1.5 bg-[#2B3139] hover:bg-[#3A4149] rounded text-white text-xs font-medium transition-colors">Leverage</button>
-                                    <button className="flex-1 py-1.5 bg-[#2B3139] hover:bg-[#3A4149] rounded text-white text-xs font-medium transition-colors">TP/SL</button>
-                                    <button className="flex-1 py-1.5 bg-[#F6465D]/10 hover:bg-[#F6465D]/20 border border-transparent hover:border-[#F6465D]/50 rounded text-[#F6465D] text-xs font-medium transition-colors">Close</button>
-                                </div>
-                            </div>
-
-                            {/* Card 2 */}
-                            <div className="bg-[#1E2329] border border-[#2B3139] hover:border-[#F0B90B]/50 transition-colors rounded-xl p-4 relative overflow-hidden group">
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#F6465D]" />
-                                {/* Header */}
-                                <div className="flex justify-between items-center mb-4 pl-2">
-                                    <div className="font-bold text-white">BTCUSDT Perp</div>
-                                    <div className="bg-[#2B3139] text-[#F0B90B] text-[10px] font-bold px-2 py-0.5 rounded">Aislado 5X</div>
-                                </div>
-                                {/* Grid Data */}
-                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 pl-2 mb-5">
-                                    <div>
-                                        <div className="text-[#848E9C] text-[10px] mb-0.5">Pérdidas y ganancias (USDT)</div>
-                                        <div className="text-[#F6465D] font-bold text-lg">-124.50</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Cantidad (USDT)</div>
-                                        <div className="text-white font-medium text-sm">0.25</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Entrada (USDT)</div>
-                                        <div className="text-white text-sm">44,230</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Margen (USDT)</div>
-                                        <div className="text-white text-sm">2,211.5</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Proporción de margen</div>
-                                        <div className="text-[#F0B90B] text-sm font-medium">12.4%</div>
-                                    </div>
-                                    <div className="relative group/tooltip">
-                                        <div className="text-[#848E9C] text-xs mb-0.5 truncate cursor-help">Precio de marca (U...</div>
-                                        <div className="text-white text-sm">43,890</div>
-                                        <div className="absolute bottom-full left-0 mb-1 bg-[#2B3139] text-white text-xs px-2 py-1 rounded hidden group-hover/tooltip:block z-10 whitespace-nowrap border border-[#3A4149]">
-                                            Precio de marca (USDT)
-                                        </div>
-                                    </div>
-                                    <div className="col-span-2 grid grid-cols-2 gap-4">
-                                        <div className="relative group/tooltip">
-                                            <div className="text-[#848E9C] text-xs mb-0.5 truncate cursor-help">Precio de liquidación...</div>
-                                            <div className="text-[#F6465D] text-sm font-medium">41,200</div>
-                                            <div className="absolute bottom-full left-0 mb-1 bg-[#2B3139] text-white text-xs px-2 py-1 rounded hidden group-hover/tooltip:block z-10 whitespace-nowrap border border-[#3A4149]">
-                                                Precio de liquidación (USDT)
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Actions */}
-                                <div className="flex items-center gap-2 pl-2">
-                                    <button className="flex-1 py-1.5 bg-[#2B3139] hover:bg-[#3A4149] rounded text-white text-xs font-medium transition-colors">Leverage</button>
-                                    <button className="flex-1 py-1.5 bg-[#2B3139] hover:bg-[#3A4149] rounded text-white text-xs font-medium transition-colors">TP/SL</button>
-                                    <button className="flex-1 py-1.5 bg-[#F6465D]/10 hover:bg-[#F6465D]/20 border border-transparent hover:border-[#F6465D]/50 rounded text-[#F6465D] text-xs font-medium transition-colors">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {positionsTab === 'EJECUCION' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {/* Running Card */}
-                            <div className="bg-[#1E2329] border border-[#2B3139] hover:border-[#F0B90B]/50 transition-colors rounded-xl p-4 relative overflow-hidden group">
-                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#02C076]" />
-                                {/* Header */}
-                                <div className="flex justify-between items-center mb-4 pl-2">
-                                    <div className="font-bold text-white">ETHUSDT Perp</div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="bg-[#F0B90B]/20 border border-[#F0B90B]/50 text-[#F0B90B] text-[10px] font-bold px-2 py-0.5 rounded animate-pulse">EJECUTANDO</div>
-                                        <div className="bg-[#2B3139] text-[#F0B90B] text-[10px] font-bold px-2 py-0.5 rounded">Cruzado 10X</div>
-                                    </div>
-                                </div>
-
-                                {/* Progress */}
-                                <div className="pl-2 mb-4">
-                                    <div className="flex justify-between text-[10px] text-[#848E9C] mb-1">
-                                        <span>Órdenes completadas</span>
-                                        <span>3 / 12</span>
-                                    </div>
-                                    <div className="w-full bg-[#2B3139] h-1.5 rounded-full overflow-hidden">
-                                        <div className="bg-[#02C076] h-full w-1/4"></div>
-                                    </div>
-                                </div>
-
-                                {/* Grid Data */}
-                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 pl-2 mb-5">
-                                    <div>
-                                        <div className="text-[#848E9C] text-[10px] mb-0.5">Pérdidas y ganancias (USDT)</div>
-                                        <div className="text-[#02C076] font-bold text-lg">+56.30</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Cantidad (USDT)</div>
-                                        <div className="text-white font-medium text-sm">1.5</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Entrada (USDT)</div>
-                                        <div className="text-white text-sm">2,850</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Margen (USDT)</div>
-                                        <div className="text-white text-sm">427.5</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[#848E9C] text-xs mb-0.5">Proporción de margen</div>
-                                        <div className="text-[#F0B90B] text-sm font-medium">2.1%</div>
-                                    </div>
-                                    <div className="relative group/tooltip">
-                                        <div className="text-[#848E9C] text-xs mb-0.5 truncate cursor-help">Precio de marca (U...</div>
-                                        <div className="text-white text-sm">2,890</div>
-                                        <div className="absolute bottom-full left-0 mb-1 bg-[#2B3139] text-white text-xs px-2 py-1 rounded hidden group-hover/tooltip:block z-10 whitespace-nowrap border border-[#3A4149]">
-                                            Precio de marca (USDT)
-                                        </div>
-                                    </div>
-                                    <div className="col-span-2 grid grid-cols-2 gap-4">
-                                        <div className="relative group/tooltip">
-                                            <div className="text-[#848E9C] text-xs mb-0.5 truncate cursor-help">Precio de liquidación...</div>
-                                            <div className="text-[#F6465D] text-sm font-medium">2,520</div>
-                                            <div className="absolute bottom-full left-0 mb-1 bg-[#2B3139] text-white text-xs px-2 py-1 rounded hidden group-hover/tooltip:block z-10 whitespace-nowrap border border-[#3A4149]">
-                                                Precio de liquidación (USDT)
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* Actions */}
-                                <div className="flex items-center gap-2 pl-2">
-                                    <button className="flex-1 py-1.5 bg-[#2B3139] hover:bg-[#3A4149] rounded text-white text-xs font-medium transition-colors">Leverage</button>
-                                    <button className="flex-1 py-1.5 bg-[#2B3139] hover:bg-[#3A4149] rounded text-white text-xs font-medium transition-colors">TP/SL</button>
-                                    <button className="flex-1 py-1.5 bg-[#F6465D]/10 hover:bg-[#F6465D]/20 border border-transparent hover:border-[#F6465D]/50 rounded text-[#F6465D] text-xs font-medium transition-colors">Cancelar</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                <div className="w-full max-h-[500px] overflow-y-auto custom-scrollbar pb-6 pr-2">
 
                     {positionsTab === 'HISTORIAL' && (
                         <div className="flex flex-col gap-2">
