@@ -41,8 +41,8 @@ const ChartsSection = memo(() => {
                     <h3 className="text-lg font-bold text-white">Rendimiento (Balance / PnL)</h3>
                 </div>
 
-                <div className="h-[300px] w-full bg-[#1E2329] flex flex-col justify-center relative">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="w-full" style={{ minHeight: 0 }}>
+                    <ResponsiveContainer width="100%" height={280}>
                         <LineChart data={balanceData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                             <XAxis dataKey="name" stroke="#848E9C" fontSize={10} tickLine={false} axisLine={false} />
                             <YAxis stroke="#848E9C" fontSize={10} tickLine={false} axisLine={false} />
@@ -56,8 +56,8 @@ const ChartsSection = memo(() => {
 
             <div className="bg-[#1E2329] border border-[#2B3139] rounded-xl p-6">
                 <h3 className="text-lg font-bold text-white mb-6">Distribución de Activos</h3>
-                <div className="flex flex-col items-center justify-center h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="flex flex-col items-center justify-center">
+                    <ResponsiveContainer width="100%" height={220}>
                         <PieChart>
                             <Pie
                                 data={assetsData}
@@ -76,7 +76,7 @@ const ChartsSection = memo(() => {
                             <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                     </ResponsiveContainer>
-                    <div className="grid grid-cols-2 gap-4 w-full mt-4">
+                    <div className="grid grid-cols-2 gap-4 w-full mt-2">
                         {assetsData.map((entry, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
