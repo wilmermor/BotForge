@@ -66,7 +66,7 @@ export const useSimulador = () => {
 
             // Build payload
             const payload = {
-                strategy_id: selectedStrategyId || "76954b38-7224-467a-af96-1d8cad7c5f92",
+                strategy_id: selectedStrategyId || "3478b624-b8d7-4779-b908-5901edd3f3db",
                 pair: "BTCUSDT",
                 timeframe: "1h",
                 date_start: new Date(startDate).toISOString(),
@@ -101,7 +101,25 @@ export const useSimulador = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setSimulationResult(data);
+                // Sanitize metrics to avoid null/undefined crashes in render
+                const sanitized = {
+                    ...data,
+                    trades: Array.isArray(data.trades) ? data.trades : [],
+                    metrics: {
+                        total_trades: data.metrics?.total_trades ?? 0,
+                        win_rate_pct: data.metrics?.win_rate_pct ?? 0,
+                        total_pnl: data.metrics?.total_pnl ?? 0,
+                        max_drawdown_pct: data.metrics?.max_drawdown_pct ?? 0,
+                        roi_pct: data.metrics?.roi_pct ?? 0,
+                        profitable_trades: data.metrics?.profitable_trades ?? 0,
+                        losing_trades: data.metrics?.losing_trades ?? 0,
+                        profit_factor: data.metrics?.profit_factor ?? 0,
+                        sharpe_ratio: data.metrics?.sharpe_ratio ?? 0,
+                        sortino_ratio: data.metrics?.sortino_ratio ?? 0,
+                        calmar_ratio: data.metrics?.calmar_ratio ?? 0,
+                    },
+                };
+                setSimulationResult(sanitized);
                 setSimulationStatus('completed');
                 setPositionsTab('HISTORIAL');
             } else {

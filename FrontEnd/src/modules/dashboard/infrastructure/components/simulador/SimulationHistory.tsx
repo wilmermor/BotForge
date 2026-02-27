@@ -46,39 +46,39 @@ const SimulationHistory: React.FC<SimulationHistoryProps> = ({
                                 <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
                                     <div>
                                         <div className="text-[#848E9C] text-[11px] mb-1">ROI</div>
-                                        <div className={`font-bold ${simulationResult.metrics.roi_pct >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]'}`}>
-                                            {simulationResult.metrics.roi_pct.toFixed(2)}%
+                                        <div className={`font-bold ${(simulationResult.metrics?.roi_pct ?? 0) >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]'}`}>
+                                            {(simulationResult.metrics?.roi_pct ?? 0).toFixed(2)}%
                                         </div>
                                     </div>
                                     <div>
                                         <div className="text-[#848E9C] text-[11px] mb-1">Comp/Vend</div>
                                         <div className="text-white font-bold flex items-center gap-1">
-                                            <span className="text-[#02C076]">{simulationResult.trades.filter(t => t.side === 'buy').length}</span>
+                                            <span className="text-[#02C076]">{Array.isArray(simulationResult.trades) ? simulationResult.trades.filter(t => t.side === 'buy').length : 0}</span>
                                             <span className="text-[#848E9C] text-[10px]">B</span>
                                             <span className="text-[#848E9C] mx-0.5">/</span>
-                                            <span className="text-[#F6465D]">{simulationResult.trades.filter(t => t.side === 'sell').length}</span>
+                                            <span className="text-[#F6465D]">{Array.isArray(simulationResult.trades) ? simulationResult.trades.filter(t => t.side === 'sell').length : 0}</span>
                                             <span className="text-[#848E9C] text-[10px]">S</span>
                                         </div>
                                     </div>
                                     <div>
                                         <div className="text-[#848E9C] text-[11px] mb-1">Profit Factor</div>
-                                        <div className="text-white font-bold">{simulationResult.metrics.profit_factor?.toFixed(2) || '0.00'}</div>
+                                        <div className="text-white font-bold">{(simulationResult.metrics?.profit_factor ?? 0).toFixed(2)}</div>
                                     </div>
                                     <div>
                                         <div className="text-[#848E9C] text-[11px] mb-1">Trades (G/P)</div>
                                         <div className="text-white font-bold">
-                                            <span className="text-[#02C076]">{simulationResult.metrics.profitable_trades}</span>
+                                            <span className="text-[#02C076]">{simulationResult.metrics?.profitable_trades ?? 0}</span>
                                             <span className="text-[#848E9C] mx-1">/</span>
-                                            <span className="text-[#F6465D]">{simulationResult.metrics.losing_trades}</span>
+                                            <span className="text-[#F6465D]">{simulationResult.metrics?.losing_trades ?? 0}</span>
                                         </div>
                                     </div>
                                     <div>
                                         <div className="text-[#848E9C] text-[11px] mb-1">Max Drawdown</div>
-                                        <div className="text-[#F6465D] font-bold">{simulationResult.metrics.max_drawdown_pct.toFixed(2)}%</div>
+                                        <div className="text-[#F6465D] font-bold">{(simulationResult.metrics?.max_drawdown_pct ?? 0).toFixed(2)}%</div>
                                     </div>
                                     <div>
                                         <div className="text-[#848E9C] text-[11px] mb-1">Sharpe Ratio</div>
-                                        <div className="text-[#F0B90B] font-bold">{simulationResult.metrics.sharpe_ratio?.toFixed(2) || '0.00'}</div>
+                                        <div className="text-[#F0B90B] font-bold">{(simulationResult.metrics?.sharpe_ratio ?? 0).toFixed(2)}</div>
                                     </div>
                                 </div>
                             </div>
@@ -107,15 +107,15 @@ const SimulationHistory: React.FC<SimulationHistoryProps> = ({
                                                 <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
                                                 <span>Qty: {trade.quantity}</span>
                                                 <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                                                <span className="text-[#F0B90B]">Fee: ${trade.fee.toFixed(4)}</span>
+                                                <span className="text-[#F0B90B]">Fee: ${(trade.fee ?? 0).toFixed(4)}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className={`font-bold ${trade.pnl !== null ? (trade.pnl >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]') : 'text-[#848E9C]'}`}>
-                                            {trade.pnl !== null ? (trade.pnl > 0 ? `+${trade.pnl.toFixed(2)} USDT` : `${trade.pnl.toFixed(2)} USDT`) : 'Ejecutada'}
+                                        <div className={`font-bold ${trade.pnl !== null && trade.pnl !== undefined ? (trade.pnl >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]') : 'text-[#848E9C]'}`}>
+                                            {trade.pnl !== null && trade.pnl !== undefined ? (trade.pnl > 0 ? `+${(trade.pnl ?? 0).toFixed(2)} USDT` : `${(trade.pnl ?? 0).toFixed(2)} USDT`) : 'Ejecutada'}
                                         </div>
-                                        <div className="text-[#848E9C] text-xs">Precio: {trade.price.toFixed(2)}</div>
+                                        <div className="text-[#848E9C] text-xs">Precio: {(trade.price ?? 0).toFixed(2)}</div>
                                     </div>
                                 </div>
                             ))

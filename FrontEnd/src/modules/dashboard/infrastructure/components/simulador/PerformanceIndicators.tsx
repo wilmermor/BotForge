@@ -39,17 +39,17 @@ const PerformanceIndicators: React.FC<PerformanceIndicatorsProps> = ({ simulatio
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 w-full">
             <IndicatorCard
                 label="PNL TOTAL"
-                value={metrics ? `${metrics.total_pnl > 0 ? '+' : ''}$${metrics.total_pnl.toFixed(2)}` : '$0.00'}
+                value={metrics ? `${(metrics.total_pnl ?? 0) > 0 ? '+' : ''}$${(metrics.total_pnl ?? 0).toFixed(2)}` : '$0.00'}
                 icon={Activity}
-                colorClass={metrics && metrics.total_pnl < 0 ? 'text-[#F6465D]' : 'text-[#02C076]'}
-                subValue={metrics ? `${metrics.roi_pct.toFixed(2)}% ROI` : '0.00% ROI'}
+                colorClass={metrics && (metrics.total_pnl ?? 0) < 0 ? 'text-[#F6465D]' : 'text-[#02C076]'}
+                subValue={metrics ? `${(metrics.roi_pct ?? 0).toFixed(2)}% ROI` : '0.00% ROI'}
             />
             <IndicatorCard
                 label="WIN RATE"
-                value={metrics ? `${metrics.win_rate_pct.toFixed(2)}%` : '0.00%'}
+                value={metrics ? `${(metrics.win_rate_pct ?? 0).toFixed(2)}%` : '0.00%'}
                 icon={TrendingUp}
                 colorClass="text-[#F0B90B]"
-                subValue={metrics ? `${metrics.profitable_trades}W / ${metrics.losing_trades}L` : '0W / 0L'}
+                subValue={metrics ? `${metrics.profitable_trades ?? 0}W / ${metrics.losing_trades ?? 0}L` : '0W / 0L'}
             />
             <IndicatorCard
                 label="PROFIT FACTOR"
@@ -59,7 +59,7 @@ const PerformanceIndicators: React.FC<PerformanceIndicatorsProps> = ({ simulatio
             />
             <IndicatorCard
                 label="DRAWDOWN MÁX"
-                value={metrics ? `${metrics.max_drawdown_pct.toFixed(2)}%` : '0.00%'}
+                value={metrics ? `${(metrics.max_drawdown_pct ?? 0).toFixed(2)}%` : '0.00%'}
                 icon={TrendingDown}
                 colorClass="text-[#F6465D]"
             />
@@ -70,10 +70,10 @@ const PerformanceIndicators: React.FC<PerformanceIndicatorsProps> = ({ simulatio
             />
             <IndicatorCard
                 label="TRADES"
-                value={metrics?.total_trades || '0'}
+                value={metrics?.total_trades ?? 0}
                 icon={BookOpen}
-                subValue={simulationResult?.trades ?
-                    `${simulationResult.trades.filter(t => t.side === 'buy').length} Compra / ${simulationResult.trades.filter(t => t.side === 'sell').length} Venta`
+                subValue={Array.isArray(simulationResult?.trades) && simulationResult.trades.length > 0
+                    ? `${simulationResult.trades.filter(t => t.side === 'buy').length} Compra / ${simulationResult.trades.filter(t => t.side === 'sell').length} Venta`
                     : null}
             />
         </div>

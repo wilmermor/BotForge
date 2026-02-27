@@ -99,7 +99,7 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
             />
 
             {/* Modal Container */}
-            <div className="relative w-full max-w-[500px] bg-[#1E2329] border border-[#2B3139] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="relative w-full max-w-[480px] mx-4 bg-[#1E2329] border border-[#2B3139] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
 
                 {/* Header Section */}
                 <div className="p-6 pb-4 border-b border-[#2B3139] flex justify-between items-start">
@@ -116,64 +116,71 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
                     )}
                 </div>
 
-                <div className="p-8 flex flex-col items-center text-center">
-                    {/* Animation / Icon Container */}
-                    <div className="relative w-32 h-32 mb-6 flex items-center justify-center">
-                        {status === 'simulating' ? (
-                            <div className="w-full h-full relative">
-                                {/* Pulse Effect */}
-                                <div className="absolute inset-0 bg-[#F0B90B]/10 rounded-full animate-ping" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <svg viewBox="0 0 100 100" className="w-24 h-24">
-                                        <defs>
-                                            <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stopColor="#F0B90B" stopOpacity="0" />
-                                                <stop offset="50%" stopColor="#F0B90B" stopOpacity="1" />
-                                                <stop offset="100%" stopColor="#F0B90B" stopOpacity="0" />
-                                            </linearGradient>
-                                        </defs>
-                                        {/* Animated Path */}
-                                        <path
-                                            d="M 10 70 Q 25 30 40 60 T 70 40 T 90 20"
-                                            fill="none"
-                                            stroke="#2B3139"
-                                            strokeWidth="3"
-                                            strokeLinecap="round"
-                                        />
-                                        <path
-                                            d="M 10 70 Q 25 30 40 60 T 70 40 T 90 20"
-                                            fill="none"
-                                            stroke="#F0B90B"
-                                            strokeWidth="3"
-                                            strokeLinecap="round"
-                                            strokeDasharray="200"
-                                            strokeDashoffset="200"
-                                            className="animate-chart-line"
-                                        />
-                                        {/* Moving Dot */}
-                                        <circle r="3" fill="#F0B90B" className="animate-chart-dot">
-                                            <animateMotion
-                                                path="M 10 70 Q 25 30 40 60 T 70 40 T 90 20"
-                                                dur="2s"
-                                                repeatCount="indefinite"
+                <div className={`flex flex-col items-center text-center ${showStats ? 'px-5 pt-4 pb-2' : 'p-8'}`}>
+                    {/* Animation / Icon Container — hidden when showing stats */}
+                    {!showStats && (
+                        <div className="relative w-32 h-32 mb-6 flex items-center justify-center">
+                            {status === 'simulating' ? (
+                                <div className="w-full h-full relative">
+                                    {/* Pulse Effect */}
+                                    <div className="absolute inset-0 bg-[#F0B90B]/10 rounded-full animate-ping" />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <svg viewBox="0 0 100 100" className="w-24 h-24">
+                                            <defs>
+                                                <linearGradient id="chartGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stopColor="#F0B90B" stopOpacity="0" />
+                                                    <stop offset="50%" stopColor="#F0B90B" stopOpacity="1" />
+                                                    <stop offset="100%" stopColor="#F0B90B" stopOpacity="0" />
+                                                </linearGradient>
+                                            </defs>
+                                            {/* Animated Path */}
+                                            <path
+                                                d="M 10 70 Q 25 30 40 60 T 70 40 T 90 20"
+                                                fill="none"
+                                                stroke="#2B3139"
+                                                strokeWidth="3"
+                                                strokeLinecap="round"
                                             />
-                                        </circle>
-                                    </svg>
+                                            <path
+                                                d="M 10 70 Q 25 30 40 60 T 70 40 T 90 20"
+                                                fill="none"
+                                                stroke="#F0B90B"
+                                                strokeWidth="3"
+                                                strokeLinecap="round"
+                                                strokeDasharray="200"
+                                                strokeDashoffset="200"
+                                                className="animate-chart-line"
+                                            />
+                                            {/* Moving Dot */}
+                                            <circle r="3" fill="#F0B90B" className="animate-chart-dot">
+                                                <animateMotion
+                                                    path="M 10 70 Q 25 30 40 60 T 70 40 T 90 20"
+                                                    dur="2s"
+                                                    repeatCount="indefinite"
+                                                />
+                                            </circle>
+                                        </svg>
+                                    </div>
                                 </div>
-                            </div>
-                        ) : (
-                            <div className={`w-24 h-24 rounded-full ${status === 'completed' ? 'bg-[#02C076]/10' : 'bg-[#F6465D]/10'} flex items-center justify-center animate-in zoom-in-50 duration-300`}>
-                                <StatusIcon className={`w-12 h-12 ${config.text}`} />
-                            </div>
-                        )}
-                    </div>
+                            ) : (
+                                <div className={`w-24 h-24 rounded-full ${status === 'completed' ? 'bg-[#02C076]/10' : 'bg-[#F6465D]/10'} flex items-center justify-center animate-in zoom-in-50 duration-300`}>
+                                    <StatusIcon className={`w-12 h-12 ${config.text}`} />
+                                </div>
+                            )}
+                        </div>
+                    )}
 
-                    <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
-                        {config.title}
-                    </h2>
-                    <p className="text-[#848E9C] text-sm leading-relaxed max-w-[280px]">
-                        {config.description}
-                    </p>
+                    {/* Title & Description — hidden when showing stats */}
+                    {!showStats && (
+                        <>
+                            <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
+                                {config.title}
+                            </h2>
+                            <p className="text-[#848E9C] text-sm leading-relaxed max-w-[280px]">
+                                {config.description}
+                            </p>
+                        </>
+                    )}
 
                     {/* Progress Bar (Only when simulating) */}
                     {status === 'simulating' && (
@@ -187,20 +194,31 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
 
                     {/* Results / Stats View */}
                     {status === 'completed' && showStats && result && (
-                        <div className="w-full grid grid-cols-2 gap-4 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            {[
-                                { label: 'PnL Total', value: `${result.metrics.total_pnl.toFixed(2)} USDT`, color: result.metrics.total_pnl >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]' },
-                                { label: 'Win Rate', value: `${result.metrics.win_rate_pct.toFixed(2)}%`, color: 'text-white' },
-                                { label: 'ROI', value: `${result.metrics.roi_pct.toFixed(2)}%`, color: result.metrics.roi_pct >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]' },
-                                { label: 'Trades', value: result.metrics.total_trades, color: 'text-white' },
-                                { label: 'Drawdown Max', value: `${result.metrics.max_drawdown_pct.toFixed(2)}%`, color: 'text-[#F6465D]' },
-                                { label: 'Profit Factor', value: result.metrics.profit_factor?.toFixed(2) || 'N/A', color: 'text-white' },
-                            ].map((stat, idx) => (
-                                <div key={idx} className="bg-[#2B3139]/50 p-3 rounded-xl border border-[#2B3139]">
-                                    <div className="text-[#848E9C] text-[10px] uppercase font-bold mb-1">{stat.label}</div>
-                                    <div className={`text-lg font-bold ${stat.color}`}>{stat.value}</div>
-                                </div>
-                            ))}
+                        <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {/* Compact title */}
+                            <div className="flex items-center gap-2 mb-3">
+                                <CheckCircle2 className="w-4 h-4 text-[#02C076] flex-shrink-0" />
+                                <span className="text-white font-bold text-sm">Estadísticas de la Simulación</span>
+                            </div>
+                            {/* Scrollable compact grid */}
+                            <div className="grid grid-cols-3 gap-2 max-h-[220px] overflow-y-auto pr-1">
+                                {[
+                                    { label: 'PnL Total', value: `${(result.metrics?.total_pnl ?? 0).toFixed(2)} USDT`, color: (result.metrics?.total_pnl ?? 0) >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]' },
+                                    { label: 'Win Rate', value: `${(result.metrics?.win_rate_pct ?? 0).toFixed(2)}%`, color: 'text-[#F0B90B]' },
+                                    { label: 'ROI', value: `${(result.metrics?.roi_pct ?? 0).toFixed(2)}%`, color: (result.metrics?.roi_pct ?? 0) >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]' },
+                                    { label: 'Trades', value: String(result.metrics?.total_trades ?? 0), color: 'text-white' },
+                                    { label: 'Drawdown', value: `${(result.metrics?.max_drawdown_pct ?? 0).toFixed(2)}%`, color: 'text-[#F6465D]' },
+                                    { label: 'P. Factor', value: (result.metrics?.profit_factor ?? 0).toFixed(2), color: 'text-white' },
+                                    { label: 'Ganadas', value: String(result.metrics?.profitable_trades ?? 0), color: 'text-[#02C076]' },
+                                    { label: 'Perdidas', value: String(result.metrics?.losing_trades ?? 0), color: 'text-[#F6465D]' },
+                                    { label: 'Sharpe', value: (result.metrics?.sharpe_ratio ?? 0).toFixed(2), color: 'text-white' },
+                                ].map((stat, idx) => (
+                                    <div key={idx} className="bg-[#2B3139]/60 p-2.5 rounded-lg border border-[#2B3139] text-left">
+                                        <div className="text-[#848E9C] text-[9px] uppercase font-bold mb-0.5 truncate">{stat.label}</div>
+                                        <div className={`text-sm font-bold leading-tight ${stat.color} truncate`}>{stat.value}</div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -208,32 +226,39 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
                 {/* Footer / Action */}
                 <div className="p-6 pt-0 border-t border-transparent flex flex-col gap-3">
                     {status === 'completed' ? (
-                        !showStats ? (
-                            <div className="grid grid-cols-2 gap-3 w-full">
-                                <button
-                                    onClick={() => setShowStats(true)}
-                                    className="py-3 px-4 rounded-xl font-bold text-white bg-[#02C076] hover:bg-[#02C076]/90 transition-all shadow-[0_4px_15px_rgba(2,192,118,0.2)]"
-                                >
-                                    Ver Resultados
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        onClose();
-                                        onViewProcess?.();
-                                    }}
-                                    className="py-3 px-4 rounded-xl font-bold text-[#848E9C] bg-[#2B3139] hover:bg-[#3A4149] hover:text-white transition-all"
-                                >
-                                    Ver Proceso
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setShowStats(false)}
-                                className="w-full py-3 rounded-xl font-bold text-[#848E9C] border border-[#2B3139] hover:bg-[#2B3139] hover:text-white transition-all"
-                            >
-                                Volver
-                            </button>
-                        )
+                        <div className="flex flex-col gap-3 w-full">
+                            {!showStats ? (
+                                <div className="grid grid-cols-2 gap-3 w-full">
+                                    <button
+                                        onClick={() => setShowStats(true)}
+                                        className="py-3 px-4 rounded-xl font-bold text-white bg-[#02C076] hover:bg-[#02C076]/90 transition-all shadow-[0_4px_15px_rgba(2,192,118,0.2)]"
+                                    >
+                                        Ver Resultados
+                                    </button>
+                                    <button
+                                        onClick={onClose}
+                                        className="py-3 px-4 rounded-xl font-bold text-white bg-[#2B3139] hover:bg-[#3A4149] transition-all border border-[#2B3139]"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-3 w-full">
+                                    <button
+                                        onClick={() => setShowStats(false)}
+                                        className="py-3 px-4 rounded-xl font-bold text-[#848E9C] border border-[#2B3139] hover:bg-[#2B3139] hover:text-white transition-all"
+                                    >
+                                        Volver
+                                    </button>
+                                    <button
+                                        onClick={onClose}
+                                        className="py-3 px-4 rounded-xl font-bold text-white bg-[#2B3139] hover:bg-[#3A4149] transition-all border border-[#2B3139]"
+                                    >
+                                        Cerrar
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ) : status === 'error' ? (
                         <button
                             onClick={onClose}
