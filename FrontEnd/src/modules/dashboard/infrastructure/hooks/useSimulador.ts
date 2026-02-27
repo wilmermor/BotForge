@@ -64,10 +64,6 @@ export const useSimulador = () => {
             setSimulationStatus('simulating');
             setSimulationError(null);
 
-            // Start a timer for the minimum 10s duration
-            const minimumExecutionTime = 10000; // 10 seconds
-            const startTime = Date.now();
-
             // Build payload
             const payload = {
                 strategy_id: selectedStrategyId || "76954b38-7224-467a-af96-1d8cad7c5f92",
