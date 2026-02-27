@@ -40,7 +40,7 @@ export const StrategySelectionModal = ({ isOpen, onClose, onSelect }: StrategySe
     const fetchStrategies = async () => {
         setIsLoading(true);
         try {
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZDlmMmU5MS05MmM3LTRmMmEtYWJhNi1hMDJjZTkzODllZDkiLCJleHAiOjE3NzIwNzM2MzYsInR5cGUiOiJhY2Nlc3MifQ.6kNDweB_j8t3x6GrOVXRb32abg8QS-3okHsgg4f6l1c";
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDU1ODAsInR5cGUiOiJhY2Nlc3MifQ.DyfYIXexPYAummGmL5-aKN5xh2kLUw_Ajt7zluX7nf8"
             const response = await fetch("http://localhost:8000/api/v1/strategies/", {
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -103,8 +103,8 @@ export const StrategySelectionModal = ({ isOpen, onClose, onSelect }: StrategySe
                             key={type}
                             onClick={() => setFilterType(type as any)}
                             className={`flex-1 py-1.5 text-[11px] font-bold rounded transition-all ${filterType === type
-                                    ? 'bg-[#1E2329] text-[#F0B90B] shadow-md'
-                                    : 'text-[#848E9C] hover:text-white'
+                                ? 'bg-[#1E2329] text-[#F0B90B] shadow-md'
+                                : 'text-[#848E9C] hover:text-white'
                                 }`}
                         >
                             {type === 'ALL' ? 'TODAS' : type}

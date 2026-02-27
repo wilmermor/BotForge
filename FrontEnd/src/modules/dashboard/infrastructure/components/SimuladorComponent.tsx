@@ -5,12 +5,20 @@ import SimuladorControls from './simulador/SimuladorControls';
 import PerformanceIndicators from './simulador/PerformanceIndicators';
 import BotConfigurationPanel from './simulador/BotConfigurationPanel';
 import SimulationHistory from './simulador/SimulationHistory';
+import { SimulationLoadingModal } from './modals/SimulationLoadingModal';
 
 const SimuladorComponent = () => {
     const simulador = useSimulador();
 
     return (
         <div className="w-full h-full flex flex-col space-y-6">
+            <SimulationLoadingModal
+                isOpen={simulador.simulationStatus !== 'idle'}
+                onClose={() => simulador.setSimulationStatus('idle')}
+                status={simulador.simulationStatus}
+                message={simulador.simulationError || undefined}
+            />
+
             <SimuladorHeader strategyType={simulador.strategyType} />
 
             <SimuladorControls
