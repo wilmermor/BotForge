@@ -20,6 +20,7 @@ export interface SimulationTrade {
     side: 'buy' | 'sell';
     quantity: number;
     price: number;
+    fee: number;
     pnl: number | null;
 }
 
@@ -32,6 +33,9 @@ export interface SimulationMetrics {
     profitable_trades: number;
     losing_trades: number;
     profit_factor?: number;
+    sharpe_ratio?: number;
+    sortino_ratio?: number;
+    calmar_ratio?: number;
 }
 
 export interface SimulationResult {
