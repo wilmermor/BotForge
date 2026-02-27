@@ -70,7 +70,7 @@ export const useSimulador = () => {
 
             // Build payload
             const payload = {
-                strategy_id: selectedStrategyId || "2c7195f3-f4aa-4ee4-905c-bad482b05c28",
+                strategy_id: selectedStrategyId || "47895ffa-e32b-41fd-8ba2-cc430bb65fe0",
                 pair: "BTCUSDT",
                 timeframe: "1h",
                 date_start: new Date(startDate).toISOString(),
@@ -91,7 +91,7 @@ export const useSimulador = () => {
                     }
             };
 
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDU1ODAsInR5cGUiOiJhY2Nlc3MifQ.DyfYIXexPYAummGmL5-aKN5xh2kLUw_Ajt7zluX7nf8"
+            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDkyNTAsInR5cGUiOiJhY2Nlc3MifQ.5unVva5TUW-zym5T93MjULYti5EwlUPEvu0t6imnDbA"
             const response = await fetch("http://localhost:8000/api/v1/simulations/", {
                 method: "POST",
                 headers: {
