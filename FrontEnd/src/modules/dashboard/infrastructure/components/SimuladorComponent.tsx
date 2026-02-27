@@ -6,6 +6,7 @@ import PerformanceIndicators from './simulador/PerformanceIndicators';
 import BotConfigurationPanel from './simulador/BotConfigurationPanel';
 import SimulationHistory from './simulador/SimulationHistory';
 import { SimulationLoadingModal } from './modals/SimulationLoadingModal';
+import { ErrorBoundary } from '../../../../shared/components/ErrorBoundary';
 
 const SimuladorComponent = () => {
     const simulador = useSimulador();
@@ -54,18 +55,22 @@ const SimuladorComponent = () => {
                             </div>
                         </div>
 
-                        <PerformanceIndicators simulationResult={simulador.simulationResult} />
+                        <ErrorBoundary key={simulador.simulationResult?.pair ?? 'perf-empty'}>
+                            <PerformanceIndicators simulationResult={simulador.simulationResult} />
+                        </ErrorBoundary>
                     </div>
 
                     <BotConfigurationPanel {...simulador} />
                 </div>
 
                 <div id="simulation-history">
-                    <SimulationHistory
-                        positionsTab={simulador.positionsTab}
-                        setPositionsTab={simulador.setPositionsTab}
-                        simulationResult={simulador.simulationResult}
-                    />
+                    <ErrorBoundary key={`hist-${simulador.simulationResult?.pair ?? 'empty'}-${simulador.simulationResult?.metrics?.total_trades ?? 0}`}>
+                        <SimulationHistory
+                            positionsTab={simulador.positionsTab}
+                            setPositionsTab={simulador.setPositionsTab}
+                            simulationResult={simulador.simulationResult}
+                        />
+                    </ErrorBoundary>
                 </div>
 
                 <style>{`
