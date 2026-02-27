@@ -66,7 +66,7 @@ export const useSimulador = () => {
 
             // Build payload
             const payload = {
-                strategy_id: selectedStrategyId || "3478b624-b8d7-4779-b908-5901edd3f3db",
+                strategy_id: selectedStrategyId,
                 pair: "BTCUSDT",
                 timeframe: "1h",
                 date_start: new Date(startDate).toISOString(),
