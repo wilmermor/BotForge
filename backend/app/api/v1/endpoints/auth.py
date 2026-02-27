@@ -17,9 +17,10 @@ from app.schemas.auth import (
     LoginRequest,
     RefreshRequest,
     RegisterRequest,
+    OAuthLoginRequest,
     TokenResponse,
 )
-from app.services.user_service import authenticate_user, create_user
+from app.services.user_service import authenticate_user, create_user, authenticate_oauth_user
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -85,4 +86,29 @@ async def refresh_token(data: RefreshRequest):
     return TokenResponse(
         access_token=create_access_token(user_id),
         refresh_token=create_refresh_token(user_id),
+    )
+
+
+@router.post("/oauth", response_model=TokenResponse)
+async def oauth_login(
+    data: OAuthLoginRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Handle login/registration via OAuth providers like Google or Binance.
+    """
+    # Simulate token validation: in production here you verify the token
+    # using appropriate libraries like google-auth or Binance API
+    if not data.token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid {data.provider} token",
+        )
+
+    # Use simulated user details from token request
+    user = await authenticate_oauth_user(db, data)
+    
+    return TokenResponse(
+        access_token=create_access_token(str(user.id)),
+        refresh_token=create_refresh_token(str(user.id)),
     )

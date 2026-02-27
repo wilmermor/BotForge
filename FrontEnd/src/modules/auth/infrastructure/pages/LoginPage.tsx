@@ -1,13 +1,84 @@
 
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FcGoogle } from 'react-icons/fc';
+import { SiBinance } from 'react-icons/si';
 
 const LoginPage = () => {
+    const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Here you would typically handle authentication
-        // For now, we'll navigate to dashboard (or wherever)
-        // Check if user has active sub? if not go to plans? (simulated for now)
+        setError(null);
+        setIsLoading(true);
+
+        try {
+            const response = await fetch("http://localhost:8000/api/v1/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token);
+                // Check if user has active sub? if not go to plans? (simulated for now)
+                navigate('/dashboard');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.detail || "Error iniciando sesión");
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+            setError("Fallo de conexión con el servidor");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleOAuth = async (provider: string) => {
+        setError(null);
+        setIsLoading(true);
+
+        // Simular el tiempo de respuesta de la ventana de OAuth (Google/Binance)
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            const payload = {
+                provider: provider.toLowerCase(),
+                token: `mock_${provider.toLowerCase()}_token_12345`,
+                email: `usuario_test@${provider.toLowerCase()}.com`,
+                full_name: `Usuario de ${provider}`
+            };
+
+            const response = await fetch("http://localhost:8000/api/v1/auth/oauth", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token);
+                navigate('/dashboard');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.detail || `Error al autenticar con ${provider}`);
+            }
+        } catch (err) {
+            console.error(`OAuth error con ${provider}:`, err);
+            setError("Fallo de conexión con el servidor");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -35,6 +106,11 @@ const LoginPage = () => {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form className="space-y-6" action="#" method="POST" onSubmit={handleSubmit}>
+                    {error && (
+                        <div className="p-3 text-sm text-[#F6465D] bg-[#F6465D]/10 border border-[#F6465D]/30 rounded-md">
+                            {error}
+                        </div>
+                    )}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium leading-6 text-[#848E9C]">
                             Email address
@@ -45,6 +121,8 @@ const LoginPage = () => {
                                 name="email"
                                 type="email"
                                 autoComplete="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="block w-full rounded-md border-0 bg-[#1E2329] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
                             />
@@ -68,6 +146,8 @@ const LoginPage = () => {
                                 name="password"
                                 type="password"
                                 autoComplete="current-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="block w-full rounded-md border-0 bg-[#1E2329] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
                             />
@@ -77,12 +157,44 @@ const LoginPage = () => {
                     <div>
                         <button
                             type="submit"
-                            className="flex w-full justify-center rounded-md bg-[#F0B90B] px-3 py-2.5 text-sm font-semibold leading-6 text-black shadow-sm circle hover:bg-[#FCD535] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0B90B] transition-colors duration-200"
+                            disabled={isLoading}
+                            className="flex w-full justify-center rounded-md bg-[#F0B90B] px-3 py-2.5 text-sm font-semibold leading-6 text-black shadow-sm circle hover:bg-[#FCD535] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0B90B] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Sign in
+                            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                         </button>
                     </div>
                 </form>
+
+                <div className="mt-8">
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div className="w-full border-t border-[#2B3139]" />
+                        </div>
+                        <div className="relative flex justify-center text-sm font-medium leading-6">
+                            <span className="bg-[#0B0E11] px-6 text-[#848E9C]">O continúa con</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 grid grid-cols-2 gap-4">
+                        <button
+                            type="button"
+                            onClick={() => handleOAuth('Google')}
+                            className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1E2329] px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-[#2B3139] hover:bg-[#2B3139]/80 transition-colors focus-visible:ring-transparent"
+                        >
+                            <FcGoogle className="h-5 w-5" />
+                            <span className="text-sm font-semibold leading-6">Google</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => handleOAuth('Binance')}
+                            className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1E2329] px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-[#2B3139] hover:bg-[#2B3139]/80 transition-colors focus-visible:ring-transparent"
+                        >
+                            <SiBinance className="h-5 w-5 text-[#F0B90B]" />
+                            <span className="text-sm font-semibold leading-6">Binance</span>
+                        </button>
+                    </div>
+                </div>
 
                 <p className="mt-10 text-center text-sm text-[#848E9C]">
                     No tienes cuenta?{' '}

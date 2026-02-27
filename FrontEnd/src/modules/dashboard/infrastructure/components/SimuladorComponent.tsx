@@ -11,27 +11,37 @@ const SimuladorComponent = () => {
     const simulador = useSimulador();
 
     return (
-        <div className="w-full h-full flex flex-col space-y-6">
+        <>
             <SimulationLoadingModal
                 isOpen={simulador.simulationStatus !== 'idle'}
                 onClose={() => simulador.setSimulationStatus('idle')}
                 status={simulador.simulationStatus}
                 message={simulador.simulationError || undefined}
+                result={simulador.simulationResult}
+                onViewProcess={() => {
+                    const historyElement = document.getElementById('simulation-history');
+                    if (historyElement) {
+                        historyElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    simulador.setPositionsTab('HISTORIAL');
+                }}
             />
 
-            <SimuladorHeader strategyType={simulador.strategyType} />
+            <div className="w-full h-full flex flex-col space-y-6">
 
-            <SimuladorControls
-                isStrategyModalOpen={simulador.isStrategyModalOpen}
-                setIsStrategyModalOpen={simulador.setIsStrategyModalOpen}
-                handleSelectStrategy={simulador.handleSelectStrategy}
-                startDate={simulador.startDate}
-                setStartDate={simulador.setStartDate}
-                endDate={simulador.endDate}
-                setEndDate={simulador.setEndDate}
-                strategyType={simulador.strategyType}
-                setStrategyType={simulador.setStrategyType}
-            />
+                <SimuladorHeader strategyType={simulador.strategyType} />
+
+                <SimuladorControls
+                    isStrategyModalOpen={simulador.isStrategyModalOpen}
+                    setIsStrategyModalOpen={simulador.setIsStrategyModalOpen}
+                    handleSelectStrategy={simulador.handleSelectStrategy}
+                    startDate={simulador.startDate}
+                    setStartDate={simulador.setStartDate}
+                    endDate={simulador.endDate}
+                    setEndDate={simulador.setEndDate}
+                    strategyType={simulador.strategyType}
+                    setStrategyType={simulador.setStrategyType}
+                />
 
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
                 {/* LEFT COLUMN: Candlestick Chart and Indicators (70%) */}
@@ -42,21 +52,22 @@ const SimuladorComponent = () => {
                         <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <span className="bg-[#1E2329]/80 text-[#848E9C] text-xs px-3 py-1 rounded"></span>
                         </div>
+
+                        <PerformanceIndicators simulationResult={simulador.simulationResult} />
                     </div>
 
-                    <PerformanceIndicators simulationResult={simulador.simulationResult} />
+                    <BotConfigurationPanel {...simulador} />
                 </div>
 
-                <BotConfigurationPanel {...simulador} />
-            </div>
+                <div id="simulation-history">
+                    <SimulationHistory
+                        positionsTab={simulador.positionsTab}
+                        setPositionsTab={simulador.setPositionsTab}
+                        simulationResult={simulador.simulationResult}
+                    />
+                </div>
 
-            <SimulationHistory
-                positionsTab={simulador.positionsTab}
-                setPositionsTab={simulador.setPositionsTab}
-                simulationResult={simulador.simulationResult}
-            />
-
-            <style>{`
+                <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }
@@ -71,7 +82,8 @@ const SimuladorComponent = () => {
                     background-color: #3A4149;
                 }
             `}</style>
-        </div>
+            </div>
+        </>
     );
 };
 
