@@ -5,7 +5,6 @@ import {
     Settings,
     Activity,
     ChevronRight,
-    Filter,
     X,
     FolderOpen,
     Play
@@ -40,7 +39,7 @@ export const StrategySelectionModal = ({ isOpen, onClose, onSelect }: StrategySe
     const fetchStrategies = async () => {
         setIsLoading(true);
         try {
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDU1ODAsInR5cGUiOiJhY2Nlc3MifQ.DyfYIXexPYAummGmL5-aKN5xh2kLUw_Ajt7zluX7nf8"
+            const token = localStorage.getItem('token') || '';
             const response = await fetch("http://localhost:8000/api/v1/strategies/", {
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -127,10 +126,10 @@ export const StrategySelectionModal = ({ isOpen, onClose, onSelect }: StrategySe
                             onClick={() => onSelect(strategy)}
                             className="bg-transparent hover:bg-[#2B3139] rounded-lg p-3 flex items-center gap-3 transition-colors cursor-pointer group"
                         >
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${strategy.type === 'grid' ? 'bg-[#F0B90B]/10' : 'bg-[#02C076]/10'
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${strategy.type.toLowerCase() === 'grid' ? 'bg-[#F0B90B]/10' : 'bg-[#02C076]/10'
                                 }`}>
-                                {strategy.type === 'grid' ? (
-                                    <Settings className={`w-5 h-5 ${strategy.type === 'grid' ? 'text-[#F0B90B]' : 'text-[#02C076]'}`} />
+                                {strategy.type.toLowerCase() === 'grid' ? (
+                                    <Settings className="w-5 h-5 text-[#F0B90B]" />
                                 ) : (
                                     <Activity className="w-5 h-5 text-[#02C076]" />
                                 )}
@@ -138,14 +137,25 @@ export const StrategySelectionModal = ({ isOpen, onClose, onSelect }: StrategySe
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
                                     <h4 className="text-white font-bold text-[14px] truncate">{strategy.name}</h4>
-                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${strategy.type === 'grid' ? 'bg-[#F0B90B]/20 text-[#F0B90B]' : 'bg-[#02C076]/20 text-[#02C076]'
+                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${strategy.type.toLowerCase() === 'grid' ? 'bg-[#F0B90B]/20 text-[#F0B90B]' : 'bg-[#02C076]/20 text-[#02C076]'
                                         }`}>
                                         {strategy.type}
                                     </span>
                                 </div>
-                                <p className="text-[#848E9C] text-[11px] mt-0.5 flex items-center gap-1">
-                                    Actualizada hace {new Date().getDate() - new Date(strategy.updated_at).getDate()} días
-                                </p>
+                                <div className="text-[#848E9C] text-[11px] mt-0.5 flex flex-wrap gap-2">
+                                    {strategy.type.toLowerCase() === 'grid' && strategy.params && (
+                                        <>
+                                            <span className="font-medium inline-block bg-[#1E2329] px-1.5 rounded text-[#EAECEF]">Rango: {strategy.params.lower_price} - {strategy.params.upper_price}</span>
+                                            <span className="font-medium inline-block bg-[#1E2329] px-1.5 rounded text-[#EAECEF]">Grids: {strategy.params.grid_count}</span>
+                                        </>
+                                    )}
+                                    {strategy.type.toLowerCase() === 'dca' && strategy.params && (
+                                        <>
+                                            <span className="font-medium inline-block bg-[#1E2329] px-1.5 rounded text-[#EAECEF]">Inv: {strategy.params.buy_amount} USDT</span>
+                                            <span className="font-medium inline-block bg-[#1E2329] px-1.5 rounded text-[#EAECEF]">Int: {strategy.params.interval_bars} velas</span>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                             <ChevronRight className="w-4 h-4 text-[#2B3139] group-hover:text-[#848E9C] transition-colors" />
                         </div>
