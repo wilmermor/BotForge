@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, CheckCircle2, AlertTriangle, TrendingUp } from 'lucide-react';
+import type { SimulationResult } from '../../hooks/types';
 
 export type SimulationStatus = 'idle' | 'simulating' | 'completed' | 'error';
 
@@ -8,15 +9,26 @@ interface SimulationLoadingModalProps {
     onClose: () => void;
     status: SimulationStatus;
     message?: string;
+    result?: SimulationResult | null;
+    onViewProcess?: () => void;
 }
 
 export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
     isOpen,
     onClose,
     status,
-    message
+    message,
+    result,
+    onViewProcess
 }) => {
     const [progress, setProgress] = useState(0);
+    const [showStats, setShowStats] = useState(false);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setShowStats(false);
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         let interval: any;
@@ -26,7 +38,7 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
             // Animación asintótica: avanza rápido al principio y se frena 
             // al acercarse al final, hasta que el status cambie a 'completed'
             interval = setInterval(() => {
-                setProgress(prev => {
+                setProgress((prev: number) => {
                     if (prev < 30) return prev + 2;      // Rápido hasta 30%
                     if (prev < 60) return prev + 0.5;    // Normal hasta 60%
                     if (prev < 90) return prev + 0.1;    // Lento hasta 90%
@@ -79,7 +91,7 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
     const StatusIcon = config.Icon;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
             {/* Overlay */}
             <div
                 className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
@@ -172,19 +184,65 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
                             />
                         </div>
                     )}
+
+                    {/* Results / Stats View */}
+                    {status === 'completed' && showStats && result && (
+                        <div className="w-full grid grid-cols-2 gap-4 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {[
+                                { label: 'PnL Total', value: `${result.metrics.total_pnl.toFixed(2)} USDT`, color: result.metrics.total_pnl >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]' },
+                                { label: 'Win Rate', value: `${result.metrics.win_rate_pct.toFixed(2)}%`, color: 'text-white' },
+                                { label: 'ROI', value: `${result.metrics.roi_pct.toFixed(2)}%`, color: result.metrics.roi_pct >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]' },
+                                { label: 'Trades', value: result.metrics.total_trades, color: 'text-white' },
+                                { label: 'Drawdown Max', value: `${result.metrics.max_drawdown_pct.toFixed(2)}%`, color: 'text-[#F6465D]' },
+                                { label: 'Profit Factor', value: result.metrics.profit_factor?.toFixed(2) || 'N/A', color: 'text-white' },
+                            ].map((stat, idx) => (
+                                <div key={idx} className="bg-[#2B3139]/50 p-3 rounded-xl border border-[#2B3139]">
+                                    <div className="text-[#848E9C] text-[10px] uppercase font-bold mb-1">{stat.label}</div>
+                                    <div className={`text-lg font-bold ${stat.color}`}>{stat.value}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer / Action */}
-                <div className="p-6 pt-0 border-t border-transparent flex justify-center">
-                    {status !== 'simulating' ? (
+                <div className="p-6 pt-0 border-t border-transparent flex flex-col gap-3">
+                    {status === 'completed' ? (
+                        !showStats ? (
+                            <div className="grid grid-cols-2 gap-3 w-full">
+                                <button
+                                    onClick={() => setShowStats(true)}
+                                    className="py-3 px-4 rounded-xl font-bold text-white bg-[#02C076] hover:bg-[#02C076]/90 transition-all shadow-[0_4px_15px_rgba(2,192,118,0.2)]"
+                                >
+                                    Ver Resultados
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        onClose();
+                                        onViewProcess?.();
+                                    }}
+                                    className="py-3 px-4 rounded-xl font-bold text-[#848E9C] bg-[#2B3139] hover:bg-[#3A4149] hover:text-white transition-all"
+                                >
+                                    Ver Proceso
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowStats(false)}
+                                className="w-full py-3 rounded-xl font-bold text-[#848E9C] border border-[#2B3139] hover:bg-[#2B3139] hover:text-white transition-all"
+                            >
+                                Volver
+                            </button>
+                        )
+                    ) : status === 'error' ? (
                         <button
                             onClick={onClose}
-                            className={`w-full py-3 rounded-xl font-bold text-white transition-all ${status === 'completed' ? 'bg-[#02C076] hover:bg-[#02C076]/90' : 'bg-[#2B3139] hover:bg-[#3A4149]'}`}
+                            className="w-full py-3 rounded-xl font-bold text-white bg-[#2B3139] hover:bg-[#3A4149] transition-all"
                         >
-                            {status === 'completed' ? 'Ver Resultados' : 'Cerrar'}
+                            Cerrar
                         </button>
                     ) : (
-                        <div className="text-[#848E9C] text-[10px] font-medium tracking-[0.2em] uppercase">
+                        <div className="text-center text-[#848E9C] text-[10px] font-medium tracking-[0.2em] uppercase py-2">
                             No cierre esta ventana
                         </div>
                     )}
