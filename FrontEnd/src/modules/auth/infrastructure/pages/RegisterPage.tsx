@@ -1,14 +1,93 @@
-
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FcGoogle } from 'react-icons/fc';
+import { SiBinance } from 'react-icons/si';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Form States
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle registration data collection
-        // Then navigate to plan selection
-        navigate('/checkout/plan');
+        setError(null);
+        setIsLoading(true);
+
+        try {
+            const payload = {
+                email,
+                password,
+                full_name: `${firstName} ${lastName}`.trim()
+            };
+
+            const response = await fetch("http://localhost:8000/api/v1/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token);
+                navigate('/checkout/plan');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.detail || "Error al crear la cuenta");
+            }
+        } catch (err) {
+            console.error("Register error:", err);
+            setError("Fallo de conexión con el servidor");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleOAuth = async (provider: string) => {
+        setError(null);
+        setIsLoading(true);
+
+        // Simular el tiempo de respuesta de la ventana de OAuth (Google/Binance)
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        try {
+            const payload = {
+                provider: provider.toLowerCase(),
+                token: `mock_${provider.toLowerCase()}_token_12345`,
+                email: `usuario_test@${provider.toLowerCase()}.com`,
+                full_name: `Usuario de ${provider}`
+            };
+
+            const response = await fetch("http://localhost:8000/api/v1/auth/oauth", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token);
+                navigate('/checkout/plan');
+            } else {
+                const errorData = await response.json();
+                setError(errorData.detail || `Error al autenticar con ${provider}`);
+            }
+        } catch (err) {
+            console.error(`OAuth error con ${provider}:`, err);
+            setError("Fallo de conexión con el servidor");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -36,6 +115,11 @@ const RegisterPage = () => {
                     </div>
 
                     {/* Grid de campos */}
+                    {error && (
+                        <div className="p-3 text-sm text-[#F6465D] bg-[#F6465D]/10 border border-[#F6465D]/30 rounded-md">
+                            {error}
+                        </div>
+                    )}
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         {/* Nombre */}
                         <div className="col-span-1">
@@ -46,6 +130,8 @@ const RegisterPage = () => {
                                     name="first-name"
                                     type="text"
                                     placeholder="Carlos"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
                                     required
                                     className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 />
@@ -61,6 +147,8 @@ const RegisterPage = () => {
                                     name="last-name"
                                     type="text"
                                     placeholder="Rodríguez"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
                                     required
                                     className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 />
@@ -75,7 +163,7 @@ const RegisterPage = () => {
                                     id="birthdate"
                                     name="birthdate"
                                     type="date"
-                                    required
+
                                     className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors [color-scheme:dark]"
                                 />
                             </div>
@@ -88,7 +176,8 @@ const RegisterPage = () => {
                                 <select
                                     id="nationality"
                                     name="nationality"
-                                    required
+                                    defaultValue=""
+
                                     className="block w-full appearance-none bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 >
                                     <option value="" disabled className="bg-[#1E2329] text-[#5E6873]">Selecciona un país</option>
@@ -119,7 +208,7 @@ const RegisterPage = () => {
                                     name="address"
                                     type="text"
                                     placeholder="Ciudad, calle, número..."
-                                    required
+
                                     className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 />
                             </div>
@@ -134,6 +223,8 @@ const RegisterPage = () => {
                                     name="email"
                                     type="email"
                                     placeholder="carlos.rodriguez@ejemplo.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
                                     className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 />
@@ -149,6 +240,8 @@ const RegisterPage = () => {
                                     name="password"
                                     type="password"
                                     placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     required
                                     minLength={8}
                                     className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
@@ -162,10 +255,42 @@ const RegisterPage = () => {
                     <div className="pt-4">
                         <button
                             type="submit"
-                            className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-[#1E2329] font-semibold py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-[#F0B90B] focus:ring-offset-2 focus:ring-offset-[#0B0E11] text-base"
+                            disabled={isLoading}
+                            className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-[#1E2329] font-semibold py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-[#F0B90B] focus:ring-offset-2 focus:ring-offset-[#0B0E11] text-base disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Continuar
+                            {isLoading ? 'Creando cuenta...' : 'Continuar'}
                         </button>
+                    </div>
+
+                    <div className="mt-6">
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                                <div className="w-full border-t border-[#2B3139]" />
+                            </div>
+                            <div className="relative flex justify-center text-sm font-medium leading-6">
+                                <span className="bg-[#0B0E11] px-6 text-[#848E9C]">O regístrate con</span>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 grid grid-cols-2 gap-4">
+                            <button
+                                type="button"
+                                onClick={() => handleOAuth('Google')}
+                                className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1E2329] px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-[#2B3139] hover:bg-[#2B3139]/80 transition-colors focus-visible:ring-transparent"
+                            >
+                                <FcGoogle className="h-5 w-5" />
+                                <span className="text-sm font-semibold leading-6">Google</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => handleOAuth('Binance')}
+                                className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1E2329] px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-[#2B3139] hover:bg-[#2B3139]/80 transition-colors focus-visible:ring-transparent"
+                            >
+                                <SiBinance className="h-5 w-5 text-[#F0B90B]" />
+                                <span className="text-sm font-semibold leading-6">Binance</span>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Términos y condiciones */}

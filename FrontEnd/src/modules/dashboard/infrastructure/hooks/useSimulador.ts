@@ -91,7 +91,8 @@ export const useSimulador = () => {
                     }
             };
 
-            const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDkyNTAsInR5cGUiOiJhY2Nlc3MifQ.5unVva5TUW-zym5T93MjULYti5EwlUPEvu0t6imnDbA"
+            //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDkyNTAsInR5cGUiOiJhY2Nlc3MifQ.5unVva5TUW-zym5T93MjULYti5EwlUPEvu0t6imnDbA"
+            const token = localStorage.getItem('token') || '';
             const response = await fetch("http://localhost:8000/api/v1/simulations/", {
                 method: "POST",
                 headers: {

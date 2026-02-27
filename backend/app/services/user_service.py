@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_password, verify_password
 from app.models.user import User
-from app.schemas.auth import RegisterRequest
+from app.schemas.auth import RegisterRequest, OAuthLoginRequest
 
 from app.models.plan import Plan
 
@@ -89,4 +89,31 @@ async def update_user(
         user.full_name = full_name
     await db.flush()
     await db.refresh(user)
+    return user
+
+
+async def authenticate_oauth_user(
+    db: AsyncSession, data: OAuthLoginRequest
+) -> User:
+    """
+    Authenticate or register a user via OAuth (Google, Binance).
+    Returns the user instance.
+    """
+    user = await get_user_by_email(db, data.email)
+    
+    # If the user does not exist, we automatically register them
+    if not user:
+        # Create a strong random password since they use OAuth
+        import secrets
+        import string
+        alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+        random_password = ''.join(secrets.choice(alphabet) for i in range(24))
+        
+        register_data = RegisterRequest(
+            email=data.email,
+            password=random_password,
+            full_name=data.full_name or "Usuario " + data.provider
+        )
+        user = await create_user(db, register_data)
+        
     return user

@@ -18,6 +18,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class OAuthLoginRequest(BaseModel):
+    """OAuth login request from external providers like Google or Binance."""
+    provider: str
+    token: str
+    email: EmailStr
+    full_name: str | None = None
+
+
 class TokenResponse(BaseModel):
     """JWT token pair response."""
     access_token: str
