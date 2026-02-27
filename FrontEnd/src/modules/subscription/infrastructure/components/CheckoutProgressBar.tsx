@@ -2,7 +2,7 @@
 import React from 'react';
 
 interface CheckoutProgressBarProps {
-    step: 1 | 2 | 3;
+    step: 1 | 2 | 3 | 4;
 }
 
 const CheckoutProgressBar: React.FC<CheckoutProgressBarProps> = ({ step }) => {
@@ -30,8 +30,8 @@ const CheckoutProgressBar: React.FC<CheckoutProgressBarProps> = ({ step }) => {
 
             {/* Step 3: Confirmación */}
             <div className={`flex items-center ${step >= 3 ? 'text-[#F0B90B]' : 'text-[#474D57]'} ${step === 3 ? 'font-semibold' : ''}`}>
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${step >= 3 ? 'border-2 border-[#F0B90B] text-[#F0B90B] font-bold' : 'border-2 border-[#2B3139] text-[#474D57] font-bold'} mr-2 text-xs`}>
-                    3
+                <span className={`flex items-center justify-center w-6 h-6 rounded-full ${step > 3 ? 'bg-[#F0B90B] text-black font-bold' : (step === 3 ? 'border-2 border-[#F0B90B] text-[#F0B90B] font-bold' : 'border-2 border-[#2B3139] text-[#474D57] font-bold')} mr-2 text-xs`}>
+                    {step > 3 ? '✓' : '3'}
                 </span>
                 Confirmación
             </div>

@@ -1,29 +1,42 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, RefreshCw, Smartphone, Building2, Bitcoin } from 'lucide-react';
+import { Clock, RefreshCw, Smartphone, Building2, Bitcoin, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
 const PendingPage = () => {
     const navigate = useNavigate();
-    const [isVerifying, setIsVerifying] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(true);
+    const [showToast, setShowToast] = useState(true);
+
+    useEffect(() => {
+        // Iniciar validación automática de 5 segundos
+        const timer = setTimeout(() => {
+            setIsVerifying(false);
+            setShowToast(false);
+            navigate('/checkout/success');
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [navigate]);
 
     // Mock data
     const transaction = {
         method: 'mobile', // 'mobile', 'transfer', 'crypto'
         plan: 'Plan Pro - Mensual',
-        amount: '$29.99 USD',
+        amount: '$19.99 USD',
         date: '18 Feb 2026, 21:05',
         reference: '1234-5678-9012',
     };
 
     const handleVerify = () => {
-        setIsVerifying(true);
-        // Simulate verification logic
-        setTimeout(() => {
-            setIsVerifying(false);
-            // In a real app, you would check status and redirect if needed
-        }, 2000);
+        if (!isVerifying) {
+            setIsVerifying(true);
+            setShowToast(true);
+            setTimeout(() => {
+                navigate('/checkout/success');
+            }, 5000);
+        }
     };
 
     const getMethodIcon = () => {
@@ -120,6 +133,23 @@ const PendingPage = () => {
                     Volver a intentar
                 </button>
             </div>
+
+            {/* Validation Notification - Toast Style */}
+            <AnimatePresence>
+                {showToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 50 }}
+                        className="fixed bottom-8 right-8 z-[200] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border bg-[#1E2329] border-[#F0B90B] text-white"
+                    >
+                        <div className="p-1 rounded-full bg-[#F0B90B]/20 text-[#F0B90B]">
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                        </div>
+                        <span className="font-bold text-sm">Validando...</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
         </div>
     );

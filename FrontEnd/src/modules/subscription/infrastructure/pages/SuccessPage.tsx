@@ -10,7 +10,7 @@ const SuccessPage = () => {
     const transaction = {
         method: 'mobile', // 'mobile', 'transfer', 'crypto'
         plan: 'Plan Pro - Mensual',
-        amount: '$29.99 USD',
+        amount: '$19.99 USD',
         date: '15 Feb 2026, 14:32',
         reference: '1234-5678-9012',
     };
@@ -35,7 +35,7 @@ const SuccessPage = () => {
                 </div>
             </div>
 
-            <CheckoutProgressBar step={3} />
+            <CheckoutProgressBar step={4} />
 
             <h1 className="text-4xl font-bold text-white mb-2">¡Pago recibido con éxito!</h1>
             <p className="text-[#848E9C] text-lg mb-10 max-w-md mx-auto">
@@ -88,7 +88,7 @@ const SuccessPage = () => {
             {/* Actions */}
             <div className="flex flex-col gap-4 w-full max-w-sm">
                 <button
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/dashboard?view=dashboard')}
                     className="w-full py-4 bg-[#F0B90B] text-black font-bold rounded-lg hover:bg-[#FCD535] transition-all transform hover:scale-[1.02] shadow-lg shadow-[#F0B90B]/20 flex items-center justify-center gap-2"
                 >
                     Ir a mi Dashboard <ArrowRight className="h-5 w-5" />

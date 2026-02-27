@@ -14,6 +14,7 @@ import SuccessPage from './modules/subscription/infrastructure/pages/SuccessPage
 import PendingPage from './modules/subscription/infrastructure/pages/PendingPage';
 import FailedPage from './modules/subscription/infrastructure/pages/FailedPage';
 import DashboardPage from './modules/dashboard/infrastructure/pages/DashboardPage';
+import DocumentationPage from './modules/dashboard/infrastructure/pages/DocumentationPage';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
 
       {/* Main Single-Screen Dashboard Route */}
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/documentation" element={<DocumentationPage />} />
     </Routes>
   );
 }
