@@ -76,6 +76,6 @@ async def execute_simulation(
     )
     db.add(simulation_log)
     await db.flush()
-    await db.refresh(simulation_log)
+    await db.refresh(simulation_log, ["strategy", "currency_pair"])
 
     return simulation_log

@@ -1,12 +1,14 @@
-import { Search, Eye, Trash2 } from 'lucide-react';
+import { Search, Eye, Trash2, Loader2 } from 'lucide-react';
 import type { StrategyRecord } from '../HistorialComponent';
 
 interface TransactionTableProps {
     strategies: StrategyRecord[];
     onOpenModal: (strategy: StrategyRecord) => void;
+    onOpenDeleteModal: (strategy: StrategyRecord) => void;
+    isLoading: boolean;
 }
 
-const TransactionTable = ({ strategies, onOpenModal }: TransactionTableProps) => {
+const TransactionTable = ({ strategies, onOpenModal, onOpenDeleteModal, isLoading }: TransactionTableProps) => {
     return (
         <div className="overflow-hidden">
             <div className="overflow-x-auto">
@@ -22,7 +24,17 @@ const TransactionTable = ({ strategies, onOpenModal }: TransactionTableProps) =>
                         </tr>
                     </thead>
                     <tbody>
-                        {strategies.length === 0 ? (
+                        {isLoading ? (
+                            <tr>
+                                <td colSpan={6} className="py-24 text-center">
+                                    <div className="flex flex-col items-center justify-center">
+                                        <Loader2 className="h-10 w-10 text-[#F0B90B] animate-spin mb-4" />
+                                        <h3 className="text-white text-lg font-bold mb-1">Cargando simulaciones...</h3>
+                                        <p className="text-[#848E9C] text-sm">Obteniendo tu historial desde el servidor.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : strategies.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="py-24 text-center">
                                     <div className="flex flex-col items-center justify-center">
@@ -76,7 +88,11 @@ const TransactionTable = ({ strategies, onOpenModal }: TransactionTableProps) =>
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </button>
-                                            <button className="h-9 w-9 bg-[#2B3139] hover:bg-[#F6465D] rounded-lg text-[#848E9C] hover:text-white flex items-center justify-center transition-all shadow-sm">
+                                            <button
+                                                onClick={() => onOpenDeleteModal(item)}
+                                                className="h-9 w-9 bg-[#2B3139] hover:bg-[#F6465D] rounded-lg text-[#848E9C] hover:text-white flex items-center justify-center transition-all shadow-sm"
+                                                title="Borrar simulación"
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                             </button>
                                         </div>

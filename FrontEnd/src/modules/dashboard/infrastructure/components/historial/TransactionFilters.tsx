@@ -24,8 +24,6 @@ const TransactionFilters = ({
         'Todas las Estrategias',
         'Bots de Grid',
         'Bots de DCA',
-        'Estrategias Personalizadas',
-        'Backtests Rápidos'
     ];
 
     return (

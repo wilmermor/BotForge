@@ -63,28 +63,52 @@ export const StrategyDetailModal: React.FC<StrategyDetailModalProps> = ({ isOpen
                                 <div className="text-white text-sm font-medium">{strategy.pair}</div>
                             </div>
                             <div>
-                                <div className="text-[#848E9C] text-xs mb-1">Modo margen</div>
-                                <div className="text-white text-sm font-medium">Cruzado (Cross)</div>
+                                <div className="text-[#848E9C] text-xs mb-1">Timeframe</div>
+                                <div className="text-white text-sm font-medium">{strategy.timeframe || 'N/A'}</div>
                             </div>
-                            {strategy.type === 'Grid' && (
+                            {strategy.type === 'Grid' && strategy.strategyParams && (
                                 <>
                                     <div>
                                         <div className="text-[#848E9C] text-xs mb-1">Rango de precio</div>
-                                        <div className="text-white text-sm font-medium">$42,000 - $48,000</div>
+                                        <div className="text-white text-sm font-medium">
+                                            ${strategy.strategyParams.lower_price || '0'} - ${strategy.strategyParams.upper_price || '0'}
+                                        </div>
                                     </div>
                                     <div>
                                         <div className="text-[#848E9C] text-xs mb-1">Grids</div>
-                                        <div className="text-white text-sm font-medium">12 (Aritmética)</div>
+                                        <div className="text-white text-sm font-medium">
+                                            {strategy.strategyParams.grid_count || '0'} ({strategy.strategyParams.grid_type || 'Aritmética'})
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                            {strategy.type === 'DCA' && strategy.strategyParams && (
+                                <>
+                                    <div>
+                                        <div className="text-[#848E9C] text-xs mb-1">Base Order</div>
+                                        <div className="text-white text-sm font-medium">
+                                            ${strategy.strategyParams.buy_amount || '0'}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[#848E9C] text-xs mb-1">intervals</div>
+                                        <div className="text-white text-sm font-medium">
+                                            {strategy.strategyParams.interval_bars || '0'}
+                                        </div>
                                     </div>
                                 </>
                             )}
                             <div>
-                                <div className="text-[#848E9C] text-xs mb-1">Apalancamiento</div>
-                                <div className="text-white text-sm font-medium">5X</div>
+                                <div className="text-[#848E9C] text-xs mb-1">Modo margen</div>
+                                <div className="text-white text-sm font-medium">
+                                    {strategy.strategyParams?.margin_mode || 'Cruzado (Cross)'}
+                                </div>
                             </div>
                             <div>
-                                <div className="text-[#848E9C] text-xs mb-1">Take Profit / Stop Loss</div>
-                                <div className="text-white text-sm font-medium">No configurado</div>
+                                <div className="text-[#848E9C] text-xs mb-1">Apalancamiento</div>
+                                <div className="text-white text-sm font-medium">
+                                    {strategy.strategyParams?.leverage || '1'}X
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -100,7 +124,7 @@ export const StrategyDetailModal: React.FC<StrategyDetailModalProps> = ({ isOpen
                                 <div className="text-[#848E9C] text-xs mb-1 flex items-center gap-1.5">
                                     <Wallet className="h-3 w-3" /> Profit Total
                                 </div>
-                                <div className={`text-lg font-bold ${strategy.resultValue > 0 ? 'text-[#02C076]' : 'text-[#F6465D]'}`}>
+                                <div className={`text-lg font-bold ${strategy.resultValue >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]'}`}>
                                     {strategy.result}
                                 </div>
                             </div>
@@ -108,7 +132,7 @@ export const StrategyDetailModal: React.FC<StrategyDetailModalProps> = ({ isOpen
                                 <div className="text-[#848E9C] text-xs mb-1 flex items-center gap-1.5">
                                     <TrendingUp className="h-3 w-3" /> ROI
                                 </div>
-                                <div className={`text-lg font-bold ${strategy.resultValue > 0 ? 'text-[#02C076]' : 'text-[#F6465D]'}`}>
+                                <div className={`text-lg font-bold ${strategy.resultValue >= 0 ? 'text-[#02C076]' : 'text-[#F6465D]'}`}>
                                     {strategy.returnPct}
                                 </div>
                             </div>
@@ -130,13 +154,15 @@ export const StrategyDetailModal: React.FC<StrategyDetailModalProps> = ({ isOpen
                             </div>
                             <div className="bg-[#2B3139]/30 border border-[#2B3139] rounded-xl p-4">
                                 <div className="text-[#848E9C] text-xs mb-1 text-[#F6465D]">Max Drawdown</div>
-                                <div className="text-lg font-bold text-[#F6465D]">-8.2%</div>
+                                <div className="text-lg font-bold text-[#F6465D]">
+                                    {strategy.maxDrawdown || '0.00%'}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Footer Actions Inside Content */}
-                    <div className="mt-8 flex items-center gap-3">
+                    {/*<div className="mt-8 flex items-center gap-3">
                         <button className="flex-1 bg-[#F0B90B] hover:brightness-110 text-black py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
                             <Copy className="h-4 w-4" />
                             Replicar Estrategia
@@ -144,7 +170,7 @@ export const StrategyDetailModal: React.FC<StrategyDetailModalProps> = ({ isOpen
                         <button className="bg-[#2B3139] hover:bg-[#3A4149] text-white p-3 rounded-xl transition-all" title="Exportar">
                             <Download className="h-5 w-5" />
                         </button>
-                    </div>
+                    </div>*/}
                 </div>
 
                 {/* Final Footer */}
