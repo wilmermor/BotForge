@@ -131,63 +131,8 @@ const SimulationHistory: React.FC<SimulationHistoryProps> = ({
 
 const DefaultHistoryItems = () => (
     <>
-        {/* History List Item 1 */}
-        <div className="bg-[#1E2329] border border-[#2B3139] hover:bg-[#2B3139]/50 transition-colors rounded-lg p-3 flex items-center justify-between cursor-pointer group">
-            <div className="flex items-center gap-4">
-                <div className="w-1 h-10 bg-[#02C076] rounded-full" />
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-white text-sm">BTCUSDT Perp</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded uppercase font-bold flex items-center gap-1 bg-[#02C076]/10 text-[#02C076]">
-                            <ArrowUp className="w-2.5 h-2.5" /> Compra
-                        </span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded uppercase font-bold bg-[#02C076]/20 text-[#02C076]">
-                            Profit
-                        </span>
-                    </div>
-                    <div className="text-[#848E9C] text-[11px] flex items-center gap-2">
-                        <span><Clock className="w-3 h-3 inline mr-1" /> Hoy, 14:23</span>
-                        <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                        <span>Qty: 0.45</span>
-                        <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                        <span className="text-[#F0B90B]">Fee: $1.20</span>
-                    </div>
-                </div>
-            </div>
-            <div className="text-right">
-                <div className="text-[#02C076] font-bold">+184.20 USDT</div>
-                <div className="text-[#848E9C] text-xs">Precio: 45,230.50</div>
-            </div>
-        </div>
 
-        {/* History List Item 2 */}
-        <div className="bg-[#1E2329] border border-[#2B3139] hover:bg-[#2B3139]/50 transition-colors rounded-lg p-3 flex items-center justify-between cursor-pointer group">
-            <div className="flex items-center gap-4">
-                <div className="w-1 h-10 bg-[#F6465D] rounded-full" />
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-white text-sm">SOLUSDT Perp</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded uppercase font-bold flex items-center gap-1 bg-[#F6465D]/10 text-[#F6465D]">
-                            <ArrowDown className="w-2.5 h-2.5" /> Venta
-                        </span>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded uppercase font-bold bg-[#F6465D]/20 text-[#F6465D]">
-                            Loss
-                        </span>
-                    </div>
-                    <div className="text-[#848E9C] text-[11px] flex items-center gap-2">
-                        <span><Clock className="w-3 h-3 inline mr-1" /> Ayer, 09:15</span>
-                        <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                        <span>Qty: 12.0</span>
-                        <span className="w-1 h-1 rounded-full bg-[#3A4149]"></span>
-                        <span className="text-[#F0B90B]">Fee: $0.85</span>
-                    </div>
-                </div>
-            </div>
-            <div className="text-right">
-                <div className="text-[#F6465D] font-bold">-45.80 USDT</div>
-                <div className="text-[#848E9C] text-xs">Precio: 98.40</div>
-            </div>
-        </div>
+
     </>
 );
 
