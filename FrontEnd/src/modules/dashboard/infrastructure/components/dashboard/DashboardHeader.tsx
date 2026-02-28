@@ -1,4 +1,4 @@
-import { RefreshCw, Download, Calendar } from 'lucide-react';
+import { RefreshCw, Calendar, ChevronDown } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { format, startOfWeek, startOfMonth } from 'date-fns';
@@ -61,33 +61,36 @@ const DashboardHeader = ({ isLoading, onRefresh }: DashboardHeaderProps) => {
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                 {/* Date Filter */}
-                <div className="flex items-center gap-2 bg-[#1E2329] border border-[#2B3139] p-1 rounded-lg w-full sm:w-auto">
-                    <Calendar className="w-4 h-4 text-[#848E9C] ml-2 hidden sm:block" />
-                    <select
-                        value={datePreset}
-                        onChange={(e) => setDatePreset(e.target.value)}
-                        className="bg-transparent text-white text-sm focus:outline-none p-1.5 cursor-pointer w-full sm:w-auto"
-                    >
-                        <option value="today">Hoy</option>
-                        <option value="week">Esta semana</option>
-                        <option value="month">Este mes</option>
-                        <option value="custom">Personalizado</option>
-                    </select>
+                <div className="flex flex-col sm:flex-row items-center gap-2 bg-[#1E2329] border border-[#2B3139] py-1 px-3 rounded-lg w-full sm:w-auto focus-within:border-[#F0B90B] transition-colors">
+                    <div className="flex items-center w-full sm:w-auto gap-2 relative">
+                        <Calendar className="w-4 h-4 text-[#848E9C]" />
+                        <select
+                            value={datePreset}
+                            onChange={(e) => setDatePreset(e.target.value)}
+                            className="bg-transparent text-white text-sm font-medium focus:outline-none py-1.5 pr-7 cursor-pointer w-full sm:w-auto appearance-none [&>option]:bg-[#1E2329] [&>option]:text-white"
+                        >
+                            <option value="today">Hoy</option>
+                            <option value="week">Esta semana</option>
+                            <option value="month">Este mes</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                        <ChevronDown className="w-4 h-4 text-[#848E9C] pointer-events-none absolute right-1" />
+                    </div>
 
                     {datePreset === 'custom' && (
-                        <div className="flex items-center gap-2 px-2 border-l border-[#2B3139]">
+                        <div className="flex items-center justify-between sm:justify-start gap-2 px-2 sm:border-l border-[#2B3139] w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 mt-1 sm:mt-0">
                             <input
                                 type="date"
                                 value={customRange.start}
                                 onChange={(e) => setCustomRange(p => ({ ...p, start: e.target.value }))}
-                                className="bg-transparent text-white text-xs focus:outline-none [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                                className="bg-transparent text-white text-sm focus:outline-none [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-70 hover:[&::-webkit-calendar-picker-indicator]:opacity-100 cursor-pointer"
                             />
-                            <span className="text-[#848E9C]">-</span>
+                            <span className="text-[#848E9C] text-sm font-medium">-</span>
                             <input
                                 type="date"
                                 value={customRange.end}
                                 onChange={(e) => setCustomRange(p => ({ ...p, end: e.target.value }))}
-                                className="bg-transparent text-white text-xs focus:outline-none [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                                className="bg-transparent text-white text-sm focus:outline-none [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-70 hover:[&::-webkit-calendar-picker-indicator]:opacity-100 cursor-pointer"
                             />
                         </div>
                     )}
@@ -101,10 +104,6 @@ const DashboardHeader = ({ isLoading, onRefresh }: DashboardHeaderProps) => {
                     >
                         <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                         <span className="hidden sm:inline">Actualizar</span>
-                    </button>
-                    <button className="flex items-center gap-2 bg-[#F0B90B] hover:bg-[#E0A90B] text-black px-4 py-2 rounded-lg text-sm font-bold transition-colors">
-                        <Download className="w-4 h-4" />
-                        <span className="hidden sm:inline">Reporte</span>
                     </button>
                 </div>
             </div>
