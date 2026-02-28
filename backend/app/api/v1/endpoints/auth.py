@@ -106,9 +106,10 @@ async def oauth_login(
         )
 
     # Use simulated user details from token request
-    user = await authenticate_oauth_user(db, data)
+    user, is_new_user = await authenticate_oauth_user(db, data)
     
     return TokenResponse(
         access_token=create_access_token(str(user.id)),
         refresh_token=create_refresh_token(str(user.id)),
+        is_new_user=is_new_user,
     )

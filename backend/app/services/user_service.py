@@ -142,13 +142,12 @@ async def update_password(
     await db.refresh(user)
     return user
 
-
 async def authenticate_oauth_user(
     db: AsyncSession, data: OAuthLoginRequest
-) -> User:
+) -> tuple[User, bool]:
     """
     Authenticate or register a user via OAuth (Google, Binance).
-    Returns the user instance.
+    Returns (user, is_new_user).
     """
     user = await get_user_by_email(db, data.email)
     
@@ -167,9 +166,18 @@ async def authenticate_oauth_user(
         )
         user = await create_user(db, register_data)
         
+        if data.avatar:
+            user.avatar = data.avatar
+            await db.flush()
+            
+        return user, True
+    
+    # Optionally update avatar for existing users if it changed
+    if data.avatar and user.avatar != data.avatar:
+        user.avatar = data.avatar
+        await db.flush()
         
-    return user
-
+    return user, False
 
 async def check_plan_expiration(db: AsyncSession, user: User) -> User:
     """Check if the user's active PRO plan has expired and rollback to FREE."""

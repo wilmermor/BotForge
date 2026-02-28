@@ -69,7 +69,7 @@ const ConfiguracionComponent = ({ activeTab, setActiveTab }: ConfiguracionCompon
             try {
                 const token = localStorage.getItem('token');
                 if (!token) return;
-                const response = await fetch("http://localhost:8000/api/v1/users/me", {
+                const response = await fetch("http://127.0.0.1:8000/api/v1/users/me", {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (response.ok) {
@@ -77,6 +77,7 @@ const ConfiguracionComponent = ({ activeTab, setActiveTab }: ConfiguracionCompon
                     if (data.plan_rel && data.plan_rel.name) {
                         setCurrentPlanId(data.plan_rel.name.toLowerCase() === 'pro' ? 'pro' : 'free');
                     }
+                    if (data.avatar) setAvatar(data.avatar);
                 }
             } catch (error) {
                 console.error("Error fetching user profile:", error);
@@ -94,7 +95,7 @@ const ConfiguracionComponent = ({ activeTab, setActiveTab }: ConfiguracionCompon
         } else {
             try {
                 const token = localStorage.getItem('token') || '';
-                const response = await fetch("http://localhost:8000/api/v1/users/me/plan", {
+                const response = await fetch("http://127.0.0.1:8000/api/v1/users/me/plan", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
