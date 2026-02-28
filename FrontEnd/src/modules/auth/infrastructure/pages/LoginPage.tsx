@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { SiBinance } from 'react-icons/si';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -140,17 +142,28 @@ const LoginPage = () => {
                                 </a>
                             </div>
                         </div>
-                        <div className="mt-2">
+                        <div className="mt-2 relative">
                             <input
                                 id="password"
                                 name="password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 autoComplete="current-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="block w-full rounded-md border-0 bg-[#1E2329] py-2.5 px-3 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 bg-[#1E2329] py-2.5 px-3 pr-10 text-white shadow-sm ring-1 ring-inset ring-[#2B3139] placeholder:text-[#474D57] focus:ring-2 focus:ring-inset focus:ring-[#F0B90B] sm:text-sm sm:leading-6"
                             />
+                            <button
+                                type="button"
+                                className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#848E9C] hover:text-[#F0B90B] transition-colors"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? (
+                                    <HiEyeOff className="h-5 w-5" />
+                                ) : (
+                                    <HiEye className="h-5 w-5" />
+                                )}
+                            </button>
                         </div>
                     </div>
 

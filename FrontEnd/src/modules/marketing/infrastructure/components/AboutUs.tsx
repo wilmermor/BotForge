@@ -6,32 +6,32 @@ const people = [
     {
         name: 'Wilmer Moreno',
         role: 'Backend - BD - Líder de grupo',
-        imageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+        imageUrl: '/AboutUs/imagewil.jpeg',
     },
     {
         name: 'Daniel Hernández',
         role: 'Frontend - Design',
-        imageUrl: '/AboutUs/imagedani.png'
+        imageUrl: '/AboutUs/imagedani.jpeg'
     },
     {
         name: 'Lázaro Hernández',
         role: 'Frontend - Design',
-        imageUrl: '/AboutUs/imagelaz.png', // Usamos la variable importada
+        imageUrl: '/AboutUs/imagelaz.jpeg', // Usamos la variable importada
     },
     {
         name: 'Jesús Rodríguez',
         role: 'Backend',
-        imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+        imageUrl: '/AboutUs/imagechu.jpeg',
     },
     {
         name: 'Alexander González',
         role: 'Backend - BD',
-        imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+        imageUrl: '/AboutUs/imagealex.jpeg',
     },
     {
         name: 'Alejandra Méndez',
         role: 'Design UI/UX - Levantamiento de información',
-        imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+        imageUrl: '/AboutUs/imageale.jpeg',
     },
 ];
 
