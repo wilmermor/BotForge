@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { LogoutConfirmModal } from './modals/LogoutConfirmModal';
 
 export type ViewType = 'dashboard' | 'simulador' | 'historial' | 'notificaciones' | 'configuracion' | 'soporte';
 
@@ -11,6 +13,7 @@ interface SidebarProps {
 
 const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
     const navigate = useNavigate();
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const menuItems = [
         { id: 'dashboard' as ViewType, name: 'Dashboard', icon: LayoutGrid },
@@ -25,8 +28,9 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
     ];
 
     const handleLogout = () => {
-        // Simple redirect for now
-        navigate('/login');
+        setShowLogoutModal(false);
+        localStorage.removeItem('token');
+        navigate('/');
     };
 
     return (
@@ -159,7 +163,7 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
             {/* Footer Actions */}
             <div className="py-4 px-6 border-t border-[#1E2329] shrink-0">
                 <button
-                    onClick={handleLogout}
+                    onClick={() => setShowLogoutModal(true)}
                     className={`
                         flex items-center w-full text-[#F6465D]/80 hover:text-[#F6465D] transition-colors group relative
                         ${isCollapsed ? 'justify-center px-0' : ''}
@@ -172,6 +176,12 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
                     )}
                 </button>
             </div>
+            {/* Logout Confirm Modal */}
+            <LogoutConfirmModal
+                show={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={handleLogout}
+            />
         </aside>
     );
 };
