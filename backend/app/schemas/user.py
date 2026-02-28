@@ -32,3 +32,8 @@ class UserUpdate(BaseModel):
     email: EmailStr | None = None
     country: str | None = None
     avatar: str | None = None
+
+class UserPasswordUpdate(BaseModel):
+    """User password change request."""
+    current_password: str
+    new_password: str

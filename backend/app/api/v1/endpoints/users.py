@@ -10,8 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.dependencies import get_current_user
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserResponse, UserUpdate
-from app.services.user_service import update_user, update_user_plan
+from app.schemas.user import UserResponse, UserUpdate, UserPasswordUpdate
+from app.services.user_service import update_user, update_user_plan, update_password
 from pydantic import BaseModel
 
 class UserPlanUpdate(BaseModel):
@@ -55,3 +55,21 @@ async def change_plan(
 ):
     """Change the current user's plan (pro/free)."""
     return await update_user_plan(db, current_user, data.plan_name)
+
+@router.post("/me/password")
+async def change_password(
+    data: UserPasswordUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Change the current user's password."""
+    try:
+        updated = await update_password(
+            db,
+            current_user,
+            data.current_password,
+            data.new_password
+        )
+        return {"msg": "Contraseña actualizada correctamente"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

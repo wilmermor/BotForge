@@ -28,7 +28,7 @@ interface SeguridadSectionProps {
     setShowPass: (s: ShowPass) => void;
     passRequirements: Requirement[];
     isPassValid: boolean;
-    showToast: (msg: string) => void;
+    showToast: (msg: string, type?: 'success' | 'error') => void;
 }
 
 export const SeguridadSection: React.FC<SeguridadSectionProps> = ({
@@ -42,6 +42,40 @@ export const SeguridadSection: React.FC<SeguridadSectionProps> = ({
     isPassValid,
     showToast
 }) => {
+    const [isUpdating, setIsUpdating] = React.useState(false);
+
+    const handlePasswordUpdate = async () => {
+        if (!isPassValid || !passwords.current) return;
+        setIsUpdating(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch("http://localhost:8000/api/v1/users/me/password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({
+                    current_password: passwords.current,
+                    new_password: passwords.next
+                })
+            });
+
+            if (response.ok) {
+                showToast('Contraseña actualizada con éxito', 'success');
+                setPasswords({ current: '', next: '', confirm: '' });
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                showToast(errorData.detail || 'Error al actualizar la contraseña', 'error');
+            }
+        } catch (error) {
+            console.error("Error updating password:", error);
+            showToast('Error de conexión', 'error');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -169,17 +203,14 @@ export const SeguridadSection: React.FC<SeguridadSectionProps> = ({
                     </div>
 
                     <button
-                        disabled={!isPassValid || !passwords.current}
-                        onClick={() => {
-                            showToast('Contraseña actualizada con éxito');
-                            setPasswords({ current: '', next: '', confirm: '' });
-                        }}
-                        className={`w-full md:w-auto px-8 py-3 rounded-xl font-bold transition-all ${isPassValid && passwords.current
+                        disabled={!isPassValid || !passwords.current || isUpdating}
+                        onClick={handlePasswordUpdate}
+                        className={`w-full md:w-auto px-8 py-3 rounded-xl font-bold transition-all ${isPassValid && passwords.current && !isUpdating
                             ? 'bg-[#F0B90B] text-black hover:brightness-110 shadow-lg'
                             : 'bg-[#2B3139] text-[#848E9C] cursor-not-allowed border border-[#3A4149]'
                             }`}
                     >
-                        Actualizar Contraseña
+                        {isUpdating ? 'Actualizando...' : 'Actualizar Contraseña'}
                     </button>
                 </div>
             </div>
