@@ -15,6 +15,7 @@ interface BotConfigurationPanelProps {
     setIsTpSlExpanded: (expanded: boolean) => void;
     isLoading: boolean;
     handleStartSimulation: () => void;
+    handleSaveStrategy: () => Promise<string | null>;
 
     // Grid specific
     gridType: 'ARITMETICA' | 'GEOMETRICA';
@@ -46,7 +47,7 @@ interface BotConfigurationPanelProps {
 const BotConfigurationPanel: React.FC<BotConfigurationPanelProps> = (props) => {
     const {
         strategyType, marginMode, setMarginMode, leverage, setLeverage,
-        isTpSlExpanded, setIsTpSlExpanded, isLoading, handleStartSimulation
+        isTpSlExpanded, setIsTpSlExpanded, isLoading, handleStartSimulation, handleSaveStrategy
     } = props;
 
     return (
@@ -184,7 +185,10 @@ const BotConfigurationPanel: React.FC<BotConfigurationPanelProps> = (props) => {
                     className={`w-full py-3.5 rounded-lg font-bold text-white transition-all flex items-center justify-center gap-2 ${isLoading ? 'bg-[#2B3139] cursor-not-allowed' : 'bg-[#02C076] hover:brightness-110 active:scale-[0.98]'}`}>
                     {isLoading ? 'SIMULANDO...' : 'INICIAR SIMULACIÓN'}
                 </button>
-                <button className="w-full py-2.5 rounded-lg font-medium text-white bg-[#2B3139] hover:bg-[#3A4149] transition-all flex items-center justify-center gap-2 text-sm">
+                <button
+                    onClick={() => handleSaveStrategy()}
+                    disabled={isLoading}
+                    className="w-full py-2.5 rounded-lg font-medium text-white bg-[#2B3139] hover:bg-[#3A4149] disabled:opacity-50 transition-all flex items-center justify-center gap-2 text-sm">
                     <Settings className="w-4 h-4" /> Guardar configuración
                 </button>
             </div>
