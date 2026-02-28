@@ -34,13 +34,12 @@ async def update_profile(
 ):
     """Update the current user's profile."""
     try:
+        # Only pass fields that were actually provided in the request body
+        update_data = data.model_dump(exclude_unset=True)
         updated = await update_user(
             db, 
             current_user, 
-            full_name=data.full_name,
-            email=data.email,
-            country=data.country,
-            avatar=data.avatar
+            **update_data
         )
         return updated
     except ValueError as e:
