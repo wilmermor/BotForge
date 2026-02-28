@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Camera, RefreshCw, Save, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -8,7 +8,7 @@ interface PerfilSectionProps {
     isUploading: boolean;
     fileInputRef: React.RefObject<HTMLInputElement | null>;
     handleAvatarChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    showToast: (msg: string) => void;
+    showToast: (msg: string, type?: 'success' | 'error') => void;
 }
 
 export const PerfilSection: React.FC<PerfilSectionProps> = ({
@@ -19,6 +19,61 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
     handleAvatarChange,
     showToast
 }) => {
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [country, setCountry] = useState('España');
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                const response = await fetch("http://localhost:8000/api/v1/users/me", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.full_name) setFullName(data.full_name);
+                    if (data.email) setEmail(data.email);
+                    if (data.country) setCountry(data.country);
+                    if (data.avatar) setAvatar(data.avatar);
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+            }
+        };
+        fetchProfile();
+    }, []);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch("http://localhost:8000/api/v1/users/me", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({ full_name: fullName, email, country, avatar: avatar })
+            });
+
+            if (response.ok) {
+                showToast('Perfil actualizado correctamente', 'success');
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMsg = errorData.detail || 'Error al actualizar perfil';
+                showToast(errorMsg, 'error');
+            }
+        } catch (error) {
+            console.error("Error saving profile:", error);
+            showToast('Error de conexión', 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -89,11 +144,12 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
                 <div className="p-6 border-b border-[#2B3139] flex items-center justify-between">
                     <h3 className="text-lg font-bold text-white">Información Personal</h3>
                     <button
-                        onClick={() => showToast('Perfil actualizado correctamente')}
-                        className="bg-[#F0B90B] text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:brightness-110 transition-all"
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="bg-[#F0B90B] text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <Save className="h-4 w-4" />
-                        Guardar Cambios
+                        {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        {isSaving ? 'Guardando...' : 'Guardar Cambios'}
                     </button>
                 </div>
                 <div className="p-6 space-y-6">
@@ -102,7 +158,9 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
                             <label className="text-xs font-bold text-[#848E9C] uppercase tracking-wider">Nombre Completo</label>
                             <input
                                 type="text"
-                                defaultValue="Trader Profesional"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                placeholder="Tu nombre completo"
                                 className="w-full bg-[#2B3139] border border-[#3A4149] focus:border-[#F0B90B] focus:outline-none rounded-lg px-4 py-2.5 text-white text-sm"
                             />
                         </div>
@@ -110,7 +168,9 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
                             <label className="text-xs font-bold text-[#848E9C] uppercase tracking-wider">Correo Electrónico</label>
                             <input
                                 type="email"
-                                defaultValue="trader@botforge.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="tu@email.com"
                                 className="w-full bg-[#2B3139] border border-[#3A4149] focus:border-[#F0B90B] focus:outline-none rounded-lg px-4 py-2.5 text-white text-sm"
                             />
                         </div>
@@ -119,17 +179,18 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
                     <div className="flex flex-col md:flex-row gap-6">
                         <div className="flex-1 space-y-2">
                             <label className="text-xs font-bold text-[#848E9C] uppercase tracking-wider">País / Región</label>
-                            <select className="w-full bg-[#2B3139] border border-[#3A4149] focus:border-[#F0B90B] focus:outline-none rounded-lg px-4 py-2.5 text-white text-sm appearance-none">
-                                <option>Venezuela</option>
-                                <option>España</option>
-                                <option>México</option>
-                            </select>
-                        </div>
-                        <div className="flex-1 space-y-2">
-                            <label className="text-xs font-bold text-[#848E9C] uppercase tracking-wider">Zona Horaria</label>
-                            <select className="w-full bg-[#2B3139] border border-[#3A4149] focus:border-[#F0B90B] focus:outline-none rounded-lg px-4 py-2.5 text-white text-sm appearance-none">
-                                <option>(UTC-04:00) Caracas</option>
-                                <option>(UTC+01:00) Madrid</option>
+                            <select
+                                value={country}
+                                onChange={(e) => setCountry(e.target.value)}
+                                className="w-full bg-[#2B3139] border border-[#3A4149] focus:border-[#F0B90B] focus:outline-none rounded-lg px-4 py-2.5 text-white text-sm appearance-none"
+                            >
+                                <option value="Venezuela">Venezuela</option>
+                                <option value="España">España</option>
+                                <option value="México">México</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Colombia">Colombia</option>
+                                <option value="Chile">Chile</option>
+                                <option value="Perú">Perú</option>
                             </select>
                         </div>
                     </div>

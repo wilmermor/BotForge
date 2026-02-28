@@ -62,6 +62,7 @@ async def create_user(db: AsyncSession, data: RegisterRequest) -> User:
         email=data.email,
         password_hash=hash_password(data.password),
         full_name=data.full_name,
+        country=data.country,
         plan_id=plan.id,
     )
     db.add(user)
@@ -101,10 +102,26 @@ async def update_user(
     db: AsyncSession,
     user: User,
     full_name: str | None = None,
+    email: str | None = None,
+    country: str | None = None,
+    avatar: str | None = None,
 ) -> User:
     """Update user profile fields."""
     if full_name is not None:
         user.full_name = full_name
+        
+    if email is not None and email != user.email:
+        existing = await get_user_by_email(db, email)
+        if existing and existing.id != user.id:
+            raise ValueError("Email already in use")
+        user.email = email
+        
+    if country is not None:
+        user.country = country
+        
+    if avatar is not None:
+        user.avatar = avatar
+        
     await db.flush()
     await db.refresh(user)
     return user
