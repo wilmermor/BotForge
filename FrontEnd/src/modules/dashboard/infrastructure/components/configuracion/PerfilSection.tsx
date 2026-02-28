@@ -34,10 +34,10 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.full_name) setFullName(data.full_name);
-                    if (data.email) setEmail(data.email);
-                    if (data.country) setCountry(data.country);
-                    if (data.avatar) setAvatar(data.avatar);
+                    setFullName(data.full_name || '');
+                    setEmail(data.email || '');
+                    setCountry(data.country || 'España');
+                    setAvatar(data.avatar || null);
                 }
             } catch (error) {
                 console.error("Error fetching user profile:", error);
@@ -71,6 +71,30 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
             showToast('Error de conexión', 'error');
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handleDeleteAvatar = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch("http://localhost:8000/api/v1/users/me", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({ avatar: null })
+            });
+
+            if (response.ok) {
+                setAvatar(null);
+                showToast('Foto de perfil eliminada correctamente', 'success');
+            } else {
+                showToast('Error al eliminar la foto de perfil', 'error');
+            }
+        } catch (error) {
+            console.error("Error deleting avatar:", error);
+            showToast('Error de conexión', 'error');
         }
     };
 
@@ -127,7 +151,7 @@ export const PerfilSection: React.FC<PerfilSectionProps> = ({
                             </button>
                             {avatar && (
                                 <button
-                                    onClick={() => setAvatar(null)}
+                                    onClick={handleDeleteAvatar}
                                     className="bg-red-500/10 text-red-500 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors flex items-center gap-2"
                                 >
                                     <Trash2 className="h-4 w-4" />

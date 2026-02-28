@@ -98,28 +98,31 @@ async def authenticate_user(
     return user
 
 
+# Sentinel to distinguish between "not provided" and "None" for nullable fields
+UNSET = object()
+
 async def update_user(
     db: AsyncSession,
     user: User,
-    full_name: str | None = None,
-    email: str | None = None,
-    country: str | None = None,
-    avatar: str | None = None,
+    full_name: str | None = UNSET,
+    email: str | None = UNSET,
+    country: str | None = UNSET,
+    avatar: str | None = UNSET,
 ) -> User:
     """Update user profile fields."""
-    if full_name is not None:
+    if full_name is not UNSET:
         user.full_name = full_name
         
-    if email is not None and email != user.email:
-        existing = await get_user_by_email(db, email)
+    if email is not UNSET and email != user.email:
+        existing = await get_user_by_email(db, email or "")
         if existing and existing.id != user.id:
             raise ValueError("Email already in use")
-        user.email = email
+        user.email = email or ""
         
-    if country is not None:
+    if country is not UNSET:
         user.country = country
         
-    if avatar is not None:
+    if avatar is not UNSET:
         user.avatar = avatar
         
     await db.flush()
@@ -127,12 +130,24 @@ async def update_user(
     return user
 
 
+async def update_password(
+    db: AsyncSession, user: User, current_password: str, new_password: str
+) -> User:
+    """Update user password."""
+    if not verify_password(current_password, user.password_hash):
+        raise ValueError("Contraseña actual incorrecta")
+        
+    user.password_hash = hash_password(new_password)
+    await db.flush()
+    await db.refresh(user)
+    return user
+
 async def authenticate_oauth_user(
     db: AsyncSession, data: OAuthLoginRequest
-) -> User:
+) -> tuple[User, bool]:
     """
     Authenticate or register a user via OAuth (Google, Binance).
-    Returns the user instance.
+    Returns (user, is_new_user).
     """
     user = await get_user_by_email(db, data.email)
     
@@ -151,9 +166,18 @@ async def authenticate_oauth_user(
         )
         user = await create_user(db, register_data)
         
+        if data.avatar:
+            user.avatar = data.avatar
+            await db.flush()
+            
+        return user, True
+    
+    # Optionally update avatar for existing users if it changed
+    if data.avatar and user.avatar != data.avatar:
+        user.avatar = data.avatar
+        await db.flush()
         
-    return user
-
+    return user, False
 
 async def check_plan_expiration(db: AsyncSession, user: User) -> User:
     """Check if the user's active PRO plan has expired and rollback to FREE."""
