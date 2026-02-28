@@ -88,13 +88,13 @@ const TransactionTable = ({ strategies, onOpenModal, onOpenDeleteModal, isLoadin
                                             >
                                                 <Eye className="h-4 w-4" />
                                             </button>
-                                            <button
+                                            {/*<button
                                                 onClick={() => onOpenDeleteModal(item)}
                                                 className="h-9 w-9 bg-[#2B3139] hover:bg-[#F6465D] rounded-lg text-[#848E9C] hover:text-white flex items-center justify-center transition-all shadow-sm"
                                                 title="Borrar simulación"
                                             >
                                                 <Trash2 className="h-4 w-4" />
-                                            </button>
+                                            </button>*/}
                                         </div>
                                     </td>
                                 </tr>

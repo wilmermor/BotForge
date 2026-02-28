@@ -11,6 +11,7 @@ interface SimulationLoadingModalProps {
     message?: string;
     result?: SimulationResult | null;
     onViewProcess?: () => void;
+    onUpgradePlan?: () => void;
 }
 
 export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
@@ -19,7 +20,8 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
     status,
     message,
     result,
-    onViewProcess
+    onViewProcess,
+    onUpgradePlan
 }) => {
     const [progress, setProgress] = useState(0);
     const [showStats, setShowStats] = useState(false);
@@ -260,12 +262,22 @@ export const SimulationLoadingModal: React.FC<SimulationLoadingModalProps> = ({
                             )}
                         </div>
                     ) : status === 'error' ? (
-                        <button
-                            onClick={onClose}
-                            className="w-full py-3 rounded-xl font-bold text-white bg-[#2B3139] hover:bg-[#3A4149] transition-all"
-                        >
-                            Cerrar
-                        </button>
+                        <div className="flex flex-col gap-3 w-full">
+                            {(message?.toLowerCase().includes('límite') || message?.toLowerCase().includes('pro')) && onUpgradePlan && (
+                                <button
+                                    onClick={onUpgradePlan}
+                                    className="w-full py-3.5 rounded-xl font-bold text-black bg-[#F0B90B] hover:bg-[#FCD535] transition-all shadow-[0_4px_15px_rgba(240,185,11,0.2)]"
+                                >
+                                    Mejorar a Plan PRO
+                                </button>
+                            )}
+                            <button
+                                onClick={onClose}
+                                className="w-full py-3 rounded-xl font-bold text-white bg-[#2B3139] hover:bg-[#3A4149] transition-all"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
                     ) : (
                         <div className="text-center text-[#848E9C] text-[10px] font-medium tracking-[0.2em] uppercase py-2">
                             No cierre esta ventana

@@ -1,5 +1,5 @@
 import type { PositionsTabType, StrategyType, SimulationResult } from './types';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { SimulationStatus } from '../components/modals/SimulationLoadingModal';
 
 export const useSimulador = () => {
@@ -38,8 +38,19 @@ export const useSimulador = () => {
     const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
     const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
     const [selectedStrategyId, setSelectedStrategyId] = useState<string | null>(null);
+    const isProgrammaticSet = useRef(false);
+
+    // Clear selectedStrategyId if parameters change (manual edit)
+    useEffect(() => {
+        if (isProgrammaticSet.current) {
+            isProgrammaticSet.current = false;
+            return;
+        }
+        setSelectedStrategyId(null);
+    }, [minPrice, maxPrice, grids, investment, dcaBuyAmount, dcaIntervalBars, dcaTpPct, dcaSlPct, strategyType]);
 
     const handleSelectStrategy = (strategy: any) => {
+        isProgrammaticSet.current = true;
         setIsStrategyModalOpen(false);
         setSelectedStrategyId(strategy.id);
         const type = strategy.type.toUpperCase() as StrategyType;
@@ -108,6 +119,7 @@ export const useSimulador = () => {
         try {
             setIsLoading(true);
             setSimulationError(null);
+            setSimulationStatus('simulating');
 
             const token = localStorage.getItem('token') || '';
             const payload = {
@@ -128,7 +140,7 @@ export const useSimulador = () => {
                     }
             };
 
-            const response = await fetch("http://localhost:8000/api/v1/strategies/", {
+            const response = await fetch("http://127.0.0.1:8000/api/v1/strategies/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -141,9 +153,16 @@ export const useSimulador = () => {
 
             if (response.ok) {
                 setSelectedStrategyId(data.id);
+                setSimulationStatus('idle');
                 return data.id as string;
             } else {
-                setSimulationError(data.detail || "Error al crear la estrategia en el servidor.");
+                // Check if the error is due to plan limits
+                const detail = String(data.detail || "").toLowerCase();
+                if (detail.includes("límite") || detail.includes("pro") || detail.includes("limit")) {
+                    setSimulationError("Has alcanzado el límite de estrategias para tu Plan FREE. Mejora a Plan PRO para crear y guardar nuevas configuraciones.");
+                } else {
+                    setSimulationError(data.detail || "Error al crear la estrategia en el servidor.");
+                }
                 setSimulationStatus('error');
                 return null;
             }
@@ -202,7 +221,7 @@ export const useSimulador = () => {
 
             //const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzBjMDJiZC02NDUzLTRkMzctODk2NS1hNDMzZjMzZTRkZWEiLCJleHAiOjE3NzIyMDkyNTAsInR5cGUiOiJhY2Nlc3MifQ.5unVva5TUW-zym5T93MjULYti5EwlUPEvu0t6imnDbA"
             const token = localStorage.getItem('token') || '';
-            const response = await fetch("http://localhost:8000/api/v1/simulations/", {
+            const response = await fetch("http://127.0.0.1:8000/api/v1/simulations/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -237,7 +256,12 @@ export const useSimulador = () => {
                 setPositionsTab('HISTORIAL');
             } else {
                 setSimulationStatus('error');
-                setSimulationError(data.detail || "Error en la simulación");
+                const detail = String(data.detail || "").toLowerCase();
+                if (detail.includes("límite diario") || detail.includes("espera al día siguiente")) {
+                    setSimulationError("Ya se alcanzó el límite diario de simulaciones para tu Plan FREE. Espera al día siguiente o mejora al Plan PRO para realizar backtesting ilimitado.");
+                } else {
+                    setSimulationError(data.detail || "Error en la simulación");
+                }
                 console.error("Simulation failed:", data);
             }
         } catch (error) {

@@ -29,8 +29,14 @@ async def create(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new trading strategy."""
-    strategy = await strategy_service.create_strategy(db, current_user.id, data)
-    return strategy
+    try:
+        strategy = await strategy_service.create_strategy(db, current_user.id, data)
+        return strategy
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
 @router.get("/", response_model=list[StrategyResponse])
