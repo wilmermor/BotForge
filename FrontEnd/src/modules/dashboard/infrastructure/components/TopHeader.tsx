@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Menu, Search } from 'lucide-react';
+import { Menu, Search, User } from 'lucide-react';
 import type { ViewType } from './Sidebar';
 import { NotificationsModal } from './modals/NotificationsModal';
 import { ProfileModal } from './modals/ProfileModal';
@@ -68,8 +68,8 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
 
     // Helper to get initials from full name
     const getInitials = (name?: string) => {
-        if (!name) return 'JD';
-        const parts = name.trim().split(' ');
+        if (!name) return '';
+        const parts = name.trim().split(/\s+/);
         if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
         return name.substring(0, 2).toUpperCase();
     };
@@ -138,7 +138,11 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
                         {userData?.avatar ? (
                             <img src={userData.avatar} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
-                            <span className="text-white font-medium text-xs">{getInitials(userData?.full_name)}</span>
+                            userData?.full_name ? (
+                                <span className="text-white font-medium text-xs">{getInitials(userData.full_name)}</span>
+                            ) : (
+                                <User className="w-5 h-5 text-[#848E9C]" />
+                            )
                         )}
                     </button>
 

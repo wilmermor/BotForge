@@ -47,8 +47,8 @@ export const ProfileModal = ({ isOpen, onNavigate }: ProfileModalProps) => {
 
     // Helper to get initials from full name
     const getInitials = (name?: string) => {
-        if (!name) return 'JD';
-        const parts = name.trim().split(' ');
+        if (!name) return '';
+        const parts = name.trim().split(/\s+/);
         if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
         return name.substring(0, 2).toUpperCase();
     };
@@ -64,14 +64,18 @@ export const ProfileModal = ({ isOpen, onNavigate }: ProfileModalProps) => {
                     {userData?.avatar ? (
                         <img src={userData.avatar} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                        <span className="text-white font-bold text-xl">{getInitials(userData?.full_name)}</span>
+                        userData?.full_name ? (
+                            <span className="text-white font-bold text-xl">{getInitials(userData.full_name)}</span>
+                        ) : (
+                            <User className="w-7 h-7 text-[#848E9C]" />
+                        )
                     )}
                 </div>
                 <div>
                     <div className="flex flex-col">
-                        <span className="text-[#848E9C] text-[10px] font-bold uppercase tracking-widest mb-0.5">Usuario</span>
+                        <span className="text-[#848E9C] text-[10px] font-bold uppercase tracking-widest mb-0.5">Nombre completo</span>
                         <h3 className="text-white font-bold text-[17px] leading-tight">
-                            {userData?.full_name || 'Juan Díaz'}
+                            {userData?.full_name || (userData ? 'Sin nombre' : 'Cargando...')}
                         </h3>
                     </div>
                     {/* Username removed as requested */}
