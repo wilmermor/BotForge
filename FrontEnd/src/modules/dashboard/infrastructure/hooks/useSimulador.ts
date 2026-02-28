@@ -58,7 +58,120 @@ export const useSimulador = () => {
         }
     };
 
+    const validateParams = (): string | null => {
+        if (strategyType === 'GRID') {
+            const lower = parseFloat(minPrice);
+            const upper = parseFloat(maxPrice);
+            const gridCount = parseInt(grids);
+            const invest = parseFloat(investment);
+
+            if (isNaN(lower) || isNaN(upper) || isNaN(gridCount) || isNaN(invest)) {
+                return "Validación GRID: Todos los campos (Precios, Grids, Inversión) deben ser números válidos.";
+            }
+            if (lower >= upper) {
+                return "Validación GRID: El precio inferior debe ser estrictamente menor que el superior.";
+            }
+            if (gridCount < 2) {
+                return "Validación GRID: Debe configurarse un mínimo de 2 grids.";
+            }
+            if (invest <= 0) {
+                return "Validación GRID: La inversión total debe ser mayor a 0 USDT.";
+            }
+        } else {
+            const buyAmount = parseFloat(dcaBuyAmount);
+            const interval = parseInt(dcaIntervalBars);
+
+            if (isNaN(buyAmount) || isNaN(interval)) {
+                return "Validación DCA: Monto de compra e intervalo de barras deben ser números.";
+            }
+            if (buyAmount <= 0) {
+                return "Validación DCA: El monto de cada compra debe ser mayor a 0 USDT.";
+            }
+            if (interval < 1) {
+                return "Validación DCA: El intervalo de barras debe ser mínimo 1.";
+            }
+
+            if (dcaTpPct && parseFloat(dcaTpPct) < 0) return "Validación DCA: Take Profit no puede ser negativo.";
+            if (dcaSlPct && parseFloat(dcaSlPct) < 0) return "Validación DCA: Stop Loss no puede ser negativo.";
+        }
+        return null;
+    };
+
+    const handleSaveStrategy = async (): Promise<string | null> => {
+        const errorMsg = validateParams();
+        if (errorMsg) {
+            setSimulationError(errorMsg);
+            setSimulationStatus('error');
+            return null;
+        }
+
+        try {
+            setIsLoading(true);
+            setSimulationError(null);
+
+            const token = localStorage.getItem('token') || '';
+            const payload = {
+                name: `Mi Estrategia ${strategyType} - ${new Date().toLocaleDateString()}`,
+                type: strategyType.toLowerCase(),
+                params: strategyType === 'GRID'
+                    ? {
+                        upper_price: parseFloat(maxPrice),
+                        lower_price: parseFloat(minPrice),
+                        grid_count: parseInt(grids),
+                        investment_amount: parseFloat(investment),
+                    }
+                    : {
+                        buy_amount: parseFloat(dcaBuyAmount),
+                        interval_bars: parseInt(dcaIntervalBars),
+                        take_profit_pct: dcaTpPct ? parseFloat(dcaTpPct) : null,
+                        stop_loss_pct: dcaSlPct ? parseFloat(dcaSlPct) : null,
+                    }
+            };
+
+            const response = await fetch("http://localhost:8000/api/v1/strategies/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSelectedStrategyId(data.id);
+                return data.id as string;
+            } else {
+                setSimulationError(data.detail || "Error al crear la estrategia en el servidor.");
+                setSimulationStatus('error');
+                return null;
+            }
+        } catch (error) {
+            setSimulationError("Error de conexión al guardar la configuración.");
+            setSimulationStatus('error');
+            return null;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleStartSimulation = async () => {
+        let sid = selectedStrategyId;
+
+        if (!sid) {
+            const newId = await handleSaveStrategy();
+            if (!newId) return;
+            sid = newId;
+        } else {
+            const errorMsg = validateParams();
+            if (errorMsg) {
+                setSimulationError(errorMsg);
+                setSimulationStatus('error');
+                return;
+            }
+        }
+
         try {
             setIsLoading(true);
             setSimulationStatus('simulating');
@@ -66,7 +179,7 @@ export const useSimulador = () => {
 
             // Build payload
             const payload = {
-                strategy_id: selectedStrategyId,
+                strategy_id: sid,
                 pair: "BTCUSDT",
                 timeframe: "1h",
                 date_start: new Date(startDate).toISOString(),
@@ -165,6 +278,7 @@ export const useSimulador = () => {
 
         // Actions
         handleSelectStrategy,
-        handleStartSimulation
+        handleStartSimulation,
+        handleSaveStrategy
     };
 };
