@@ -21,6 +21,8 @@ class User(Base, UUIDMixin, TimestampMixin):
     )
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    country: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    avatar: Mapped[str | None] = mapped_column(String, nullable=True)
     plan_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("plan.id"), nullable=False
     )

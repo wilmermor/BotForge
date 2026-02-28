@@ -10,6 +10,7 @@ const RegisterPage = () => {
     // Form States
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [country, setCountry] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +27,8 @@ const RegisterPage = () => {
             const payload = {
                 email,
                 password,
-                full_name: `${firstName} ${lastName}`.trim()
+                full_name: `${firstName} ${lastName}`.trim(),
+                country: country || undefined
             };
 
             const response = await fetch("http://localhost:8000/api/v1/auth/register", {
@@ -178,19 +180,19 @@ const RegisterPage = () => {
                                 <select
                                     id="nationality"
                                     name="nationality"
-                                    defaultValue=""
-
+                                    value={country}
+                                    onChange={(e) => setCountry(e.target.value)}
                                     className="block w-full appearance-none bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 >
                                     <option value="" disabled className="bg-[#1E2329] text-[#5E6873]">Selecciona un país</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">México</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">Argentina</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">Colombia</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">Chile</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">Venezuela</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">España</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">Estados Unidos</option>
-                                    <option className="bg-[#1E2329] text-[#EAECEF]">Otro</option>
+                                    <option value="México" className="bg-[#1E2329] text-[#EAECEF]">México</option>
+                                    <option value="Argentina" className="bg-[#1E2329] text-[#EAECEF]">Argentina</option>
+                                    <option value="Colombia" className="bg-[#1E2329] text-[#EAECEF]">Colombia</option>
+                                    <option value="Chile" className="bg-[#1E2329] text-[#EAECEF]">Chile</option>
+                                    <option value="Venezuela" className="bg-[#1E2329] text-[#EAECEF]">Venezuela</option>
+                                    <option value="España" className="bg-[#1E2329] text-[#EAECEF]">España</option>
+                                    <option value="Estados Unidos" className="bg-[#1E2329] text-[#EAECEF]">Estados Unidos</option>
+                                    <option value="Otro" className="bg-[#1E2329] text-[#EAECEF]">Otro</option>
                                 </select>
                                 {/* Icono de flecha personalizado */}
                                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#848E9C]">
