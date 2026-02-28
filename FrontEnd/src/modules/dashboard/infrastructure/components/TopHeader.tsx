@@ -42,6 +42,38 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const [userData, setUserData] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch("http://localhost:8000/api/v1/users/me", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setUserData(data);
+                }
+            } catch (error) {
+                console.error("Error fetching user profile in header:", error);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
+
+    // Helper to get initials from full name
+    const getInitials = (name?: string) => {
+        if (!name) return 'JD';
+        const parts = name.trim().split(' ');
+        if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        return name.substring(0, 2).toUpperCase();
+    };
+
     const toggleProfile = () => {
         setIsProfileOpen(!isProfileOpen);
         setIsNotificationsOpen(false);
@@ -101,9 +133,13 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
                 <div className="relative" ref={profileRef}>
                     <button
                         onClick={toggleProfile}
-                        className={`h-9 w-9 rounded-full bg-[#2B3139] flex items-center justify-center border transition-colors ${isProfileOpen ? 'border-[#F0B90B]' : 'border-[#3E454D] hover:border-[#F0B90B]'}`}
+                        className={`h-9 w-9 rounded-full bg-[#2B3139] flex items-center justify-center border transition-colors overflow-hidden ${isProfileOpen ? 'border-[#F0B90B]' : 'border-[#3E454D] hover:border-[#F0B90B]'}`}
                     >
-                        <span className="text-white font-medium text-xs">JD</span>
+                        {userData?.avatar ? (
+                            <img src={userData.avatar} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="text-white font-medium text-xs">{getInitials(userData?.full_name)}</span>
+                        )}
                     </button>
 
                     <ProfileModal isOpen={isProfileOpen} onNavigate={handleNavigate} />
