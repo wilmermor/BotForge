@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { SiBinance } from 'react-icons/si';
+import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -11,6 +12,7 @@ const RegisterPage = () => {
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -234,18 +236,29 @@ const RegisterPage = () => {
                         {/* Contraseña */}
                         <div className="col-span-2">
                             <label htmlFor="password" className="block text-sm font-medium text-[#EAECEF]">Contraseña</label>
-                            <div className="mt-1.5">
+                            <div className="mt-1.5 relative">
                                 <input
                                     id="password"
                                     name="password"
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                     minLength={8}
-                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
+                                    className="block w-full bg-[#1E2329] border border-[#2B3139] rounded-md px-4 py-2.5 pr-10 text-sm text-[#EAECEF] placeholder-[#5E6873] focus:border-[#F0B90B] focus:outline-none focus:ring-1 focus:ring-[#F0B90B] transition-colors"
                                 />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#848E9C] hover:text-[#F0B90B] transition-colors"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? (
+                                        <HiEyeOff className="h-5 w-5" />
+                                    ) : (
+                                        <HiEye className="h-5 w-5" />
+                                    )}
+                                </button>
                             </div>
                             <p className="mt-1.5 text-xs text-[#848E9C]">Mínimo 8 caracteres, con mayúsculas y números</p>
                         </div>
