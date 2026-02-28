@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { SiBinance } from 'react-icons/si';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
+import { auth } from '../../../../lib/firebaseConfig';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -19,7 +21,7 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch("http://localhost:8000/api/v1/auth/login", {
+            const response = await fetch("http://127.0.0.1:8000/api/v1/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -48,18 +50,38 @@ const LoginPage = () => {
         setError(null);
         setIsLoading(true);
 
-        // Simular el tiempo de respuesta de la ventana de OAuth (Google/Binance)
-        await new Promise(resolve => setTimeout(resolve, 800));
-
         try {
+            let token: string;
+            let email: string;
+            let full_name: string;
+            let avatar: string | null = null;
+
+            if (provider === 'Google') {
+                // Real Firebase Google Sign-In
+                const googleProvider = new GoogleAuthProvider();
+                const result = await signInWithPopup(auth, googleProvider);
+                token = await result.user.getIdToken();
+                email = result.user.email ?? '';
+                full_name = result.user.displayName ?? '';
+                avatar = result.user.photoURL;
+            } else {
+                // Binance: still mocked (no standard OAuth supported by Firebase)
+                await new Promise(resolve => setTimeout(resolve, 800));
+                token = `mock_binance_token_12345`;
+                email = `usuario_test@binance.com`;
+                full_name = `Usuario de Binance`;
+                avatar = null;
+            }
+
             const payload = {
                 provider: provider.toLowerCase(),
-                token: `mock_${provider.toLowerCase()}_token_12345`,
-                email: `usuario_test@${provider.toLowerCase()}.com`,
-                full_name: `Usuario de ${provider}`
+                token,
+                email,
+                full_name,
+                avatar,
             };
 
-            const response = await fetch("http://localhost:8000/api/v1/auth/oauth", {
+            const response = await fetch("http://127.0.0.1:8000/api/v1/auth/oauth", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -70,14 +92,22 @@ const LoginPage = () => {
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem('token', data.access_token);
-                navigate('/dashboard');
+                // New OAuth users go to plan selection; existing users go to dashboard
+                navigate(data.is_new_user ? '/checkout/plan' : '/dashboard');
             } else {
                 const errorData = await response.json();
                 setError(errorData.detail || `Error al autenticar con ${provider}`);
             }
-        } catch (err) {
-            console.error(`OAuth error con ${provider}:`, err);
-            setError("Fallo de conexión con el servidor");
+        } catch (err: unknown) {
+            const code = (err && typeof err === 'object' && 'code' in err) ? (err as { code: string }).code : '';
+            if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+                // silent — user closed popup voluntarily
+            } else if (code === 'auth/configuration-not-found') {
+                setError("El proveedor de Google no está habilitado en Firebase Console. Actívalo en Authentication → Sign-in method.");
+            } else {
+                console.error(`OAuth error con ${provider}:`, err);
+                setError("Fallo de conexión con el servidor");
+            }
         } finally {
             setIsLoading(false);
         }
