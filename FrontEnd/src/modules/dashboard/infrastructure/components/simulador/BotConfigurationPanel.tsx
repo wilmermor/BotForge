@@ -46,7 +46,7 @@ interface BotConfigurationPanelProps {
 
 const BotConfigurationPanel: React.FC<BotConfigurationPanelProps> = (props) => {
     const {
-        strategyType, marginMode, setMarginMode, leverage, setLeverage,
+        strategyType,
         isTpSlExpanded, setIsTpSlExpanded, isLoading, handleStartSimulation, handleSaveStrategy
     } = props;
 
@@ -110,71 +110,30 @@ const BotConfigurationPanel: React.FC<BotConfigurationPanelProps> = (props) => {
                     </div>
                 )}
 
-                {/* Liquidation Summary */}
-                <div className="bg-[#1E2329] border border-[#2B3139] p-3 rounded-lg shadow-inner">
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <div className="text-[#848E9C] mb-1">Precio de liq. est. (long):</div>
-                            <div className="text-[#F6465D] font-bold">1.850</div>
-                        </div>
-                        <div>
-                            <div className="text-[#848E9C] mb-1">Precio de liq. est. (short):</div>
-                            <div className="text-[#F6465D] font-bold">3.150</div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Margin Mode & Leverage */}
-                <div className="grid grid-cols-2 gap-3">
+                {/* TP/SL Expander — solo aplica para GRID */}
+                {strategyType === 'GRID' && (
                     <div>
-                        <label className="text-sm text-white font-medium block mb-2">Modo de margen</label>
-                        <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent hover:border-[#3A4149] transition-colors cursor-pointer group">
-                            <select
-                                value={marginMode}
-                                onChange={(e) => setMarginMode(e.target.value as any)}
-                                className="w-full bg-transparent py-2 text-white text-sm focus:outline-none appearance-none cursor-pointer"
-                            >
-                                <option value="Cruzado">Cruzado</option>
-                                <option value="Aislado">Aislado</option>
-                            </select>
-                            <ChevronDown className="w-4 h-4 text-[#848E9C] group-hover:text-white" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="text-sm text-white font-medium block mb-2">Leverage</label>
-                        <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F0B90B] transition-colors">
-                            <input
-                                type="number"
-                                value={leverage}
-                                onChange={(e) => setLeverage(e.target.value)}
-                                className="w-full bg-transparent py-2 text-white text-sm focus:outline-none text-right"
-                            />
-                            <span className="text-white text-sm font-medium ml-1">X</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* TP/SL Expander */}
-                <div>
-                    <button
-                        onClick={() => setIsTpSlExpanded(!isTpSlExpanded)}
-                        className="flex items-center justify-between w-full text-white text-sm font-medium hover:text-[#F0B90B] transition-colors"
-                    >
-                        Take Profit / Stop Loss <ChevronDown className={`w-4 h-4 transform transition-transform ${isTpSlExpanded ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isTpSlExpanded && (
-                        <div className="mt-3 grid grid-cols-2 gap-3">
-                            <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#02C076]">
-                                <span className="text-[#848E9C] text-xs w-6">TP</span>
-                                <input type="number" placeholder="%" className="w-full bg-transparent py-1.5 text-white text-sm focus:outline-none" />
+                        <button
+                            onClick={() => setIsTpSlExpanded(!isTpSlExpanded)}
+                            className="flex items-center justify-between w-full text-white text-sm font-medium hover:text-[#F0B90B] transition-colors"
+                        >
+                            Take Profit / Stop Loss <ChevronDown className={`w-4 h-4 transform transition-transform ${isTpSlExpanded ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isTpSlExpanded && (
+                            <div className="mt-3 grid grid-cols-2 gap-3">
+                                <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#02C076]">
+                                    <span className="text-[#848E9C] text-xs w-6">TP</span>
+                                    <input type="number" placeholder="%" className="w-full bg-transparent py-1.5 text-white text-sm focus:outline-none" />
+                                </div>
+                                <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F6465D]">
+                                    <span className="text-[#848E9C] text-xs w-6">SL</span>
+                                    <input type="number" placeholder="%" className="w-full bg-transparent py-1.5 text-white text-sm focus:outline-none" />
+                                </div>
                             </div>
-                            <div className="bg-[#2B3139] rounded flex items-center px-3 border border-transparent focus-within:border-[#F6465D]">
-                                <span className="text-[#848E9C] text-xs w-6">SL</span>
-                                <input type="number" placeholder="%" className="w-full bg-transparent py-1.5 text-white text-sm focus:outline-none" />
-                            </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Action Buttons */}

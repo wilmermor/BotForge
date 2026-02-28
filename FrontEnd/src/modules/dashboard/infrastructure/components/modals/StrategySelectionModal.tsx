@@ -169,13 +169,8 @@ export const StrategySelectionModal = ({ isOpen, onClose, onSelect }: StrategySe
             </div>
 
             {/* Footer */}
-            <div className="border-t border-[#2B3139] p-4 bg-[#1E2329] rounded-b-xl relative z-10">
-                <button
-                    disabled={filteredStrategies.length === 0}
-                    className="w-full bg-[#2B3139] hover:bg-[#3A4149] disabled:opacity-50 text-white text-sm font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-                >
-                    <Play className="w-4 h-4" /> Ejecutar Backtest Rápido
-                </button>
+            <div className="border-t border-[#2B3139] p-2 bg-[#1E2329] rounded-b-xl relative z-10">
+
             </div>
         </div>
     );
