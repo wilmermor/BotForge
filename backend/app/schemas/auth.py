@@ -10,6 +10,7 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=128)
     full_name: str | None = Field(None, max_length=255)
+    country: str | None = Field(None, max_length=50)
 
 
 class LoginRequest(BaseModel):

@@ -16,6 +16,8 @@ class UserResponse(BaseModel):
     id: uuid.UUID
     email: EmailStr
     full_name: str | None
+    country: str | None = None
+    avatar: str | None = None
     plan_id: uuid.UUID
     plan_rel: Plan | None = None
     is_active: bool
@@ -27,3 +29,6 @@ class UserResponse(BaseModel):
 class UserUpdate(BaseModel):
     """User profile update request."""
     full_name: str | None = None
+    email: EmailStr | None = None
+    country: str | None = None
+    avatar: str | None = None

@@ -4,7 +4,7 @@ BotForge - User Endpoints.
 Profile management for authenticated users.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies import get_current_user
@@ -33,8 +33,18 @@ async def update_profile(
     db: AsyncSession = Depends(get_db),
 ):
     """Update the current user's profile."""
-    updated = await update_user(db, current_user, full_name=data.full_name)
-    return updated
+    try:
+        updated = await update_user(
+            db, 
+            current_user, 
+            full_name=data.full_name,
+            email=data.email,
+            country=data.country,
+            avatar=data.avatar
+        )
+        return updated
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/me/plan")
