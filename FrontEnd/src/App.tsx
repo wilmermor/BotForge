@@ -15,6 +15,7 @@ import PendingPage from './modules/subscription/infrastructure/pages/PendingPage
 import FailedPage from './modules/subscription/infrastructure/pages/FailedPage';
 import DashboardPage from './modules/dashboard/infrastructure/pages/DashboardPage';
 import DocumentationPage from './modules/dashboard/infrastructure/pages/DocumentationPage';
+import ProtectedRoute from './modules/auth/infrastructure/components/ProtectedRoute';
 
 function App() {
   return (
@@ -32,20 +33,24 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
       </Route>
 
-      {/* Subscription/Checkout Routes */}
-      <Route path="/checkout" element={<CheckoutLayout />}>
-        <Route path="plan" element={<PlanSelectionPage />} />
-        <Route path="payment" element={<PaymentMethodPage />} />
-        <Route path="payment/mobile" element={<MobilePaymentPage />} />
-        <Route path="payment/transfer" element={<BankTransferPage />} />
-        <Route path="payment/crypto" element={<BinancePayPage />} />
-        <Route path="success" element={<SuccessPage />} />
-        <Route path="pending" element={<PendingPage />} />
-        <Route path="failed" element={<FailedPage />} />
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        {/* Subscription/Checkout Routes */}
+        <Route path="/checkout" element={<CheckoutLayout />}>
+          <Route path="plan" element={<PlanSelectionPage />} />
+          <Route path="payment" element={<PaymentMethodPage />} />
+          <Route path="payment/mobile" element={<MobilePaymentPage />} />
+          <Route path="payment/transfer" element={<BankTransferPage />} />
+          <Route path="payment/crypto" element={<BinancePayPage />} />
+          <Route path="success" element={<SuccessPage />} />
+          <Route path="pending" element={<PendingPage />} />
+          <Route path="failed" element={<FailedPage />} />
+        </Route>
+
+        {/* Main Single-Screen Dashboard Route */}
+        <Route path="/dashboard" element={<DashboardPage />} />
       </Route>
 
-      {/* Main Single-Screen Dashboard Route */}
-      <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/documentation" element={<DocumentationPage />} />
     </Routes>
   );
