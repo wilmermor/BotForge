@@ -127,6 +127,19 @@ async def update_user(
     return user
 
 
+async def update_password(
+    db: AsyncSession, user: User, current_password: str, new_password: str
+) -> User:
+    """Update user password."""
+    if not verify_password(current_password, user.password_hash):
+        raise ValueError("Contraseña actual incorrecta")
+        
+    user.password_hash = hash_password(new_password)
+    await db.flush()
+    await db.refresh(user)
+    return user
+
+
 async def authenticate_oauth_user(
     db: AsyncSession, data: OAuthLoginRequest
 ) -> User:
