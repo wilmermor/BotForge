@@ -1,98 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { StrategyRecord, BotType, BotStatus, StrategyCategory } from '../components/HistorialComponent';
 
-const DUMMY_STRATEGIES: StrategyRecord[] = [
-    {
-        id: 'BOT-2026-0215-001',
-        name: 'Grid Pro BTC/USDT',
-        pair: 'BTC/USDT',
-        type: 'Grid',
-        status: 'Completado',
-        executionDate: '2026-02-15 14:30',
-        duration: '3d 4h',
-        investment: '$1,000.00',
-        result: '+$234.50',
-        resultValue: 234.50,
-        returnPct: '+23.45%',
-        winRate: '68%',
-        totalTrades: 156
-    },
-    {
-        id: 'BOT-2026-0214-089',
-        name: 'DCA ETH/USDT',
-        pair: 'ETH/USDT',
-        type: 'DCA',
-        status: 'Completado',
-        executionDate: '2026-02-14 09:15',
-        duration: '1d 2h',
-        investment: '$500.00',
-        result: '-$45.30',
-        resultValue: -45.30,
-        returnPct: '-9.06%',
-        winRate: '42%',
-        totalTrades: 24
-    },
-    {
-        id: 'BOT-2026-0216-012',
-        name: 'Martingale SOL/USDT',
-        pair: 'SOL/USDT',
-        type: 'Martingale',
-        status: 'En curso',
-        executionDate: '2026-02-16 08:00',
-        duration: 'En curso',
-        investment: '$2,000.00',
-        result: '+$78.20',
-        resultValue: 78.20,
-        returnPct: '+3.91%',
-        winRate: '58%',
-        totalTrades: 42
-    },
-    {
-        id: 'BOT-2026-0213-045',
-        name: 'Grid ADA/USDT',
-        pair: 'ADA/USDT',
-        type: 'Grid',
-        status: 'Cancelado',
-        executionDate: '2026-02-13 16:20',
-        duration: 'Cancelado',
-        investment: '$300.00',
-        result: '$0.00',
-        resultValue: 0,
-        returnPct: '0%',
-        winRate: '--',
-        totalTrades: 8
-    },
-    {
-        id: 'BOT-2026-0210-022',
-        name: 'Custom RSI Scalper',
-        pair: 'BNB/USDT',
-        type: 'Personalizado',
-        status: 'Completado',
-        executionDate: '2026-02-10 11:45',
-        duration: '5d 12h',
-        investment: '$5,000.00',
-        result: '+$1,120.00',
-        resultValue: 1120.00,
-        returnPct: '+22.40%',
-        winRate: '72%',
-        totalTrades: 312
-    },
-    {
-        id: 'BOT-2026-0208-005',
-        name: 'Quick Backtest',
-        pair: 'DOT/USDT',
-        type: 'Backtest',
-        status: 'Completado',
-        executionDate: '2026-02-08 15:30',
-        duration: '2h 15m',
-        investment: '$100.00',
-        result: '+$5.40',
-        resultValue: 5.40,
-        returnPct: '+5.40%',
-        winRate: '55%',
-        totalTrades: 12
-    }
-];
+// Removed DUMMY_STRATEGIES
 
 export const useHistorial = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -101,10 +10,67 @@ export const useHistorial = () => {
     const [selectedResult, setSelectedResult] = useState('P&L');
     const [activeTab, setActiveTab] = useState<StrategyCategory>('Todas las Estrategias');
     const [currentPage, setCurrentPage] = useState(1);
+    const [strategies, setStrategies] = useState<StrategyRecord[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const itemsPerPage = 8;
 
+    useEffect(() => {
+        const fetchSimulations = async () => {
+            setIsLoading(true);
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch("http://localhost:8000/api/v1/simulations/", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const mapped: StrategyRecord[] = data.map((log: any) => {
+                        const paramsObj = log.strategy?.params || {};
+                        const typeRaw = log.strategy?.type;
+                        const tType = typeRaw === 'grid' ? 'Grid' : typeRaw === 'dca' ? 'DCA' : 'Backtest';
+
+                        const investmentAmt = paramsObj.investment_amount || paramsObj.investment;
+
+                        const pnl = log.metrics.total_pnl;
+                        const resultFormatted = pnl > 0 ? `+$${pnl.toFixed(2)}` : pnl < 0 ? `-$${Math.abs(pnl).toFixed(2)}` : `$0.00`;
+                        const roi = log.metrics.roi_pct;
+                        const roiFormatted = roi > 0 ? `+${roi.toFixed(2)}%` : `${roi.toFixed(2)}%`;
+
+                        return {
+                            id: log.id,
+                            name: log.strategy?.name || 'Simulación Bot',
+                            pair: log.pair || 'N/A',
+                            type: tType as BotType,
+                            status: 'Completado',
+                            executionDate: new Date(log.created_at).toLocaleString(),
+                            duration: log.execution_time_ms ? `${(log.execution_time_ms / 1000).toFixed(1)}s` : '--',
+                            investment: investmentAmt ? `$${Number(investmentAmt).toFixed(2)}` : '--',
+                            result: resultFormatted,
+                            resultValue: pnl,
+                            returnPct: roiFormatted,
+                            winRate: log.metrics.win_rate_pct ? `${log.metrics.win_rate_pct.toFixed(2)}%` : '0%',
+                            totalTrades: log.metrics.total_trades || 0,
+                            maxDrawdown: log.metrics.max_drawdown_pct ? `${log.metrics.max_drawdown_pct.toFixed(2)}%` : '0%',
+                            timeframe: log.timeframe,
+                            strategyParams: paramsObj
+                        };
+                    });
+                    setStrategies(mapped);
+                }
+            } catch (error) {
+                console.error("Error fetching simulations:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchSimulations();
+    }, []);
+
     const filteredStrategies = useMemo(() => {
-        return DUMMY_STRATEGIES.filter(s => {
+        return strategies.filter(s => {
             const matchesSearch = s.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 s.pair.toLowerCase().includes(searchQuery.toLowerCase());
@@ -125,7 +91,7 @@ export const useHistorial = () => {
 
             return matchesSearch && matchesTab && matchesType && matchesStatus && matchesResult;
         });
-    }, [searchQuery, selectedBotType, selectedStatus, selectedResult, activeTab]);
+    }, [strategies, searchQuery, selectedBotType, selectedStatus, selectedResult, activeTab]);
 
     const totalPages = Math.ceil(filteredStrategies.length / itemsPerPage);
     const paginatedStrategies = useMemo(() => {
@@ -140,6 +106,26 @@ export const useHistorial = () => {
         setSelectedBotType('Todas');
         setSelectedStatus('Todos');
         setSelectedResult('P&L');
+    };
+
+    const deleteSimulation = async (id: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:8000/api/v1/simulations/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            if (response.ok) {
+                setStrategies(prev => prev.filter(s => s.id !== id));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error deleting simulation:", error);
+            return false;
+        }
     };
 
     return {
@@ -158,6 +144,8 @@ export const useHistorial = () => {
         totalPages,
         filteredStrategies,
         paginatedStrategies,
-        handleResetFilters
+        handleResetFilters,
+        isLoading,
+        deleteSimulation
     };
 };

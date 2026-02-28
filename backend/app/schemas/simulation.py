@@ -63,6 +63,7 @@ class SimulationMetrics(BaseModel):
 
 
 from app.schemas.currency_pair import CurrencyPair
+from app.schemas.strategy import StrategyResponse
 
 
 class SimulationResponse(BaseModel):
@@ -71,6 +72,8 @@ class SimulationResponse(BaseModel):
     currency_pair_id: uuid.UUID | None = None
     currency_pair: CurrencyPair | None = None
     pair: str | None = None
+    strategy_id: uuid.UUID | None = None
+    strategy: StrategyResponse | None = None
     timeframe: str
     date_start: datetime
     date_end: datetime
@@ -89,6 +92,8 @@ class SimulationSummary(BaseModel):
     currency_pair_id: uuid.UUID | None = None
     currency_pair: CurrencyPair | None = None
     pair: str | None = None
+    strategy_id: uuid.UUID | None = None
+    strategy: StrategyResponse | None = None
     timeframe: str
     date_start: datetime
     date_end: datetime

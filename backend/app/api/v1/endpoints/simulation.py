@@ -8,6 +8,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.dependencies import get_current_user
@@ -61,18 +62,7 @@ async def run_simulation(
             detail=f"Simulation failed: {str(e)}",
         )
 
-    return SimulationResponse(
-        id=sim_log.id,
-        pair=sim_log.pair,
-        timeframe=sim_log.timeframe,
-        date_start=sim_log.date_start,
-        date_end=sim_log.date_end,
-        metrics=SimulationMetrics(**sim_log.metrics),
-        equity_curve=sim_log.equity_curve,
-        trades=sim_log.trades,
-        execution_time_ms=sim_log.execution_time_ms,
-        created_at=sim_log.created_at,
-    )
+    return SimulationResponse.model_validate(sim_log)
 
 
 @router.get("/", response_model=list[SimulationSummary])
@@ -85,6 +75,7 @@ async def list_simulations(
     """List the current user's simulation history."""
     result = await db.execute(
         select(SimulationLog)
+        .options(selectinload(SimulationLog.strategy))
         .where(SimulationLog.user_id == current_user.id)
         .order_by(SimulationLog.created_at.desc())
         .limit(limit)
@@ -95,7 +86,11 @@ async def list_simulations(
     return [
         SimulationSummary(
             id=log.id,
+            currency_pair_id=log.currency_pair_id,
+            currency_pair=log.currency_pair,
             pair=log.pair,
+            strategy_id=log.strategy_id,
+            strategy=log.strategy,
             timeframe=log.timeframe,
             date_start=log.date_start,
             date_end=log.date_end,
@@ -115,7 +110,9 @@ async def get_simulation(
 ):
     """Get a specific simulation result."""
     result = await db.execute(
-        select(SimulationLog).where(
+        select(SimulationLog)
+        .options(selectinload(SimulationLog.strategy))
+        .where(
             SimulationLog.id == simulation_id,
             SimulationLog.user_id == current_user.id,
         )
@@ -130,7 +127,11 @@ async def get_simulation(
 
     return SimulationResponse(
         id=log.id,
+        currency_pair_id=log.currency_pair_id,
+        currency_pair=log.currency_pair,
         pair=log.pair,
+        strategy_id=log.strategy_id,
+        strategy=log.strategy,
         timeframe=log.timeframe,
         date_start=log.date_start,
         date_end=log.date_end,
@@ -140,3 +141,29 @@ async def get_simulation(
         execution_time_ms=log.execution_time_ms,
         created_at=log.created_at,
     )
+
+
+@router.delete("/{simulation_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_simulation(
+    simulation_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a specific simulation log."""
+    result = await db.execute(
+        select(SimulationLog).where(
+            SimulationLog.id == simulation_id,
+            SimulationLog.user_id == current_user.id,
+        )
+    )
+    log = result.scalar_one_or_none()
+
+    if not log:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Simulation not found",
+        )
+
+    await db.delete(log)
+    await db.commit()
+    return None
