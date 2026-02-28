@@ -3,15 +3,38 @@ import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import CheckoutProgressBar from '../components/CheckoutProgressBar';
 
+import { useState } from 'react';
+
 const PlanSelectionPage = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSelectPlan = (plan: 'free' | 'pro') => {
+    const handleSelectPlan = async (plan: 'free' | 'pro') => {
         if (plan === 'pro') {
             navigate('/checkout/payment', { state: { amount: '$19.99 USD' } });
         } else {
-            // Logic for free plan (maybe direct dashboard access?)
-            navigate('/dashboard?view=dashboard');
+            try {
+                setIsLoading(true);
+                const token = localStorage.getItem('token') || '';
+                const response = await fetch("http://localhost:8000/api/v1/users/me/plan", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ plan_name: 'free' })
+                });
+
+                if (response.ok) {
+                    navigate('/dashboard?view=dashboard');
+                } else {
+                    console.error("Failed to change plan");
+                }
+            } catch (error) {
+                console.error("Error setting plan:", error);
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -42,9 +65,10 @@ const PlanSelectionPage = () => {
                     </ul>
                     <button
                         onClick={() => handleSelectPlan('free')}
-                        className="mt-8 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 bg-[#2B3139] text-white hover:bg-[#383F49] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2B3139]"
+                        disabled={isLoading}
+                        className="mt-8 block rounded-md py-2 px-3 text-center text-sm font-semibold leading-6 bg-[#2B3139] text-white hover:bg-[#383F49] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2B3139] disabled:opacity-50"
                     >
-                        Comenzar Gratis
+                        {isLoading ? 'Cargando...' : 'Comenzar Gratis'}
                     </button>
                 </div>
 

@@ -10,14 +10,38 @@ const PendingPage = () => {
     const [showToast, setShowToast] = useState(true);
 
     useEffect(() => {
-        // Iniciar validación automática de 5 segundos
-        const timer = setTimeout(() => {
-            setIsVerifying(false);
-            setShowToast(false);
-            navigate('/checkout/success');
+        // Iniciar validación automática y llamar al backend
+        let isMounted = true;
+
+        const checkPlan = async () => {
+            try {
+                const token = localStorage.getItem('token') || '';
+                await fetch("http://localhost:8000/api/v1/users/me/plan", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ plan_name: 'pro' })
+                });
+            } catch (error) {
+                console.error("Error upgrading to PRO:", error);
+            }
+        };
+
+        const timer = setTimeout(async () => {
+            await checkPlan();
+            if (isMounted) {
+                setIsVerifying(false);
+                setShowToast(false);
+                navigate('/checkout/success');
+            }
         }, 5000);
 
-        return () => clearTimeout(timer);
+        return () => {
+            isMounted = false;
+            clearTimeout(timer);
+        };
     }, [navigate]);
 
     // Mock data
@@ -33,7 +57,20 @@ const PendingPage = () => {
         if (!isVerifying) {
             setIsVerifying(true);
             setShowToast(true);
-            setTimeout(() => {
+            setTimeout(async () => {
+                try {
+                    const token = localStorage.getItem('token') || '';
+                    await fetch("http://localhost:8000/api/v1/users/me/plan", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                        },
+                        body: JSON.stringify({ plan_name: 'pro' })
+                    });
+                } catch (e) {
+                    console.error("Error checking plan", e);
+                }
                 navigate('/checkout/success');
             }, 5000);
         }
