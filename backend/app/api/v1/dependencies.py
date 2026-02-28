@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import decode_token
 from app.db.session import get_db
 from app.models.user import User
-from app.services.user_service import get_user_by_id
+from app.services.user_service import get_user_by_id, check_plan_expiration
 
 security_scheme = HTTPBearer()
 
@@ -64,5 +64,7 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found or inactive",
         )
+
+    user = await check_plan_expiration(db, user)
 
     return user

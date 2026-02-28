@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 interface PlanChangeModalProps {
     show: boolean;
     onClose: () => void;
+    currentPlan: any;
     selectedPlan: any;
     confirmTerms: boolean;
     setConfirmTerms: (val: boolean) => void;
@@ -14,6 +15,7 @@ interface PlanChangeModalProps {
 export const PlanChangeModal: React.FC<PlanChangeModalProps> = ({
     show,
     onClose,
+    currentPlan,
     selectedPlan,
     confirmTerms,
     setConfirmTerms,
@@ -37,8 +39,8 @@ export const PlanChangeModal: React.FC<PlanChangeModalProps> = ({
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex-1 text-center p-4 rounded-xl bg-[#0B0E11]/50 border border-[#2B3139]">
                             <div className="text-[#848E9C] text-[10px] font-bold uppercase mb-1">Plan Actual</div>
-                            <div className="text-white font-bold">Plan Pro</div>
-                            <div className="text-[#848E9C] text-xs">$19.99/mes</div>
+                            <div className="text-white font-bold">{currentPlan?.name || 'Plan Free'}</div>
+                            <div className="text-[#848E9C] text-xs">${currentPlan?.price || '0'}/mes</div>
                         </div>
                         <div className="px-4 text-[#F0B90B]"><ArrowRight /></div>
                         <div className="flex-1 text-center p-4 rounded-xl bg-[#F0B90B]/5 border border-[#F0B90B]/30">

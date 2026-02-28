@@ -30,28 +30,31 @@ export const SuscripcionSection: React.FC<SuscripcionSectionProps> = ({
             className="flex flex-col gap-8"
         >
             {/* Current Plan Header */}
-            <div className="bg-gradient-to-br from-[#1E2329] to-[#0B0E11] rounded-2xl p-8 border border-[#F0B90B]/30 relative overflow-hidden shadow-2xl">
-                <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#F0B90B] rounded-full filter blur-[100px] opacity-10"></div>
+            <div className={`bg-gradient-to-br from-[#1E2329] to-[#0B0E11] rounded-2xl p-8 border ${currentPlanId === 'pro' ? 'border-[#F0B90B] shadow-[0_0_20px_rgba(240,185,11,0.15)]' : 'border-[#2B3139]'} relative overflow-hidden shadow-2xl`}>
+                <div className={`absolute -top-12 -right-12 w-48 h-48 rounded-full filter blur-[100px] opacity-10 ${currentPlanId === 'pro' ? 'bg-[#F0B90B]' : 'bg-[#EAECEF]'}`}></div>
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex gap-5">
-                        <div className="h-14 w-14 bg-[#F0B90B] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(240,185,11,0.3)]">
-                            <Zap className="h-8 w-8 text-black fill-current" />
+                        <div className={`h-14 w-14 rounded-xl flex items-center justify-center ${currentPlanId === 'pro' ? 'bg-[#F0B90B] shadow-[0_0_20px_rgba(240,185,11,0.3)]' : 'bg-[#2B3139]'}`}>
+                            <Zap className={`h-8 w-8 ${currentPlanId === 'pro' ? 'text-black' : 'text-white'} fill-current`} />
                         </div>
                         <div>
                             <div className="flex items-center gap-3">
-                                <h3 className="text-3xl font-black text-white italic tracking-tighter">PLAN PRO</h3>
-                                <span className="bg-[#F0B90B] text-black font-bold text-[10px] px-2 py-0.5 rounded-full uppercase">Plan Actual</span>
+                                <h3 className="text-3xl font-black text-white italic tracking-tighter">PLAN {currentPlanId.toUpperCase()}</h3>
+                                <span className={`${currentPlanId === 'pro' ? 'bg-[#F0B90B] text-black' : 'bg-[#2B3139] text-white'} font-bold text-[10px] px-2 py-0.5 rounded-full uppercase`}>Plan Actual</span>
                             </div>
                             <div className="flex items-center gap-4 mt-2">
-                                <span className="text-white text-lg font-bold">$19.99<span className="text-[#848E9C] text-sm font-normal">/mes</span></span>
-                                <span className="h-1.5 w-1.5 rounded-full bg-[#848E9C]"></span>
-                                <span className="text-[#848E9C] text-sm">Próximo pago: <span className="text-white font-medium">15 Mar 2026</span></span>
+                                <span className="text-white text-lg font-bold">
+                                    {currentPlanId === 'pro' ? '$19.99' : '$0'}
+                                    <span className="text-[#848E9C] text-sm font-normal">/mes</span>
+                                </span>
+                                {currentPlanId === 'pro' && (
+                                    <>
+                                        <span className="h-1.5 w-1.5 rounded-full bg-[#848E9C]"></span>
+                                        <span className="text-[#848E9C] text-sm">Próximo pago: <span className="text-white font-medium">Auto-renovación</span></span>
+                                    </>
+                                )}
                             </div>
                         </div>
-                    </div>
-                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
-                        <div className="flex items-center gap-2 text-[#02C076] text-sm font-medium"><Check className="h-4 w-4" /> Backtesting Ilimitado</div>
-                        <div className="flex items-center gap-2 text-[#02C076] text-sm font-medium"><Check className="h-4 w-4" /> Acceso Total Estrategias</div>
                     </div>
                 </div>
             </div>

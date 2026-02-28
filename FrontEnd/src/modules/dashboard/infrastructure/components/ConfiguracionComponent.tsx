@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Shield, CreditCard } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 
@@ -56,10 +57,63 @@ const ConfiguracionComponent = ({ activeTab, setActiveTab }: ConfiguracionCompon
     };
 
     const plans: Plan[] = [
-        { id: 'starter', name: 'Plan Free', price: '0', features: ['Acceso a 1 Estrategia Pro', 'Backtesting Esencial', 'Cero Riesgo'] },
+        { id: 'free', name: 'Plan Free', price: '0', features: ['Acceso a 1 Estrategia Pro', 'Backtesting Esencial', 'Cero Riesgo'] },
         { id: 'pro', name: 'Plan Pro', price: '19.99', features: ['Backtesting Ilimitado', 'Simulaciones en Paralelo', 'Métricas Minuto a Minuto', 'Acceso Total'] },
     ];
-    const currentPlanId = 'pro';
+    const [currentPlanId, setCurrentPlanId] = useState('free');
+    const navigate = useNavigate();
+
+    // Fetch user plan on mount
+    useEffect(() => {
+        const fetchPlan = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                const response = await fetch("http://localhost:8000/api/v1/users/me", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.plan_rel && data.plan_rel.name) {
+                        setCurrentPlanId(data.plan_rel.name.toLowerCase() === 'pro' ? 'pro' : 'free');
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+            }
+        };
+        fetchPlan();
+    }, []);
+
+    const handlePlanChange = async () => {
+        if (!selectedPlan) return;
+
+        setShowPlanModal(false);
+        if (selectedPlan.id === 'pro') {
+            navigate('/checkout/payment', { state: { amount: '$19.99 USD' } });
+        } else {
+            try {
+                const token = localStorage.getItem('token') || '';
+                const response = await fetch("http://localhost:8000/api/v1/users/me/plan", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ plan_name: 'free' })
+                });
+
+                if (response.ok) {
+                    setCurrentPlanId('free');
+                    showToast(`Suscripción cambiada a Plan Free`);
+                } else {
+                    showToast("Error al cambiar de plan", "error");
+                }
+            } catch (error) {
+                showToast("Error de conexión", "error");
+            }
+        }
+    };
 
     const passRequirements = [
         { label: 'Mínimo 8 caracteres', met: passwords.next.length >= 8 },
@@ -189,14 +243,12 @@ const ConfiguracionComponent = ({ activeTab, setActiveTab }: ConfiguracionCompon
 
             <PlanChangeModal
                 show={showPlanModal}
+                currentPlan={plans.find(p => p.id === currentPlanId)}
                 selectedPlan={selectedPlan}
                 confirmTerms={confirmTerms}
                 setConfirmTerms={setConfirmTerms}
                 onClose={() => setShowPlanModal(false)}
-                onConfirm={() => {
-                    setShowPlanModal(false);
-                    showToast(`Suscripción cambiada a ${selectedPlan?.name}`);
-                }}
+                onConfirm={handlePlanChange}
             />
 
             <Toast show={toast.show} msg={toast.msg} type={toast.type} />
