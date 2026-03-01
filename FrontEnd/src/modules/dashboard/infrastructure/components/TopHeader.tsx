@@ -106,15 +106,7 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
 
             {/* Right side: Search, Notifications, Avatar */}
             <div className="flex items-center gap-4">
-                {/* Search Bar */}
-                <div className="hidden md:flex relative">
-                    <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#848E9C]" />
-                    <input
-                        type="text"
-                        placeholder="Buscar..."
-                        className="bg-[#1E2329] border border-[#2B3139] text-white text-[13px] rounded-lg pl-9 pr-4 py-2 w-[220px] focus:outline-none focus:border-[#F0B90B] transition-colors placeholder:text-[#848E9C]"
-                    />
-                </div>
+
 
                 {/* Notifications Dropdown Container */}
                 <div className="relative" ref={notificationsRef}>
