@@ -1,7 +1,6 @@
 import DashboardHeader from './dashboard/DashboardHeader';
 import StatsGrid from './dashboard/StatsGrid';
 import ChartsSection from './dashboard/ChartsSection';
-import ActivePositionsTable from './dashboard/ActivePositionsTable';
 
 const DashboardComponent = () => {
     return (
@@ -10,7 +9,6 @@ const DashboardComponent = () => {
 
             <StatsGrid />
             <ChartsSection />
-            <ActivePositionsTable />
 
             {/* Custom Animations Inline */}
             <style>{`
