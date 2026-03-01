@@ -1,4 +1,5 @@
 import TradingViewWidget from './TradingViewWidget';
+import { useNavigate } from 'react-router-dom';
 import { useSimulador } from '../hooks/useSimulador';
 import SimuladorHeader from './simulador/SimuladorHeader';
 import SimuladorControls from './simulador/SimuladorControls';
@@ -10,6 +11,7 @@ import { ErrorBoundary } from '../../../../shared/components/ErrorBoundary';
 
 const SimuladorComponent = () => {
     const simulador = useSimulador();
+    const navigate = useNavigate();
 
     return (
         <>
@@ -26,6 +28,7 @@ const SimuladorComponent = () => {
                     }
                     simulador.setPositionsTab('HISTORIAL');
                 }}
+                onUpgradePlan={() => navigate('/checkout/plan')}
             />
 
             <div className="w-full h-full flex flex-col space-y-6">

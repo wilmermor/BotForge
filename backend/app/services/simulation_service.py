@@ -7,14 +7,18 @@ and persists results.
 
 import time
 import uuid
-from datetime import datetime
-
+from datetime import datetime, timezone
+from sqlalchemy import select, func, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.simulation_engine import run_simulation
 from app.models.simulation_log import SimulationLog
+from app.models.user import User
+from app.models.strategy import Strategy
+from app.models.plan import Plan
 from app.schemas.simulation import SimulationMetrics, SimulationRequest
 from app.services.market_service import fetch_ohlcv
+from sqlalchemy.orm import selectinload
 
 
 async def execute_simulation(
@@ -32,6 +36,45 @@ async def execute_simulation(
     4. Return the simulation log.
     """
     start_time = time.perf_counter()
+
+    # Get user with plan
+    user_result = await db.execute(
+        select(User).options(selectinload(User.plan_rel)).where(User.id == user_id)
+    )
+    user = user_result.scalar_one_or_none()
+
+    # Check for plan limits if no strategy_id is provided
+    if not request.strategy_id:
+        if user and user.plan_rel:
+            # Check strategy count
+            count_result = await db.execute(
+                select(Strategy).where(Strategy.user_id == user_id)
+            )
+            strategy_count = len(count_result.scalars().all())
+            
+            if strategy_count >= user.plan_rel.max_strategies:
+                raise ValueError(f"Has alcanzado el límite de estrategias ({user.plan_rel.max_strategies}) para tu plan {user.plan_rel.name.upper()}. No puedes realizar simulaciones con nuevas configuraciones sin antes mejorar a Plan PRO.")
+    
+    # Check for daily simulation limit
+    if user and user.plan_rel:
+        # Use timezone-aware comparison if needed, or just compare dates
+        today_start = datetime.now(timezone.utc).date()
+        
+        sim_count_result = await db.execute(
+            select(func.count(SimulationLog.id)).where(
+                SimulationLog.user_id == user_id,
+                cast(SimulationLog.created_at, Date) == today_start
+            )
+        )
+        simulations_today = sim_count_result.scalar_one() or 0
+
+        # Apply specific limit of 3 for free users as requested
+        max_daily = user.plan_rel.max_simulations_per_day
+        if user.plan_rel.name.lower() == "free":
+            max_daily = 3
+            
+        if simulations_today >= max_daily:
+            raise ValueError("Ya se alcanzó el límite diario de simulaciones. Espera al día siguiente o mejora al plan PRO.")
 
     # 1. Fetch market data
     ohlcv_data = await fetch_ohlcv(

@@ -9,6 +9,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sqlalchemy.orm import selectinload
 from app.models.strategy import Strategy
 from app.schemas.strategy import StrategyCreate, StrategyUpdate
 
@@ -16,7 +17,33 @@ from app.schemas.strategy import StrategyCreate, StrategyUpdate
 async def create_strategy(
     db: AsyncSession, user_id: uuid.UUID, data: StrategyCreate
 ) -> Strategy:
-    """Create a new strategy for the given user."""
+    """Create a new strategy for the given user with plan limit validation."""
+    from app.models.user import User
+    from app.models.plan import Plan
+
+    # Check user plan and strategy count
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.plan_rel))
+        .where(User.id == user_id)
+    )
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        raise ValueError("User not found")
+
+    # Get current strategy count
+    count_result = await db.execute(
+        select(Strategy).where(Strategy.user_id == user_id)
+    )
+    strategy_count = len(count_result.scalars().all())
+
+    # Check limit based on plan
+    if user.plan_rel and strategy_count >= user.plan_rel.max_strategies:
+        raise ValueError(f"Has alcanzado el límite de estrategias ({user.plan_rel.max_strategies}) para tu plan {user.plan_rel.name.upper()}. Mejora a Plan PRO para crear más.")
+    elif not user.plan_rel and strategy_count >= 1: # Fallback for users without plan_rel object loaded or set
+        raise ValueError("Has alcanzado el límite de estrategias para tu plan. Mejora a Plan PRO para crear más.")
+
     strategy = Strategy(
         user_id=user_id,
         name=data.name,
