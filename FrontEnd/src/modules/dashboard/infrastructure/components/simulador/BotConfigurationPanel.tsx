@@ -77,7 +77,7 @@ const BotConfigurationPanel: React.FC<BotConfigurationPanelProps> = (props) => {
                     />
                 )}
 
-                {strategyType === 'GRID' && (
+                {/*{strategyType === 'GRID' && (
                     <div>
                         <div className="flex justify-between items-center mb-2">
                             <label className="text-sm text-white font-medium">Cant/orden <span className="text-[#848E9C] font-normal">(opcional)</span></label>
@@ -108,11 +108,11 @@ const BotConfigurationPanel: React.FC<BotConfigurationPanelProps> = (props) => {
                             <span className="text-[#848E9C] text-sm font-medium">BTC</span>
                         </div>
                     </div>
-                )}
+                )}*/}
 
 
                 {/* TP/SL Expander — solo aplica para GRID */}
-                {strategyType === 'GRID' && (
+                {/*{strategyType === 'GRID' && (
                     <div>
                         <button
                             onClick={() => setIsTpSlExpanded(!isTpSlExpanded)}
@@ -133,7 +133,7 @@ const BotConfigurationPanel: React.FC<BotConfigurationPanelProps> = (props) => {
                             </div>
                         )}
                     </div>
-                )}
+                )}*/}
             </div>
 
             {/* Action Buttons */}
