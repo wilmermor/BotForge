@@ -218,7 +218,7 @@ const LoginPage = () => {
                         </div>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-2 gap-4">
+                    <div className="mt-6 grid grid-cols-1 gap-4">
                         <button
                             type="button"
                             onClick={() => handleOAuth('Google')}
@@ -228,14 +228,14 @@ const LoginPage = () => {
                             <span className="text-sm font-semibold leading-6">Google</span>
                         </button>
 
-                        <button
+                        {/*<button
                             type="button"
                             onClick={() => handleOAuth('Binance')}
                             className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1E2329] px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-[#2B3139] hover:bg-[#2B3139]/80 transition-colors focus-visible:ring-transparent"
                         >
                             <SiBinance className="h-5 w-5 text-[#F0B90B]" />
                             <span className="text-sm font-semibold leading-6">Binance</span>
-                        </button>
+                        </button>*/}
                     </div>
                 </div>
 
