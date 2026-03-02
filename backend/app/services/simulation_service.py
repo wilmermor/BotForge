@@ -45,7 +45,7 @@ async def execute_simulation(
 
     # Check for plan limits if no strategy_id is provided
     if not request.strategy_id:
-        if user and user.plan_rel:
+        if user and user.plan_rel.name.lower() == "free":
             # Check strategy count
             count_result = await db.execute(
                 select(Strategy).where(Strategy.user_id == user_id)
@@ -56,7 +56,7 @@ async def execute_simulation(
                 raise ValueError(f"Has alcanzado el límite de estrategias ({user.plan_rel.max_strategies}) para tu plan {user.plan_rel.name.upper()}. No puedes realizar simulaciones con nuevas configuraciones sin antes mejorar a Plan PRO.")
     
     # Check for daily simulation limit
-    if user and user.plan_rel:
+    if user and user.plan_rel.name.lower() == "free":
         # Use timezone-aware comparison if needed, or just compare dates
         today_start = datetime.now(timezone.utc).date()
         

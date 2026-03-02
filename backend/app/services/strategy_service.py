@@ -39,7 +39,7 @@ async def create_strategy(
     strategy_count = len(count_result.scalars().all())
 
     # Check limit based on plan
-    if user.plan_rel and strategy_count >= user.plan_rel.max_strategies:
+    if user.plan_rel.name.lower() == "free" and strategy_count >= user.plan_rel.max_strategies:
         raise ValueError(f"Has alcanzado el límite de estrategias ({user.plan_rel.max_strategies}) para tu plan {user.plan_rel.name.upper()}. Mejora a Plan PRO para crear más.")
     elif not user.plan_rel and strategy_count >= 1: # Fallback for users without plan_rel object loaded or set
         raise ValueError("Has alcanzado el límite de estrategias para tu plan. Mejora a Plan PRO para crear más.")
