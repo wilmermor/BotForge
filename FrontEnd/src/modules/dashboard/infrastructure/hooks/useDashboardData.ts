@@ -78,7 +78,7 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
   let negativeCount = 0;
   let neutralCount = 0;
 
-  const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   const activityCounts = [0, 0, 0, 0, 0, 0, 0];
 
   data.forEach((sim: any) => {
@@ -100,8 +100,10 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
     if (sim.created_at) {
       const date = new Date(sim.created_at);
       const dayOfWeek = date.getDay(); // 0 is Sunday, 6 is Saturday
-      if (dayOfWeek >= 0 && dayOfWeek < 7) {
-        activityCounts[dayOfWeek]++;
+      // Map 0 (Sun) to 6, and 1-6 (Mon-Sat) to 0-5
+      const adjustedIndex = (dayOfWeek + 6) % 7;
+      if (adjustedIndex >= 0 && adjustedIndex < 7) {
+        activityCounts[adjustedIndex]++;
       }
     }
   });

@@ -108,7 +108,7 @@ def profit_factor(pnls: np.ndarray) -> float | None:
     gross_loss = abs(np.sum(pnls[pnls < 0]))
 
     if gross_loss == 0:
-        return None if gross_profit == 0 else float("inf")
+        return None
 
     return float(gross_profit / gross_loss)
 
@@ -138,13 +138,13 @@ def sortino_ratio(
     rf_per_period = risk_free_rate / periods_per_year
 
     if len(downside_returns) == 0:
-        return float('inf') if (mean_return - rf_per_period) > 0 else None
+        return None
 
     # Calculate standard deviation of downside returns
     downside_std = np.std(downside_returns, ddof=1) if len(downside_returns) > 1 else np.std(downside_returns)
 
     if downside_std == 0:
-        return float('inf') if (mean_return - rf_per_period) > 0 else None
+        return None
 
     sortino = (mean_return - rf_per_period) / downside_std
     return float(sortino * np.sqrt(periods_per_year))
@@ -163,6 +163,6 @@ def calmar_ratio(roi_pct: float, max_drawdown_pct: float) -> float | None:
         Calmar Ratio, or None if no drawdown.
     """
     if max_drawdown_pct == 0:
-        return float('inf') if roi_pct > 0 else None
+        return None
 
     return float(roi_pct / abs(max_drawdown_pct))
