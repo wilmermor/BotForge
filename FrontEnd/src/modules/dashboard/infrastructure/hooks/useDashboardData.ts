@@ -46,6 +46,7 @@ export interface DashboardData {
   stats: DashboardStats[];
   charts: DashboardCharts;
   positions: DashboardPositions;
+  simulations: any[]; // Added to allow frontend filtering
 }
 
 const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardData> => {
@@ -55,7 +56,9 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
   }
 
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  const url = `${baseUrl}/api/v1/simulations/`; // Fetch simulations instead of /dashboard/stats
+  // Use params for limit if provided, otherwise default to 100
+  const limit = params.get('limit') || '100';
+  const url = `${baseUrl}/api/v1/simulations/?limit=${limit}`; 
 
   const response = await fetch(url, {
     headers: {
@@ -78,7 +81,7 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
   let negativeCount = 0;
   let neutralCount = 0;
 
-  const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   const activityCounts = [0, 0, 0, 0, 0, 0, 0];
 
   data.forEach((sim: any) => {
@@ -100,8 +103,10 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
     if (sim.created_at) {
       const date = new Date(sim.created_at);
       const dayOfWeek = date.getDay(); // 0 is Sunday, 6 is Saturday
-      if (dayOfWeek >= 0 && dayOfWeek < 7) {
-        activityCounts[dayOfWeek]++;
+      // Map 0 (Sun) to 6, and 1-6 (Mon-Sat) to 0-5
+      const adjustedIndex = (dayOfWeek + 6) % 7;
+      if (adjustedIndex >= 0 && adjustedIndex < 7) {
+        activityCounts[adjustedIndex]++;
       }
     }
   });
@@ -115,7 +120,7 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
       id: "totalStrategies",
       label: "Estrategias Totales",
       value: totalStrategies,
-      change: 0, // Optionally calculate change against a timeframe
+      change: 0,
       changeType: "neutral",
       icon: "activity"
     },
@@ -145,7 +150,6 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
     }
   ];
 
-  // Configure pie chart data
   const assetsLabels = [];
   const assetsData = [];
 
@@ -162,7 +166,6 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
     assetsData.push(neutralCount);
   }
 
-  // If no data, show empty state
   if (assetsLabels.length === 0) {
     assetsLabels.push("Sin datos");
     assetsData.push(1);
@@ -175,9 +178,11 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
       pnl: { labels: [], data: [] },
       assets: { labels: assetsLabels, data: assetsData }
     },
-    positions: { data: [], total: 0, page: 1, limit: 10 }
+    positions: { data: [], total: 0, page: 1, limit: 10 },
+    simulations: data
   };
 };
+
 
 export const useDashboardData = () => {
   const [searchParams] = useSearchParams();
