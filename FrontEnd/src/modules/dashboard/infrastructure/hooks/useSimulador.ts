@@ -105,6 +105,17 @@ export const useSimulador = () => {
             if (dcaTpPct && parseFloat(dcaTpPct) < 0) return "Validación DCA: Take Profit no puede ser negativo.";
             if (dcaSlPct && parseFloat(dcaSlPct) < 0) return "Validación DCA: Stop Loss no puede ser negativo.";
         }
+
+        // Date Range Validation
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return "Validación: Las fechas seleccionadas no son válidas.";
+        }
+        if (start >= end) {
+            return "Validación: La fecha de inicio debe ser anterior a la fecha de fin.";
+        }
+
         return null;
     };
 
@@ -259,6 +270,8 @@ export const useSimulador = () => {
                 const detail = String(data.detail || "").toLowerCase();
                 if (detail.includes("límite diario") || detail.includes("espera al día siguiente")) {
                     setSimulationError("Ya se alcanzó el límite diario de simulaciones para tu Plan FREE. Espera al día siguiente o mejora al Plan PRO para realizar backtesting ilimitado.");
+                } else if (detail.includes("no market data") || detail.includes("no existen datos")) {
+                    setSimulationError("No se encontraron datos de mercado para el rango de fechas seleccionado. Intenta con un rango más reciente o diferente.");
                 } else {
                     setSimulationError(data.detail || "Error en la simulación");
                 }

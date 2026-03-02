@@ -76,6 +76,10 @@ async def execute_simulation(
         if simulations_today >= max_daily:
             raise ValueError("Ya se alcanzó el límite diario de simulaciones. Espera al día siguiente o mejora al plan PRO.")
 
+    # Validate date range
+    if request.date_start >= request.date_end:
+        raise ValueError("El rango de fechas no es válido. La fecha de inicio debe ser anterior a la fecha de fin.")
+
     # 1. Fetch market data
     ohlcv_data = await fetch_ohlcv(
         pair=request.pair,
