@@ -22,8 +22,8 @@ class Plan(Base, UUIDMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
     price_monthly: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False, default=0.00)
-    max_strategies: Mapped[int] = mapped_column(nullable=False, default=1)
-    max_simulations_per_day: Mapped[int] = mapped_column(nullable=False, default=5)
+    max_strategies: Mapped[int] = mapped_column(nullable=False, default=10000)
+    max_simulations_per_day: Mapped[int] = mapped_column(nullable=False, default=1000)
     features: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
 
     # Relationships
