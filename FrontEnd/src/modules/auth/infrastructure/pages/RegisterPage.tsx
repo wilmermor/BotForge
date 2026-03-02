@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { SiBinance } from 'react-icons/si';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 const RegisterPage = () => {
@@ -56,18 +55,20 @@ const RegisterPage = () => {
     };
 
     const handleOAuth = async (provider: string) => {
+        if (provider !== 'Google') return;
+
         setError(null);
         setIsLoading(true);
 
-        // Simular el tiempo de respuesta de la ventana de OAuth (Google/Binance)
-        await new Promise(resolve => setTimeout(resolve, 800));
-
         try {
+            // Simulated response time
+            await new Promise(resolve => setTimeout(resolve, 800));
+
             const payload = {
                 provider: provider.toLowerCase(),
-                token: `mock_${provider.toLowerCase()}_token_12345`,
-                email: `usuario_test@${provider.toLowerCase()}.com`,
-                full_name: `Usuario de ${provider}`
+                token: `mock_google_token_12345`,
+                email: `usuario_test@google.com`,
+                full_name: `Usuario de Google`
             };
 
             const response = await fetch("http://localhost:8000/api/v1/auth/oauth", {
@@ -84,10 +85,10 @@ const RegisterPage = () => {
                 navigate('/checkout/plan');
             } else {
                 const errorData = await response.json();
-                setError(errorData.detail || `Error al autenticar con ${provider}`);
+                setError(errorData.detail || `Error al autenticar con Google`);
             }
         } catch (err) {
-            console.error(`OAuth error con ${provider}:`, err);
+            console.error(`OAuth error con Google:`, err);
             setError("Fallo de conexión con el servidor");
         } finally {
             setIsLoading(false);
@@ -287,7 +288,7 @@ const RegisterPage = () => {
                             </div>
                         </div>
 
-                        <div className="mt-6 grid grid-cols-1 gap-4">
+                        <div className="mt-6 flex justify-center">
                             <button
                                 type="button"
                                 onClick={() => handleOAuth('Google')}
@@ -296,15 +297,6 @@ const RegisterPage = () => {
                                 <FcGoogle className="h-5 w-5" />
                                 <span className="text-sm font-semibold leading-6">Google</span>
                             </button>
-
-                            {/*<button
-                                type="button"
-                                onClick={() => handleOAuth('Binance')}
-                                className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1E2329] px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-[#2B3139] hover:bg-[#2B3139]/80 transition-colors focus-visible:ring-transparent"
-                            >
-                                <SiBinance className="h-5 w-5 text-[#F0B90B]" />
-                                <span className="text-sm font-semibold leading-6">Binance</span>
-                            </button>*/}
                         </div>
                     </div>
 

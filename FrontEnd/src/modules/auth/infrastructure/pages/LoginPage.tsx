@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { SiBinance } from 'react-icons/si';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 import { auth } from '../../../../lib/firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -47,6 +46,8 @@ const LoginPage = () => {
     };
 
     const handleOAuth = async (provider: string) => {
+        if (provider !== 'Google') return;
+
         setError(null);
         setIsLoading(true);
 
@@ -56,22 +57,13 @@ const LoginPage = () => {
             let full_name: string;
             let avatar: string | null = null;
 
-            if (provider === 'Google') {
-                // Real Firebase Google Sign-In
-                const googleProvider = new GoogleAuthProvider();
-                const result = await signInWithPopup(auth, googleProvider);
-                token = await result.user.getIdToken();
-                email = result.user.email ?? '';
-                full_name = result.user.displayName ?? '';
-                avatar = result.user.photoURL;
-            } else {
-                // Binance: still mocked (no standard OAuth supported by Firebase)
-                await new Promise(resolve => setTimeout(resolve, 800));
-                token = `mock_binance_token_12345`;
-                email = `usuario_test@binance.com`;
-                full_name = `Usuario de Binance`;
-                avatar = null;
-            }
+            // Real Firebase Google Sign-In
+            const googleProvider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, googleProvider);
+            token = await result.user.getIdToken();
+            email = result.user.email ?? '';
+            full_name = result.user.displayName ?? '';
+            avatar = result.user.photoURL;
 
             const payload = {
                 provider: provider.toLowerCase(),
@@ -218,7 +210,7 @@ const LoginPage = () => {
                         </div>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-1 gap-4">
+                    <div className="mt-6 flex justify-center">
                         <button
                             type="button"
                             onClick={() => handleOAuth('Google')}
@@ -227,22 +219,13 @@ const LoginPage = () => {
                             <FcGoogle className="h-5 w-5" />
                             <span className="text-sm font-semibold leading-6">Google</span>
                         </button>
-
-                        {/*<button
-                            type="button"
-                            onClick={() => handleOAuth('Binance')}
-                            className="flex w-full items-center justify-center gap-3 rounded-md bg-[#1E2329] px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-[#2B3139] hover:bg-[#2B3139]/80 transition-colors focus-visible:ring-transparent"
-                        >
-                            <SiBinance className="h-5 w-5 text-[#F0B90B]" />
-                            <span className="text-sm font-semibold leading-6">Binance</span>
-                        </button>*/}
                     </div>
                 </div>
 
                 <p className="mt-10 text-center text-sm text-[#848E9C]">
                     No tienes cuenta?{' '}
                     <Link to="/register" className="font-semibold leading-6 text-[#F0B90B] hover:text-[#d9a50a]">
-                        Regitrate aqui
+                        Regístrate aquí
                     </Link>
                 </p>
             </div>
