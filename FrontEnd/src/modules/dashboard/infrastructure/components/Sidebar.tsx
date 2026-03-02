@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut, Bell } from 'lucide-react';
+import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutConfirmModal } from './modals/LogoutConfirmModal';
 
@@ -19,7 +19,7 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
         { id: 'dashboard' as ViewType, name: 'Dashboard', icon: LayoutGrid },
         { id: 'simulador' as ViewType, name: 'Simulador', icon: BarChart2 },
         { id: 'historial' as ViewType, name: 'Historial', icon: Clock },
-        { id: 'notificaciones' as ViewType, name: 'Notificaciones', icon: Bell, badge: 3 },
+        //{ id: 'notificaciones' as ViewType, name: 'Notificaciones', icon: Bell},
     ];
 
     const systemItems = [
@@ -89,11 +89,6 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
                                             <span className={`text-[14px] font-medium whitespace-nowrap overflow-hidden ${isActive ? 'text-[#F0B90B]' : 'text-white'}`}>
                                                 {item.name}
                                             </span>
-                                            {item.badge && (
-                                                <span className="bg-[#F0B90B] text-black text-xs font-bold px-1.5 py-0.5 rounded-full mr-2">
-                                                    {item.badge}
-                                                </span>
-                                            )}
                                         </div>
                                     )}
 
@@ -101,11 +96,6 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
                                     {isCollapsed && (
                                         <div className="absolute left-16 hidden group-hover:block bg-[#1E2329] text-white px-3 py-1.5 rounded-md text-xs whitespace-nowrap z-50 border border-[#2B3139] shadow-lg flex items-center gap-2">
                                             {item.name}
-                                            {item.badge && (
-                                                <span className="bg-[#F0B90B] text-black text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                                                    {item.badge}
-                                                </span>
-                                            )}
                                         </div>
                                     )}
                                 </button>
