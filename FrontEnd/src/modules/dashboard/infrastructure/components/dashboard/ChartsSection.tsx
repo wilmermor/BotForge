@@ -9,7 +9,7 @@ const getColorForLabel = (label: string) => {
     return '#848E9C';
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-[#1E2329] border border-[#2B3139] p-3 rounded-lg shadow-lg">
@@ -38,6 +38,12 @@ const ChartsSection = memo(() => {
         name: label,
         value: assetsRaw.data[index]
     }));
+
+    // Calculate dominant ROI percentage for central display
+    const totalAssets = assetsData.reduce((acc, curr) => acc + curr.value, 0);
+    const dominantAsset = assetsData.length > 0 ? assetsData.reduce((prev, current) => (prev.value > current.value) ? prev : current) : null;
+    const dominantPercentage = totalAssets > 0 && dominantAsset ? Math.round((dominantAsset.value / totalAssets) * 100) : 0;
+    const dominantColor = dominantAsset ? getColorForLabel(dominantAsset.name) : '#848E9C';
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -90,6 +96,16 @@ const ChartsSection = memo(() => {
                                     ))}
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />
+                                <text
+                                    x="50%"
+                                    y="50%"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    className="text-2xl font-bold"
+                                    fill={dominantColor}
+                                >
+                                    {dominantPercentage}%
+                                </text>
                             </PieChart>
                         </ResponsiveContainer>
                         <div className="grid grid-cols-2 gap-4 w-full mt-2">
