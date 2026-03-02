@@ -46,6 +46,7 @@ export interface DashboardData {
   stats: DashboardStats[];
   charts: DashboardCharts;
   positions: DashboardPositions;
+  simulations: any[]; // Added to allow frontend filtering
 }
 
 const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardData> => {
@@ -55,7 +56,9 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
   }
 
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  const url = `${baseUrl}/api/v1/simulations/`; // Fetch simulations instead of /dashboard/stats
+  // Use params for limit if provided, otherwise default to 100
+  const limit = params.get('limit') || '100';
+  const url = `${baseUrl}/api/v1/simulations/?limit=${limit}`; 
 
   const response = await fetch(url, {
     headers: {
@@ -117,7 +120,7 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
       id: "totalStrategies",
       label: "Estrategias Totales",
       value: totalStrategies,
-      change: 0, // Optionally calculate change against a timeframe
+      change: 0,
       changeType: "neutral",
       icon: "activity"
     },
@@ -147,7 +150,6 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
     }
   ];
 
-  // Configure pie chart data
   const assetsLabels = [];
   const assetsData = [];
 
@@ -164,7 +166,6 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
     assetsData.push(neutralCount);
   }
 
-  // If no data, show empty state
   if (assetsLabels.length === 0) {
     assetsLabels.push("Sin datos");
     assetsData.push(1);
@@ -177,9 +178,11 @@ const fetchDashboardData = async (params: URLSearchParams): Promise<DashboardDat
       pnl: { labels: [], data: [] },
       assets: { labels: assetsLabels, data: assetsData }
     },
-    positions: { data: [], total: 0, page: 1, limit: 10 }
+    positions: { data: [], total: 0, page: 1, limit: 10 },
+    simulations: data
   };
 };
+
 
 export const useDashboardData = () => {
   const [searchParams] = useSearchParams();
