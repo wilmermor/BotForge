@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut } from 'lucide-react';
+import { BarChart2, LayoutGrid, Clock, Settings, MessageSquare, LogOut, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutConfirmModal } from './modals/LogoutConfirmModal';
 
@@ -19,7 +19,7 @@ const Sidebar = ({ isCollapsed, activeView, setActiveView }: SidebarProps) => {
         { id: 'dashboard' as ViewType, name: 'Dashboard', icon: LayoutGrid },
         { id: 'simulador' as ViewType, name: 'Simulador', icon: BarChart2 },
         { id: 'historial' as ViewType, name: 'Historial', icon: Clock },
-        //{ id: 'notificaciones' as ViewType, name: 'Notificaciones', icon: Bell},
+        { id: 'notificaciones' as ViewType, name: 'Notificaciones', icon: Bell},
     ];
 
     const systemItems = [

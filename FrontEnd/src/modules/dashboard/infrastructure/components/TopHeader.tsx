@@ -109,7 +109,7 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
 
 
                 {/* Notifications Dropdown Container */}
-                {/*<div className="relative" ref={notificationsRef}>
+                <div className="relative" ref={notificationsRef}>
                     <button
                         onClick={toggleNotifications}
                         className={`relative p-2 transition-colors rounded-full flex items-center justify-center h-10 w-10 ${isNotificationsOpen ? 'text-white bg-[#1E2329]' : 'text-[#848E9C] hover:text-white'}`}
@@ -119,7 +119,6 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
                     </button>
                     <NotificationsModal isOpen={isNotificationsOpen} onNavigate={onNavigate} />
                 </div>
-            */}
                 {/* Profile Dropdown Container */}
                 <div className="relative" ref={profileRef}>
                     <button
