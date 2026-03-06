@@ -21,6 +21,7 @@ from app.schemas.simulation import (
     SimulationResponse,
     SimulationSummary,
 )
+from app.models.notification import Notification, NotificationType, NotificationCategory
 from app.services.simulation_service import execute_simulation
 
 router = APIRouter(prefix="/simulations", tags=["Simulations"])
@@ -61,6 +62,16 @@ async def run_simulation(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Simulation failed: {str(e)}",
         )
+
+    # Add simulation completed notification
+    sim_notification = Notification(
+        user_id=current_user.id,
+        type=NotificationType.success,
+        category=NotificationCategory.Sistema,
+        title="Simulación completada",
+        message="Simulación completada exitosamente",
+    )
+    db.add(sim_notification)
 
     return SimulationResponse.model_validate(sim_log)
 

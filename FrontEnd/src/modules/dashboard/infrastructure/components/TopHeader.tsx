@@ -3,6 +3,7 @@ import { Menu, User } from 'lucide-react';
 import type { ViewType } from './Sidebar';
 import { NotificationsModal } from './modals/NotificationsModal';
 import { ProfileModal } from './modals/ProfileModal';
+import { useNotifications } from '../hooks/useNotifications';
 
 interface TopHeaderProps {
     isCollapsed: boolean;
@@ -23,6 +24,8 @@ const viewTitles: Record<ViewType, string> = {
 const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopHeaderProps) => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+    const { notifications, unreadCount, handleMarkAllRead } = useNotifications();
 
     const profileRef = useRef<HTMLDivElement>(null);
     const notificationsRef = useRef<HTMLDivElement>(null);
@@ -115,9 +118,17 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
                         className={`relative p-2 transition-colors rounded-full flex items-center justify-center h-10 w-10 ${isNotificationsOpen ? 'text-white bg-[#1E2329]' : 'text-[#848E9C] hover:text-white'}`}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
-                        <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-[#F0B90B] ring-2 ring-[#0B0E11]"></span>
+                        {unreadCount > 0 && (
+                            <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-[#F0B90B] ring-2 ring-[#0B0E11]"></span>
+                        )}
                     </button>
-                    <NotificationsModal isOpen={isNotificationsOpen} onNavigate={onNavigate} />
+                    <NotificationsModal
+                        isOpen={isNotificationsOpen}
+                        onNavigate={onNavigate}
+                        notifications={notifications}
+                        unreadCount={unreadCount}
+                        onMarkAllRead={handleMarkAllRead}
+                    />
                 </div>
                 {/* Profile Dropdown Container */}
                 <div className="relative" ref={profileRef}>
@@ -145,3 +156,4 @@ const TopHeader = ({ isCollapsed, setIsCollapsed, activeView, onNavigate }: TopH
 };
 
 export default TopHeader;
+
