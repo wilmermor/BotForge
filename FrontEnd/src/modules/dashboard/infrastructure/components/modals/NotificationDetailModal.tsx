@@ -59,7 +59,14 @@ export const NotificationDetailModal = ({ isOpen, onClose, notification }: Notif
                                 {notification.title}
                             </h2>
                             <p className="text-[#848E9C] text-sm">
-                                15 de febrero, 2026 - 14:32:45
+                                {new Date(notification.createdAt).toLocaleString('es-ES', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                })}
                             </p>
                         </div>
                     </div>
@@ -188,13 +195,7 @@ export const NotificationDetailModal = ({ isOpen, onClose, notification }: Notif
                         </>
                     )}
 
-                    {/* Meta data */}
-                    <div className="h-px bg-[#2B3139] w-full my-4" />
-                    <div className="flex justify-between items-center text-xs text-[#848E9C] font-mono">
-                        <span>ID: {notification.id}</span>
-                        <span className="font-sans">Fuente: Sistema Core</span>
-                    </div>
-
+                    {/* Meta data removed */}
                 </div>
 
                 {/* Footer Controls */}

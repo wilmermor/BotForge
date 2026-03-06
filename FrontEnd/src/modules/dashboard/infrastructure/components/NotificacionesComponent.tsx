@@ -34,6 +34,7 @@ export interface NotificationItem {
     title: string;
     message: string;
     time: string;
+    createdAt: string;
     isRead: boolean;
     tags: Array<{ label: string; color: 'gray' | 'green' | 'red' | 'yellow' | 'blue' }>;
     details?: NotificationDetails;

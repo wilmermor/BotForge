@@ -43,6 +43,7 @@ class NotificationResponse(BaseModel):
     title: str
     message: str
     time: str
+    createdAt: datetime
     isRead: bool
     tags: list[TagItem] = []
     details: NotificationDetails | None = None
@@ -81,6 +82,7 @@ class NotificationResponse(BaseModel):
             title=obj.title,
             message=obj.message,
             time=time_str,
+            createdAt=obj.created_at,
             isRead=obj.is_read,
             tags=[TagItem(**t) for t in tags_data],
             details=NotificationDetails(**details_data) if details_data else None,

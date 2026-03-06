@@ -20,6 +20,7 @@ from app.schemas.auth import (
     OAuthLoginRequest,
     TokenResponse,
 )
+from app.models.notification import Notification, NotificationType, NotificationCategory
 from app.services.user_service import authenticate_user, create_user, authenticate_oauth_user
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -46,6 +47,17 @@ async def register(
             status_code=status_code,
             detail=str(e),
         )
+
+    # Add welcome notification
+    username = user.full_name or user.email.split('@')[0]
+    welcome_notification = Notification(
+        user_id=user.id,
+        type=NotificationType.info,
+        category=NotificationCategory.Sistema,
+        title="Bienvenida",
+        message=f"Bienvenido a BotForge {username}",
+    )
+    db.add(welcome_notification)
 
     return TokenResponse(
         access_token=create_access_token(str(user.id)),
@@ -107,6 +119,17 @@ async def oauth_login(
 
     # Use simulated user details from token request
     user, is_new_user = await authenticate_oauth_user(db, data)
+    
+    if is_new_user:
+        username = user.full_name or user.email.split('@')[0]
+        welcome_notification = Notification(
+            user_id=user.id,
+            type=NotificationType.info,
+            category=NotificationCategory.Sistema,
+            title="Bienvenida",
+            message=f"Bienvenido a BotForge {username}",
+        )
+        db.add(welcome_notification)
     
     return TokenResponse(
         access_token=create_access_token(str(user.id)),
