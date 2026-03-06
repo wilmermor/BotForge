@@ -1,118 +1,50 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import type { NotificationItem, NotificationCategory } from '../components/NotificacionesComponent';
 
-const DUMMY_NOTIFICATIONS: NotificationItem[] = [
-    {
-        id: 'NOT-2026-001',
-        type: 'success',
-        category: 'Bots',
-        title: 'Bot Grid ETH/USDT finalizado con éxito',
-        message: 'El bot completó 234 operaciones en 3 días. Profit total: +$567.80 (8.3%)',
-        time: 'Hace 15 minutos',
-        isRead: false,
-        tags: [
-            { label: 'Bot: Grid Pro', color: 'gray' },
-            { label: 'ETH/USDT', color: 'gray' },
-            { label: '+8.3%', color: 'green' }
-        ],
-        details: {
-            statusDisplay: 'Completado con éxito',
-            duration: '3 días 4 horas',
-            trades: 234,
-            profitStr: '+$567.80 (8.3%)',
-            winRate: '68.4%',
-            buyCount: 112,
-            sellCount: 122,
-            maxWin: '+$45.20',
-            maxLoss: '-$12.30'
+const BASE_URL = 'http://localhost:8000';
+
+const fetchNotifications = async (): Promise<NotificationItem[]> => {
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+
+    const response = await fetch(`${BASE_URL}/api/v1/notifications/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
         }
-    },
-    {
-        id: 'NOT-2026-002',
-        type: 'urgent',
-        category: 'Posiciones',
-        title: '⚠️ Posición liquidada - AXS/USDT',
-        message: 'La posición long de 18,200 USDT fue liquidada en $2.815. Pérdida: -$1,245.00',
-        time: 'Hace 32 minutos',
-        isRead: false,
-        tags: [
-            { label: 'Posición', color: 'gray' },
-            { label: 'AXS/USDT', color: 'gray' },
-            { label: '-$1,245', color: 'red' }
-        ],
-        details: {
-            statusDisplay: 'Liquidado',
-            pair: 'AXS/USDT',
-            direction: 'Long',
-            entry: '$2.627',
-            exit: '$2.815',
-            qty: '18,200 USDT',
-            pnl: '-$1,245.00',
-            margin: '$1,300.0',
-            leverage: '14X'
-        }
-    },
-    {
-        id: 'NOT-2026-003',
-        type: 'alert',
-        category: 'Sistema',
-        title: 'Límite de backtests mensual alcanzado 80%',
-        message: 'Has usado 80 de 100 backtests disponibles. Actualiza tu plan para más capacidad.',
-        time: 'Hace 2 horas',
-        isRead: false,
-        tags: [
-            { label: 'Sistema', color: 'gray' },
-            { label: 'Límite', color: 'gray' },
-            { label: '80%', color: 'yellow' }
-        ]
-    },
-    {
-        id: 'NOT-2026-004',
-        type: 'info',
-        category: 'Bots',
-        title: 'Bot SOL/USDT en pausa por volatilidad',
-        message: 'El bot ha detenido operaciones debido a alta volatilidad. Se reanudará automáticamente en 30 min.',
-        time: 'Hace 5 horas',
-        isRead: true,
-        tags: [
-            { label: 'Bot', color: 'gray' },
-            { label: 'SOL/USDT', color: 'gray' },
-            { label: 'Pausado', color: 'blue' }
-        ]
-    },
-    {
-        id: 'NOT-2026-005',
-        type: 'promo',
-        category: 'Sistema',
-        title: '✨ Nueva función: Trading con apalancamiento',
-        message: 'Ahora puedes configurar bots con hasta 20X de apalancamiento en pares seleccionados.',
-        time: 'Ayer',
-        isRead: false,
-        tags: [
-            { label: 'Novedad', color: 'yellow' },
-            { label: 'Actualización', color: 'yellow' }
-        ]
-    },
-    {
-        id: 'NOT-2026-006',
-        type: 'error',
-        category: 'Bots',
-        title: 'Error en ejecución de bot BTC/USDT',
-        message: 'El bot experimentó un error de conexión con el exchange. Revisa tu configuración de API.',
-        time: 'Ayer',
-        isRead: true,
-        tags: [
-            { label: 'Error', color: 'red' },
-            { label: 'API', color: 'gray' },
-            { label: 'Crítico', color: 'red' }
-        ]
+        throw new Error('Error al cargar notificaciones');
     }
-];
+
+    return response.json();
+};
 
 export const useNotifications = () => {
-    const [notifications, setNotifications] = useState<NotificationItem[]>(DUMMY_NOTIFICATIONS);
+    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     const [activeTab, setActiveTab] = useState<NotificationCategory>('Todas');
     const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const loadNotifications = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const data = await fetchNotifications();
+            setNotifications(data);
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadNotifications();
+    }, [loadNotifications]);
 
     const unreadCount = useMemo(() => notifications.filter(n => !n.isRead).length, [notifications]);
 
@@ -127,12 +59,37 @@ export const useNotifications = () => {
         });
     }, [notifications, activeTab]);
 
-    const handleMarkAllRead = () => {
-        setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+    const handleMarkAllRead = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        try {
+            await fetch(`${BASE_URL}/api/v1/notifications/read-all`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        } catch {
+            // Silent fail, optimistic update already done
+        }
     };
 
-    const handleMarkRead = (id: string) => {
-        setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true } : n));
+    const handleMarkRead = async (id: string) => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        // Optimistic update
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+
+        try {
+            await fetch(`${BASE_URL}/api/v1/notifications/${id}/read`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        } catch {
+            // Revert on error
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: false } : n));
+        }
     };
 
     return {
@@ -144,6 +101,9 @@ export const useNotifications = () => {
         selectedNotification,
         setSelectedNotification,
         handleMarkAllRead,
-        handleMarkRead
+        handleMarkRead,
+        isLoading,
+        error,
+        reload: loadNotifications,
     };
 };

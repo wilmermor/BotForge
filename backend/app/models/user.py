@@ -41,3 +41,6 @@ class User(Base, UUIDMixin, TimestampMixin):
     subscriptions = relationship(
         "Subscription", back_populates="user", cascade="all, delete-orphan"
     )
+    notifications = relationship(
+        "Notification", back_populates="user", cascade="all, delete-orphan"
+    )

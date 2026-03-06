@@ -7,6 +7,7 @@ from app.models.currency_pair import CurrencyPair
 from app.models.strategy import Strategy
 from app.models.simulation_log import SimulationLog
 from app.models.subscription import Subscription
+from app.models.notification import Notification
 
 __all__ = [
     "Base",
@@ -16,4 +17,5 @@ __all__ = [
     "Strategy",
     "SimulationLog",
     "Subscription",
+    "Notification",
 ]
